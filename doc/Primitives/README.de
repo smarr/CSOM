@@ -1,0 +1,242 @@
+HOWTO write CSOM Primitives.
+CSOM-Primitiven schreiben.
+====================
+====================
+
+Autor: Tobias Pape
+
+Erstellen des Quelltextes
+================
+
+Der Quelltext kann auf 2 Weisen erstellt werden. Die dafür
+einzuhaltenden Konventionen werden im Folgenden beschrieben.
+
+Generieren mit "som2lib.rb"
+----------------------
+
+Im 'src/primitives'-Verzeichnis befindet sich  ein Ruby-Script, welches aus
+einem _annotiertem SOM-Script_ eine entsprechende C-Datei generiert.
+
+Dafür muss das Script folgende Annotations-Regeln einhalten:
+
+* Klassenname°
+
+  Der Klassenname entspricht, wie in der VM, dem Dateinamen ohne
+  Erweiterung. 
+
+* Header-Dateien einfügen:				@include
+
+  som2lib.rb sucht nach Vorkommen von @include und setzt das
+  folgende Wort (Regex /[\w\.<>\/\\']+/) in eine include-Direktive der
+  Form
+
+  #include wort_mit_.h
+
+  um. Zu beachten ist die rein textuelle Suche. Daher sollte darauf in
+  CSOM-Texten verzichtet werden, bzw in CSOM-Kommentaren auftreten. \'
+  wird durch " ersetzt, welches seinerseits nicht benutzt werden darf.
+
+* Initialisierung:						@init{  }@
+
+  Das Auftreten von @init erzeugt eine C-Funktion in der Form
+
+  void __SOMKLASSENNAME_init(void)
+
+  und setzt einen Aufruf in die Initialisierungs-Funktion der
+  generierten Datei.
+  
+  Der Abschnitt beginnt mit @init{ ; die _folgenden_ Zeilen werden in
+  die generierte Funktion kopiert bis zum Auftreten von }@ auf einer
+  Zeile. Für Anführungszeichen gelten die Regeln im Folgenden.
+
+  Die Initialisierungs-Funktion sollte nur in CSOM-Kommentaren
+  definiert werden.
+
+* Finalisierung:						@fini{  }@
+
+  Das Auftreten von @fini erzeugt eine C-Funktion in der Form
+
+  void __SOMKLASSENNAME_fini(void)
+
+  und setzt einen Aufruf in die Finalisierungs-Funktion der
+  generierten Datei.
+  
+  Der Abschnitt beginnt mit @fini{ ; die _folgenden_ Zeilen werden in
+  die generierte Funktion kopiert bis zum Auftreten von }@ auf einer
+  Zeile. Für Anführungszeichen gelten die Regeln im Folgenden.
+
+  Die Finalisierungs-Funktion sollte nur in CSOM-Kommentaren
+  definiert werden.
+
+* Primitiven:							@" "@
+
+  Primitiven werden in CSOM in der Form
+  
+  methode: mit argumenten: ja = primitive
+
+  geschrieben. Hier wird diese Definition erweitert:
+
+  methode: mit argumenten: ja = primitive "@
+
+  Alles folgende bis @" wird in die generierte Funktion kopiert.
+  Diese hat die Form(en)
+
+  void _SOMKLASSENNAME_ohneargument(p_object object, p_frame frame)
+  void _SOMKLASSENNAME_einargument_(p_object object, p_frame frame)
+  void SOMKLASSENNAME_zwei_argumente_(p_object object, p_frame frame)
+  (usw.)
+
+  Es sollten POP Aufrufe Folgen:
+
+  pVMObject self = (pVMObject)SEND(frame, pop);
+
+  Wird nichts zurückgegeben, sollte _self_ wieder gepusht werden.
+  ACHTUNG: jedes Verwenden von " ist durch \' zu ersetzten und \' zu
+  vermeiden.
+
+  Entsprechend src/vmobjects/VMSymbol.c:_VMSymbol_get_plain_string,
+  sollten folgende Ersetzungen an Funktionsnamen durchgeführt werden.
+  ~   ->	tilde
+  &   ->	and
+  |   ->	bar
+  *   ->	star
+  /   ->	slash
+  @   ->	at
+  +   ->	plus
+  -   ->	minus
+  =   ->	equal     
+  >   ->	greaterthan
+  <   ->	lessthan
+  ,   ->	comma
+  %   ->	percent
+  \   ->	backslash
+  :   ->	_
+
+* Deklarationen werden automatisch aus den gegebenen
+  Funktionen erzeugt.
+
+
+"von Hand" erstellen: %Primitive.c%
+--------------------------
+
+%Primitive.c% (aus src/primitives) ist eigentlich die Vorlage
+ für som2lib.rb und damit der  generierte Code vergleichbar. Es sind
+ verschiedene Abschnitte  ausgewiesen, die zu ersetzen, gegebenenfalls
+ zu löschen sind: 
+
+* ____SOM_INCLUDES____
+
+  Hier sind die include-Direktiven aufzulisten, falls benötigt.
+  Die Restriktion auf Anführungszeichen " gilt nicht.
+
+* ____SOM_DECLS____
+
+  Hier sind die Funktionen zu Deklarieren, die in ____PRIMITIVES____
+  definiert werden. Funktionen dürfen nur dem Prototyp
+
+  void funcname(pVMObject, pVMFrame); 
+ 
+ entsprechen.
+
+* ____SOM_FUNCTION_INIT____
+
+  An dieser Stelle sind Initialisierungs-Aufrufe zu platzieren, die
+  beim Laden der Primitiven-Bibliothek aufgerufen werden sollen.
+
+* ____SOM_FUNCTION_FINI____
+
+  An dieser Stelle sind Finalisierungs-Aufrufe zu platzieren, die
+  beim Entladen der Primitiven-Bibliothek aufgerufen werden sollen.
+
+*  ____SOM_CLASS_NAMES____
+   
+   Die unterstützte(n) Klasse(n)° ist hier in der Form 
+
+   "Klassenname",
+  
+  wie in der CSOM referenziert, anzugeben.
+  ACHTUNG: das nachfolgende Komma ist intensional.
+
+* ____PRIMITIVES____
+
+  Alle deklarierten Funktionen sollten hier Implementiert werden.
+  Das betrifft gemappte Funktionen, die
+  Initialisierungs-Funktion(en)°, sowie Hilfsfunktionen.
+  
+  Das Namensformat für Primitiven entspricht dem Standard-CSOM-Format.
+  Das heißt, Instanz-Primtiven haben die Form
+  
+    _Klassenname_methodenName(pVMObject, pVMFrame)
+    
+  und Klassen-Primitiven dementsprechend
+
+    Klassenname_methodenName(pVMObject, pVMFrame).
+    
+  Es gelten die Ersetzungsregeln (siehe oben) entsprechend 
+  src/vmobjects/VMSymbol.c:_VMSymbol_get_plain_string. 
+
+==
+°Mehrere Klassen in einer C-Datei:
+som2lib.rb unterstützt genau eine Klasse pro generierter Datei;
+bei manuellem erstellen ist darauf zu achten, alle entsprechenden 
+Initialisierungs-Funktionen und Primitiven richtig zu deklarieren und
+zu mappen. Insbesondere sind aber alle Klasse in
+____SOM_CLASS_NAMES____ in der Form 
+
+ "Klasse1",
+ "Klasse2",
+
+anzugeben.
+
+Beispiele befinden sich in src/primitives/Core.c und dazugehörige
+src/primitives/*.c  (mehrere Klassen) und in doc/Primitives/Hello.som
+(eine Klasse, som2lib.rb) .
+
+Kompilieren und Linken
+===============
+
+CSOM lädt Primitiven-Bibliotheken via dlopen(3), daher sind sie als
+'shared library' zu erstellen.
+
+Aufruf
+-----
+
+Der GNU-C Compiler ist aufzurufen wie folgt:
+
+Mac OS X:
+
+gcc -std=gnu99 -I$SRC_DIR  -mmacosx-version-min=10.4 -undefined dynamic_lookup \
+    -dynamiclib -Wl,-single_module -Wl,-Y,1455 -fPIC \
+    -install_name KLASSENNAME.som.dylib -o KLASSENNAME.som.dylib \
+    KLASSENNAME.c
+
+Linux (BSD et al. analog):
+
+gcc -std=gnu99  -I$SRC_DIR -shared -Wl,soname,KLASSENNAME.som.so \
+    -o KLASSENNAME.som.so KLASEENNAME.c
+
+$SRC_DIR ist durch den Pfad für  src/ zu ersetzen.
+
+Genauere Informationen zu den Optionen unter gcc(1) und ld(1) (für die -Wl Sub-Optionen)
+
+Aufruf mit ostool
+--------------
+
+Im src/-Verzeichnis ist die Datei ostool.c verfürgbar. Sie ist
+kompilierbar mit 
+
+cc -o ostool.exe ostool.c
+
+Das Tool findet normalerweise im Hauptmakefile Verwendung, kann aber
+ auch zur einfacheren Generierung der Primitiven-Bibliothek verwendet
+ werden.
+
+Der Aufruf des GNU-C Compilers ist dann wie folgt:
+
+gcc -std=gnu99 -I$SRC_DIR `ostool.exe l KLASSENNAME.som`  -o \
+    `ostool.exe s KLASSENNAME.som` KLASSENNAME.c
+
+für alle angesprochenen Systeme.
+
+++++
+$Id: README.de 792 2009-04-06 08:07:33Z michael.haupt $

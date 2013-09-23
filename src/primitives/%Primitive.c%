@@ -1,0 +1,97 @@
+/*
+ *  ____CLASS_NAME____.c
+ *  CSOM
+ *
+ *
+ */
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <string.h>
+
+/*************************************************/
+#pragma mark * Included Headers                  *
+/*************************************************/
+
+____SOM_INCLUDES____
+
+/*************************************************/
+#pragma mark * Primitive Foreward Declaration    *
+/*************************************************/
+
+____SOM_DECLS____
+
+/*************************************************/
+#pragma mark * Internal functions and init.      *
+/*************************************************/
+
+/*** Lib initialization **/
+#ifdef __GNUC__
+void init(void) __attribute__((constructor));
+void fini(void) __attribute__((destructor));
+#elif
+void _init(void);
+void _fini(void);
+#pragma init _init
+#pragma fini _fini
+#endif
+
+
+#ifdef __GNUC__
+void init(void)
+#elif
+void _init(void)
+#endif
+{
+	
+	// Call init funcions.
+
+	____SOM_FUNCTION_INIT____
+	
+}
+
+#ifdef __GNUC__
+void fini(void)
+#elif
+void _fini(void)
+#endif
+{
+	// Call fini functions
+	____SOM_FUNCTION_FINI____
+}
+
+// Classes supported by this lib.
+static char *supported_classes[] = {
+    ____SOM_CLASS_NAMES____
+    NULL
+};
+
+
+/*************************************************/
+#pragma mark * Exported functions starting here  *
+/*************************************************/
+
+// returns, whether this lib is responsible for a specific class
+bool		supports_class(const char* name) {
+	
+	char **iter=supported_classes;
+	while(*iter)
+		if (strcmp(name,*iter++)==0)
+			return true;
+	return false;
+	
+}
+
+/*************************************************/
+/*************************************************/
+/*************************************************/
+#pragma mark * Primitive Implementatition here   *
+/*************************************************/
+/*************************************************/
+/*************************************************/
+
+
+____PRIMITIVES____
+
+

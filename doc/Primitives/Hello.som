@@ -1,0 +1,111 @@
+" Simple Object Machine
+  $Id: Hello.som 792 2009-04-06 08:07:33Z michael.haupt $
+
+Copyright (c) 2007 Michael Haupt, Tobias Pape
+Software Architecture Group, Hasso Plattner Institute, Potsdam, Germany
+http://www.hpi.uni-potsdam.de/swa/
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the 'Software'), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+  Primitives Test
+
+
+@include \'HelloDefine.h\'
+@include <misc/String.h>
+@include <stdio.h>
+
+@init{
+	//init here
+}@
+@fini{
+	// fini here
+}@
+"
+
+Hello = (
+  "The 'run' method is called when initializing the system"
+  run = (
+
+         'Test no argument message' println.
+         self helloWorld.
+         'Test one argument message' println.
+         self makeNoise: 'Hello, world'.
+         'Test two argument message' println.
+         self fastPrint: 'hello,' for: 5.
+
+         'Test return value and class method' println.
+         Hello getSomeNumber println.
+         Hello getSomeNumber println.
+         Hello getSomeNumber println.
+
+         'Finished.' println.
+
+  )
+
+  helloWorld =  primitive "@
+      pVMObject self = (pVMObject)SEND(frame, pop);
+        // test Define..
+      printf(\'Hello, World: %s\n\', A_STRING);
+      SEND(frame, push, self);
+  @"
+
+  makeNoise: string = primitive "@
+      pVMString string = (pVMString)SEND(frame, pop);
+      pVMObject self = (pVMObject)SEND(frame, pop);
+
+      const char* s= SEND(string, get_chars);
+      printf(\'Line noise following:\t\');
+      int len=strlen(s);
+      int i, j;
+      for(i=10;i<=50;i+=10) {
+          for(j=0;j<len;j++) {
+              printf(\'%c\', s[j] ^ i);
+          }
+      }
+      printf(\'\n\');
+      SEND(frame, push, self);
+
+  @"
+
+  fastPrint: string for: times =  primitive "@
+      pVMInteger times = (pVMInteger)SEND(frame, pop);
+      pVMString string = (pVMString)SEND(frame, pop);
+      pVMObject self = (pVMObject)SEND(frame, pop);
+
+      int i;
+      for(i=0;i<=SEND(times, get_embedded_integer);i++) {
+          printf(\'%s\', SEND(string, get_chars));
+      }
+      printf(\'\n\');
+      SEND(frame, push, self);
+  @"
+
+  ----------
+
+  getSomeNumber = primitive  "@
+      pVMObject self = (pVMObject)SEND(frame, pop);
+
+      static int test = 0;
+
+      test = (((int)self)^(test << 3)) + ((int)frame);
+
+      SEND(frame, push, (pVMObject)Universe_new_integer(test));
+   @"
+
+)

@@ -1,0 +1,67 @@
+%
+% common defintions for CSOM documentation LaTeX files.
+%
+% $Id: common.tex 170 2008-01-03 15:27:10Z tobias.pape $
+%
+
+
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc} 
+\usepackage[T1]{fontenc}
+\usepackage{xspace}
+\usepackage{listings}
+\usepackage{color}
+\definecolor{darkblue}{rgb}{0,0,0.4}
+\definecolor{darkgreen}{rgb}{0,0.5,0.5}
+\definecolor{middlegray}{rgb}{0.5,0.5,0.5}
+\definecolor{lightgray}{rgb}{0.8,0.8,0.8}
+\definecolor{orange}{rgb}{0.8,0.3,0.3}
+\definecolor{yac}{rgb}{0.6,0.6,0.1}
+
+
+\lstdefinelanguage{SOM}{
+  morekeywords={true,false,self,super,nil},
+  morekeywords=[2]{primitive},
+  otherkeywords={^,.},
+  sensitive=true,
+  morecomment=[s]{"}{"},
+  morestring=[d]',
+}
+
+\lstloadlanguages{C,[gnu]make}%
+\lstset{language=C,%
+   basicstyle=\ttfamily\scriptsize\color{darkblue},
+   keywordstyle=\ttfamily\scriptsize\bfseries\color{yac},
+   keywordstyle=[2]\ttfamily\scriptsize\bfseries\color{orange},
+   stringstyle=\sffamily\scriptsize\color{darkgreen},
+   commentstyle=\rmfamily\scriptsize\color{middlegray},
+%   mathescape,
+%   emph={square},
+%   emphstyle=\ttfamily,
+%   emph={[2]root,base},
+%   emphstyle={[2]\ttfamily},
+%   showstringspaces=false,
+%   flexiblecolumns=false,
+%   tabsize=4,
+%   numbers=left,
+%   numberstyle=\tiny,
+%  % numberblanklines=false,
+%   stepnumber=1,
+%   numbersep=5pt
+}
+
+\newcommand{\ignore}[1]{}
+
+% Logo Font
+%\font\logo=logo10
+
+\newcommand{\CSOM}{{\scshape CSOM}\xspace}
+\newcommand{\SOM}{{\scshape SOM}\xspace}
+\newcommand{\C}{{\bfseries\ttfamily C}\xspace}
+\newcommand{\class}[2]{{\texttt{{#1}::}\textbf{{#2}}}}
+\newcommand{\file}[1]{\texttt{{#1}}}
+\newcommand{\dir}[1]{\texttt{{#1}/}}
+
+%%% Local Variables:
+%%% mode: latex
+%%% End:

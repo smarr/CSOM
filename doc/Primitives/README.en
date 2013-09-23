@@ -1,0 +1,237 @@
+HOWTO write CSOM Primitives.
+====================
+====================
+
+Author: Tobias Pape
+
+Generating the Sourcecode
+=================
+
+The sourcecode can be created in two different ways. The guidelines to
+be obeyed are being described in the file below.
+
+Generation with "som2lib.rb"
+-----------------------
+
+A Ruby-script is located in the 'src/primitives' folder, which generates a
+C-source-file from an _annotated CSOM-script_.
+
+Therefore, please follow the following annoation rules:
+
+* Class name°
+
+  The class name resembles, as in the VM,  the file name without an
+  extension. 
+
+
+* Include header files:					@include
+
+  som2lib.rb searches for occurrences of @include and places the
+  resembling word (Regex /[\w\.<>\/\\']+/) into an include-directive as 
+
+  #include word_with_.h
+
+  This search is solely textual. Therefore, please avoid the
+  annotation in CSOM-parts or use it only in CSOM-comments,
+  respectively. \' will be replaced with ", which in turn shall not
+  be used.
+
+
+* Initialization:						@init{  }@
+
+  If @init is found, a C-function named
+
+  void __SOMCLASS_init(void)
+
+  is generated and places a call to it into the overall file's initialization
+  function.
+  
+  The part starts with @init{ ;  the _following_ lines are copied
+  nearly-verbatim into the generated function until  }@  is found 
+  on a single line. Quotes are handled as described below.
+
+  The initialization function shall only be defined in CSOM comments
+
+* Initialization:						@fini{  }@
+
+  If @fini is found, a C-function named
+
+  void __SOMCLASS_fini(void)
+
+  is generated and places a call to it into the overall file's finalization
+  function.
+  
+  The part starts with @fini{ ;  the _following_ lines are copied
+  nearly-verbatim into the generated function until  }@  is found 
+  on a single line. Quotes are handled as described below.
+
+  The finalization function shall only be defined in CSOM comments
+
+* Primitives:							@" "@
+
+  CSOM primitives are written as
+  
+  method: with argument: yes = primitive
+
+  This definition is expanded to:
+
+  method: with argument: yes = primitive "@
+
+  Everything following is copied to the generated function until
+  @" is found.
+  The function's form(s):
+
+  void _SOMCLASS_noarguments(p_object object, p_frame frame)
+  void _SOMCLASS_oneargument_(p_object object, p_frame frame)
+  void _SOMCLASS_two_arguments_(p_object object, p_frame frame)
+  (an so on)
+
+  POP calls shall follow:
+
+  pVMObject self = (pVMObject)SEND(frame, pop);
+
+  If the function shall not return anything, _self_ shall be pushed.
+  
+  ATTENTION: every use of " is to be replaced by \' , any use of \'
+  should be avoided.
+
+  According to src/vmobjects/VMSymbol.c:_VMSymbol_get_plain_string,
+  the following replacements in function naming shall be applied:
+
+  ~   ->	tilde
+  &   ->	and
+  |   ->	bar
+  *   ->	star
+  /   ->	slash
+  @   ->	at
+  +   ->	plus
+  -   ->	minus
+  =   ->	equal     
+  >   ->	greaterthan
+  <   ->	lessthan
+  ,   ->	comma
+  %   ->	percent
+  \   ->	backslash
+  :   ->	_
+  
+* Declarations and mappings are generated automatically from the
+  functions given 
+
+
+creating "manually": %Primitive.c%
+--------------------------
+
+%Primitive.c% (aus src/primitives) actually is the template
+ for som2lib.rb, hence the generated code is similar. Annotated parts
+ should be "filled" or deleted, as needed:
+
+* ____SOM_INCLUDES____
+
+  List include-directives here. The quote-restriction does not apply.
+
+
+* ____SOM_DECLS____
+
+  Declare here all functions, which are to be defined in
+  ____PRIMITIVES____ . Functions shall only be prototyped as:
+
+  void funcname(pVMObject, pVMFrame); 
+ 
+* ____SOM_FUNCTION_INIT____
+
+  Function calls to be executed at library load time shall go here.
+
+* ____SOM_FUNCTION_FINI____
+
+  Function calls to be executed at library unload time shall go here.
+
+*  ____SOM_CLASS_NAMES____
+   
+   The supported class(es) is listed as
+
+   "Classname",
+  
+  here, as referenced in CSOM.
+  ATTENTION: the comma is intentional.
+
+* ____PRIMITIVES____
+
+  Place implementation of all declared functions here.
+  This applies to mapped functions as well as to the initialization
+  function(s) ° and helper functions.
+  
+  The primitives naming scheme matches the standard CSOM scheme.
+  I. e., the instance primitives scheme is
+  
+    _Classname_methodName(pVMObject, pVMFrame)
+    
+  and the class primitives scheme accordingly
+
+    Classname_methodName(pVMObject, pVMFrame).
+    
+  Moreover, the replacements rules (see above) as in
+  src/vmobjects/VMSymbol.c:_VMSymbol_get_plain_string aplly here, too.
+
+==
+°Multiple classes in one C-file:
+som2lib.rb supports only one class per file generated.
+When creating a Multi-file manually, to map and declare all
+independant initialization functions and primitives correctly.
+Especially list all classes in ____SOM_CLASS_NAMES____ :
+
+ "Class2",
+ "Class2",
+
+Samples can be found in src/primitives/Core.c and the corresponding
+src/primitives/*.c  (multi-class) and in doc/Primitives/Hello.som
+(single-class, som2lib.rb).
+
+Compile and link
+===========
+
+
+CSOM loads primitive libraries via dlopen(3), therefore generate them
+as 'shared libraries'.
+
+compiler statement
+------------------
+
+Call the GNU-C compiler as shown below:
+
+Mac OS X:
+
+gcc -std=gnu99 -I$SRC_DIR  -mmacosx-version-min=10.4 -undefined dynamic_lookup \
+    -dynamiclib -Wl,-single_module -Wl,-Y,1455 -fPIC \
+     -install_name CLASSNAME.som.dylib  -o CLASSNAME.som.dylib \
+     CLASSNAME.c 
+
+Linux (BSD et al. similar):
+
+gcc -std=gnu99 -I$SRC_DIR -shared -Wl,soname,CLASSNAME.som.so \
+    -o CLASSNAME.som.so CLASSNAME.c
+
+Replace $SRC_DIR with the src/-path.
+
+Find more information regarding the options at gcc(1) and ld(1) (for
+the -Wl sub-options).
+
+compiling with ostool
+-----------------
+
+In the src/-folder ostool.c can be found and can be compiled with
+
+cc -o ostool.exe ostool.c
+
+
+Actually, the tool is used in the main makefile  but can be used for
+simpler generation of the primitive library.
+
+Call the GNU-C compiler as:
+
+gcc -std=gnu99 -I$SRC_DIR `ostool.exe l CLASSNAME.som`  -o \
+    `ostool.exe s CLASSNAME.som` CLASSNAME.c
+
+for all systems mentioned.
+
+++++
+$Id: README.en 792 2009-04-06 08:07:33Z michael.haupt $

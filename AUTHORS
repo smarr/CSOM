@@ -1,0 +1,20 @@
+This file lists all people who have contributed to the CSOM VM.
+
+The precursor of CSOM was SOM, which was originally implemented in Java at the
+University of Aarhus (Denmark) in 2001/2002. The implementation of SOM was done
+by Jakob Roland Andersen, Kasper Verdich Lund, Lars Bak, Mads Torgersen, and
+Ulrik Pagh Schultz. They also wrote the original versions of the SOM Smalltalk
+libraries, test suites, and benchmarks, that are (in extended versions) bundled
+with CSOM.
+
+SOM was used by Michael Haupt in courses on virtual machines at Lancaster
+University and Technische Universitaet Darmstadt (Germany) in VM courses in
+2006. During that time, some changes were applied to SOM by Michael Haupt and
+Sebastian Kanthak.
+
+CSOM, the C port of SOM, was realised at the Hasso Plattner Institute (Potsdam,
+Germany) in 2006/7 by Michael Haupt and Tobias Pape. Stefan Marr and Jan-Arne
+Sobania have contributed a performance patch. Stefan Marr also contributed the Snake game.
+
+This file was last modified on: 
+$LastChangedDate: 2008-04-10 20:15:47 +0200 (Do, 10 Apr 2008) $.

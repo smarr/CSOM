@@ -1,0 +1,84 @@
+\section{Glossary}
+\label{sec:glossary}
+
+
+\begin{description}
+\item[bytecode] A bytecode
+\item[bytecode index] short: bc\_idx
+\item[class] The word ``class'' can refer to two distinct
+  interpretations:
+  \begin{enumerate}
+  \item OO class \emph{or \C class}
+  \item \SOM class
+  \end{enumerate}
+\item[\C class] The combination of a  \C  \lstinline|struct| defining
+  data fields, a VTABLE defintion, prototypes of ``class methods''  and the corresponding
+  implementations.
+
+  A class shall be refered to by its component name and its class name;
+  thus \class{vmobjects}{VMObject} would refer to the files
+  \file{src/vmobjects/VMObject.h} (containing the \lstinline|struct|
+  defintions and class method prototypes) and
+  \file{src/vmobject/VMObject.c} (containing the methods' implentations
+  and the VTABLE).
+\item[\CSOM] This can refer
+  \begin{enumerate}
+  \item to the entire project ``\CSOM'',
+  \item to the project's entire code base,
+  \item or to the compiled VM binary file ``\CSOM'', which can be
+    located either in the \dir{src} or the \dir{build} directory.
+  \end{enumerate}
+\item[frame]~
+\item[object]~
+\item[OO]~
+\item[Object Model]~
+\item[OO Object] These terms refer to the ``Object Model'' used
+  throughout \CSOM.
+\item[Primitive] A ``primitive'' may refer to different meanings:
+  \begin{enumerate}
+  \item The \lstinline[language=SOM]|primitive|-Keyword of the \SOM language
+  \item A \SOM method, which is solely defined though the keyword mentioned
+  \item A single \C function located in an external binary file which is linked
+    to a \SOM method on or after compiling.
+  \item A colletion of such \C funtions in a binary dynamically loadable library.
+  \end{enumerate}
+\item[\SOM class] A ``\SOM class'' is a class defined in the \SOM language,
+  written to a file. When loaded, it is represented by an instance of
+\class{vmobjects}{VMClass}.
+\item[string]~
+\item[String] An instance of \class{misc}{String}. This is an OO-capable
+  wrapper around C-strings. They shall be used in favor of C-strings.
+\item[C-string] a `$\backslash 0$'-terminated sequence of bytes. Don't
+  rely on signedness of them. Their direct use is discouraged. Use 
+  (OO-)Strings instead.
+\item[Trait] 
+A trait consits of a VTABLE and an empty (except the VTABLE
+pointer) Object definition with corresponding method implementations.
+
+To assign a trait to classes, use\\
+\lstinline|ASSIGN_TRAIT(aTrait, aClass)| \\
+in their VTABLE-functions.
+
+
+Use \lstinline|TSEND(aTrait, anObject, aMessage, ...)| to send an
+trait-message to an object. \\
+Do not use \lstinline|SEND|.
+
+Use \lstinline|SUPPORTS(anObject, aTrait)| to check, whether an object
+supports an specific interfaces.
+
+Currenty, a class can only support one trait at a time. But each
+trait would be able to support another trait via the same mechanism of
+\lstinline|ASSIGN_TRAIT|.
+
+See \class{vmobjects}{VMInvokable} for a trait implementation example and
+\class{vmobjects}{VMPrimitive} and \class{vmobjects}{VMMethod} for examples of
+trait usage. \\
+The macros mentioned are defined in \file{src/vmobjects/OOObject.h}.
+
+This whole concept may change in the future.
+\item[vtable] see virtual method table
+\item[VTABLE] see virtual method table
+\item[virtual method table] A structure unique to each individual
+  class containing \C function pointers.
+\end{description}

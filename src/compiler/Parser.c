@@ -916,10 +916,10 @@ void blockBody(method_generation_context* mgenc, bool seen_period) {
         emit_RETURN_LOCAL(mgenc);
         mgenc->finished = true;
     } else if(sym == EndTerm) {
-        if(seen_period)
-            // we can be sure it's a method we're parsing, not a block, so the
-            // PUSH_ARGUMENT can be created immediately
-            emit_PUSH_ARGUMENT(mgenc, 0, 0);
+        // it does not matter whether a period has been seen, as the end of
+        // the method has been found (EndTerm) - so it is safe to emit a
+        // "return self"
+        emit_PUSH_ARGUMENT(mgenc, 0, 0);
         emit_RETURN_LOCAL(mgenc);
         mgenc->finished = true;
     } else {

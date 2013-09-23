@@ -148,7 +148,7 @@ void gc_mark_reachable_objects() {
     pHashmapElem elem = NULL;
     
     // iterate over the globals to mark all of them
-	for(int i=0; i < globals->size; i++) {
+    for(int i=0; i < globals->size; i++) {
         elem = (pHashmapElem) globals->elems[i];
         if (elem != NULL) {
             gc_mark_object(elem->key);
@@ -157,8 +157,8 @@ void gc_mark_reachable_objects() {
     }
         
     // Get the current frame and mark it.
-	// Since marking is done recursively, this automatically
-	// marks the whole stack
+    // Since marking is done recursively, this automatically
+    // marks the whole stack
     pVMFrame current_frame = (pVMFrame) Interpreter_get_frame();
     if (current_frame != NULL) {
         gc_mark_object(current_frame);
@@ -177,8 +177,8 @@ void gc_mark_reachable_objects() {
 void gc_mark_object(void* _self) {
     pVMObject self = (pVMObject) _self;
     if (   ((void*) self >= (void*)  object_space) 
-		&& ((void*) self <= (void*) (object_space + OBJECT_SPACE_SIZE))) 
-	{
+        && ((void*) self <= (void*) (object_space + OBJECT_SPACE_SIZE))) 
+    {
         if (self->gc_field != 1) {
             // mark self before recursively marking contained references
             self->gc_field = 1;
@@ -213,8 +213,8 @@ void gc_show_memory() {
         }
         
         if ((   (void*)current_entry->next == (void*)pointer) 
-		    || ((void*)current_entry == (void*)pointer)) 
-		{
+            || ((void*)current_entry == (void*)pointer)) 
+        {
             if ((void*)current_entry == (void*)pointer) {
                 object_size = current_entry->size;
             } else {
@@ -235,7 +235,7 @@ void gc_show_memory() {
                 fprintf(stderr,"-%d %s %p-", object_size, SEND(class_name, get_plain_string), object);
             }
         }
-		// aligns the output by inserting a line break after 36 objects
+        // aligns the output by inserting a line break after 36 objects
         object_aligner++;
         if (object_aligner == 36) {
             fprintf(stderr,"\n%d ", line_count++);
@@ -280,13 +280,13 @@ void gc_collect() {
             // nothing else to be done here
         } else {
             // in this case the pointer is a VMObject
-            pVMObject object = (pVMObject) pointer;			
+            pVMObject object = (pVMObject) pointer;         
             object_size = SEND(object, object_size);
             
             // is this object marked or not?
             if (object->gc_field == 1) {
                 // remove the marking
-				object->gc_field = 0;
+                object->gc_field = 0;
             } else {
                 num_freed++;
                 spc_freed += object_size;
@@ -297,8 +297,8 @@ void gc_collect() {
                 free_list_entry* new_entry = (free_list_entry*) pointer;
                 new_entry->size = object_size;
 
-				// if the new entry lies before the first entry,
-				// adjust the pointer to the first one
+                // if the new entry lies before the first entry,
+                // adjust the pointer to the first one
                 if (new_entry < first_free_entry) {
                     new_entry->next = first_free_entry;
                     first_free_entry = new_entry;
@@ -310,7 +310,7 @@ void gc_collect() {
                 }
             }
         }
-		// set the pointer to the next object in the heap
+        // set the pointer to the next object in the heap
         pointer = (void*)((int)pointer + object_size);
 
     } while ((void*)pointer < (void*)(object_space + OBJECT_SPACE_SIZE));
@@ -331,10 +331,10 @@ void gc_collect() {
 
 void* gc_allocate(size_t size) { 
     if(size == 0) return NULL;
-	
-	if(size < sizeof(struct _free_list_entry)) {
-		return internal_allocate(size);
-	}
+    
+    if(size < sizeof(struct _free_list_entry)) {
+        return internal_allocate(size);
+    }
     
     // first allocate-request => initialize heap
     if (object_space == NULL) {
@@ -342,8 +342,8 @@ void* gc_allocate(size_t size) {
     }
     
     // start garbage collection if the free heap has less
-	// than BUFFERSIZE_FOR_UNINTERRUPTABLE Bytes and this
-	// allocation is interruptable
+    // than BUFFERSIZE_FOR_UNINTERRUPTABLE Bytes and this
+    // allocation is interruptable
     if ((size_of_free_heap <= BUFFERSIZE_FOR_UNINTERRUPTABLE)
         && (uninterruptable_counter <= 0)) {
         gc_collect();
@@ -354,7 +354,7 @@ void* gc_allocate(size_t size) {
     free_list_entry* entry = first_free_entry;
     free_list_entry* before_entry = NULL;
 
-	// don't look for the perfect match, but for the first-fit
+    // don't look for the perfect match, but for the first-fit
     while (! ((entry->size == size) 
                || (entry->next == NULL) 
                || (entry->size >= (size + sizeof(struct _free_list_entry))))) { 
@@ -362,21 +362,21 @@ void* gc_allocate(size_t size) {
         entry = entry->next;
     }
     
-	// did we find a perfect fit?
-	// if so, we simply remove this entry from the list
+    // did we find a perfect fit?
+    // if so, we simply remove this entry from the list
     if (entry->size == size) {
         if (entry == first_free_entry) { 
-			// first one fitted - adjust the 'first-entry' pointer
+            // first one fitted - adjust the 'first-entry' pointer
             first_free_entry = entry->next;
         } else {
-			// simply remove the reference to the found entry
+            // simply remove the reference to the found entry
             before_entry->next = entry->next;
         } // entry fitted
         result = entry;
-		
+        
     } else {
-		// did we find an entry big enough for the request and a new
-		// free_entry?
+        // did we find an entry big enough for the request and a new
+        // free_entry?
         if (entry->size >= (size + sizeof(struct _free_list_entry))) {
             // save data from found entry
             int old_entry_size = entry->size;
@@ -394,13 +394,13 @@ void* gc_allocate(size_t size) {
                 before_entry->next = replace_entry;
             }
         }  else { 
-			// no space was left
-			// running the GC here will most certainly result in data loss!
-			fprintf(stderr,"Not enough heap! Data loss is possible\n");
-			fprintf(stderr, "FREE-Size: %d, uninterruptable_counter: %d\n",
-				size_of_free_heap, uninterruptable_counter);
+            // no space was left
+            // running the GC here will most certainly result in data loss!
+            fprintf(stderr,"Not enough heap! Data loss is possible\n");
+            fprintf(stderr, "FREE-Size: %d, uninterruptable_counter: %d\n",
+                size_of_free_heap, uninterruptable_counter);
             
-			gc_collect();
+            gc_collect();
             //fulfill initial request
             result = gc_allocate(size);
         }
@@ -411,8 +411,8 @@ void* gc_allocate(size_t size) {
         Universe_exit(-1);
     }
     memset(result, 0, size);
-	
-	// update the available size
+    
+    // update the available size
     size_of_free_heap -= size;
     return result;
 }
@@ -437,10 +437,10 @@ void* gc_allocate_object(size_t size) {
 void gc_free(void* ptr) {
     // do nothing when called for an object inside the object_space
     if ((   ptr < (void*)  object_space) 
-		|| (ptr >= (void*) (object_space + OBJECT_SPACE_SIZE))) 
-	{
-		internal_free(ptr);
-	}
+        || (ptr >= (void*) (object_space + OBJECT_SPACE_SIZE))) 
+    {
+        internal_free(ptr);
+    }
 }
 
 
@@ -463,16 +463,16 @@ void gc_merge_free_spaces() {
             entry->next = new_next;
             entry->size = new_size;
         } else {
-			size_of_free_heap += entry->size;	
-			entry = entry->next;
+            size_of_free_heap += entry->size;   
+            entry = entry->next;
         }
     }
-	if (entry->next == NULL) {
-		size_of_free_heap += entry->size;	
-	} else {
-		fprintf(stderr, "Missed last free_entry of GC\n");
-		Universe_exit(-1);
-	}
+    if (entry->next == NULL) {
+        size_of_free_heap += entry->size;   
+    } else {
+        fprintf(stderr, "Missed last free_entry of GC\n");
+        Universe_exit(-1);
+    }
 }
 
 
@@ -504,10 +504,10 @@ char* internal_allocate_string(const char* restrict str) {
  * inside the heap.
  */
 void gc_initialize() { 
-	// Buffersize is adjusted to the size of the heap (10%)
+    // Buffersize is adjusted to the size of the heap (10%)
     BUFFERSIZE_FOR_UNINTERRUPTABLE = (int) (OBJECT_SPACE_SIZE * 0.1);
 
-	// allocation of the heap
+    // allocation of the heap
     object_space = malloc(OBJECT_SPACE_SIZE);
     if (!object_space) {
         fprintf(stderr, "Failed to allocate the initial %d bytes for the GC. Panic.\n",

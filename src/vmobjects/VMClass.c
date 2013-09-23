@@ -439,11 +439,11 @@ void* load_lib(const pString restrict path) {
     // static handle. will be returned
     static void* handle = NULL;
     
-	// try load lib
-	if((handle=dlopen(SEND(path, chars), DL_LOADMODE)))
-		//found.
-		return handle;
-	else
+    // try load lib
+    if((handle=dlopen(SEND(path, chars), DL_LOADMODE)))
+        //found.
+        return handle;
+    else
         return NULL;
 }
 
@@ -457,7 +457,7 @@ bool is_responsible(void* handle, const char* class) {
 
     supports_class = (supports_class_fn)dlsym(handle, "supports_class");
 
-	if(!supports_class) {
+    if(!supports_class) {
         debug_error(dlerror());
         Universe_error_exit("Library doesn't have expected format");
     }
@@ -496,13 +496,13 @@ void set_primitives(pVMClass class, void* handle, const char* cname,
             pVMSymbol sig = TSEND(VMInvokable, the_primitive, get_signature);
             const char* selector = SEND(sig, get_plain_string);
             
-			{ //string block                
-				char symbol[strlen(cname) + strlen(selector) + 2 + 1];
+            { //string block                
+                char symbol[strlen(cname) + strlen(selector) + 2 + 1];
                                                                 //2 for 2x '_'
-				sprintf(symbol, format, cname, selector);
+                sprintf(symbol, format, cname, selector);
                  
-				// try loading the primitive
-				routine = (routine_fn)dlsym(handle, symbol);
+                // try loading the primitive
+                routine = (routine_fn)dlsym(handle, symbol);
             }
             
             if(!routine) {
@@ -553,13 +553,13 @@ void _VMClass_load_primitives(void* _self, const pString* cp, int cp_count) {
             if(is_responsible(dlhandle, cname)) {
                 // ...and is responsible:
                 // explicitely call the libirary initializer
-            	void* init_csp = dlsym(dlhandle, "init_csp");
-            	if (init_csp) {
-            		((init_csp_fn)init_csp)();
-            	} else {
-            		dlclose(dlhandle);
-            		Universe_error_exit("Library does not define the init_csp() initializer.");
-            	}
+                void* init_csp = dlsym(dlhandle, "init_csp");
+                if (init_csp) {
+                    ((init_csp_fn)init_csp)();
+                } else {
+                    dlclose(dlhandle);
+                    Universe_error_exit("Library does not define the init_csp() initializer.");
+                }
                 break;
             } else {
                 // ... but says not responsible, but have to

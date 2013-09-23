@@ -282,6 +282,7 @@ void  _Integer_asString(pVMObject object, pVMFrame frame) {
 
 void Integer_fromString_(pVMObject object, pVMFrame frame) {
     pVMString self = (pVMString)SEND(frame, pop);
+    SEND(frame, pop);
     
     int32_t integer = atoi(SEND(self, get_chars));
     

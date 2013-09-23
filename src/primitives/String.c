@@ -90,7 +90,7 @@ void  _String_equal(pVMObject object, pVMFrame frame) {
 }
 
 
-void  _String_primSubstringFrom_To_(pVMObject object, pVMFrame frame) {
+void  _String_primSubstringFrom_to_(pVMObject object, pVMFrame frame) {
     pVMInteger end = (pVMInteger)SEND(frame, pop);
     pVMInteger start = (pVMInteger)SEND(frame, pop);
     
@@ -102,7 +102,7 @@ void  _String_primSubstringFrom_To_(pVMObject object, pVMFrame frame) {
     int l = e - s + 1;
     
     char* result = (char*)internal_allocate(l + 1);
-    strncpy(result, string + s, l);
+    strncpy(result, string + s - 1, l);
     result[l] = '\0';
     
     SEND(frame, push, (pVMObject)Universe_new_string(result));

@@ -34,7 +34,7 @@ void  _String_asSymbol(pVMObject object, pVMFrame frame);
 void  _String_hashcode(pVMObject object, pVMFrame frame);
 void  _String_length(pVMObject object, pVMFrame frame);
 void  _String_equal(pVMObject object, pVMFrame frame);
-void  _String_primSubstringFrom_To_(pVMObject object, pVMFrame frame);
+void  _String_primSubstringFrom_to_(pVMObject object, pVMFrame frame);
 
 
 #endif CORE_STRING_H_

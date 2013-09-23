@@ -1,0 +1,8 @@
+*.o
+build/ostool.exe*
+CORE
+CSOM
+Smalltalk/SOMCore.csp
+src/platform.h
+CSOM.xcodeproj/project.xcworkspace
+CSOM.xcodeproj/xcuserdata

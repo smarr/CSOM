@@ -37,6 +37,7 @@ void _System_exit_(pVMObject object, pVMFrame frame);
 void _System_printString_(pVMObject object, pVMFrame frame);
 void _System_printNewline(pVMObject object, pVMFrame frame);
 void _System_time(pVMObject object, pVMFrame frame);
+void _System_fullGC(pVMObject object, pVMFrame frame);
 
 void __System_init(void);
 extern struct timeval _System_start_time;

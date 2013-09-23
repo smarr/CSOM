@@ -35,6 +35,8 @@ THE SOFTWARE.
 
 #include <vm/Universe.h>
 
+#include <memory/gc.h>
+
 #include "System.h"
 
 //file variable
@@ -108,6 +110,12 @@ void  _System_ticks(pVMObject object, pVMFrame frame) {
     SEND(frame, push, (pVMObject)Universe_new_biginteger(ticks));
 }
 
+
+void _System_fullGC(pVMObject object, pVMFrame frame) {
+    SEND(frame, pop);
+    gc_collect();
+    SEND(frame, push, true_object);
+}
 
 void __System_init(void) {
     gettimeofday(&_System_start_time , NULL);

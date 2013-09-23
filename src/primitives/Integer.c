@@ -200,9 +200,15 @@ void  _Integer_percent(pVMObject object, pVMFrame frame) {
 
     // Do operation:
     pVMInteger right = (pVMInteger)rightObj;
+    
+    int64_t l = (int64_t)SEND(left, get_embedded_integer);
+    int64_t r = (int64_t)SEND(right, get_embedded_integer);
 
-    int64_t result = (int64_t)SEND(left, get_embedded_integer) % 
-                     (int64_t)SEND(right, get_embedded_integer);
+    int64_t result = l % r;
+    
+    if (l > 0 && r < 0) {
+        result += r;
+    }
     
     _Integer__pushResult(object, frame, result);
 }

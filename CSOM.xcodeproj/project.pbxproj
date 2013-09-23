@@ -638,6 +638,7 @@
 		1DEB928A08733DD80010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				HEADER_SEARCH_PATHS = (
@@ -645,13 +646,16 @@
 					src,
 				);
 				LIBRARY_SEARCH_PATHS = lib;
+				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
+				VALID_ARCHS = i386;
 			};
 			name = Debug;
 		};
 		1DEB928B08733DD80010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -661,7 +665,9 @@
 					src,
 				);
 				LIBRARY_SEARCH_PATHS = lib;
+				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
+				VALID_ARCHS = i386;
 			};
 			name = Release;
 		};

@@ -39,5 +39,6 @@ void  _Double_equal(pVMObject object, pVMFrame frame);
 void  _Double_lessthan(pVMObject object, pVMFrame frame);
 void  _Double_asString(pVMObject object, pVMFrame frame);
 void  _Double_sqrt(pVMObject object, pVMFrame frame);
+void  _Double_rount(pVMObject object, pVMFrame frame);
 
 #endif CORE_DOUBLE_H_

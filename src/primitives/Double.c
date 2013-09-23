@@ -147,3 +147,15 @@ void _Double_sqrt(pVMObject object, pVMFrame frame) {
                                                      get_embedded_double)));
     SEND(frame, push, (pVMObject) result);
 }
+
+
+void _Double_round(pVMObject object, pVMFrame frame) {
+    pVMDouble self = (pVMDouble)SEND(frame, pop);
+    long int rounded = lround(SEND(self, get_embedded_double));
+    
+    // Check with integer bounds and push:
+    if(rounded > INT32_MAX || rounded < INT32_MIN)
+        SEND(frame, push, (pVMObject)Universe_new_biginteger(rounded));
+    else
+        SEND(frame, push, (pVMObject)Universe_new_integer((int32_t)rounded));
+}

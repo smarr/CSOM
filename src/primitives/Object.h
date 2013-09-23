@@ -32,5 +32,15 @@ THE SOFTWARE.
 void  _Object_equalequal(pVMObject object, pVMFrame frame);
 void  _Object_objectSize(pVMObject object, pVMFrame frame);
 void  _Object_hashcode(pVMObject object, pVMFrame frame);
+void  _Object_inspect(pVMObject object, pVMFrame frame);
+void  _Object_halt(pVMObject object, pVMFrame frame);
+
+void  _Object_perform_(pVMObject object, pVMFrame frame);
+void  _Object_perform_withArguments_(pVMObject object, pVMFrame frame);
+void  _Object_perform_inSuperclass_(pVMObject object, pVMFrame frame);
+void  _Object_perform_withArguments_inSuperclass_(pVMObject object, pVMFrame frame);
+void  _Object_instVarAt_(pVMObject object, pVMFrame frame);
+void  _Object_instVarAt_put_(pVMObject object, pVMFrame frame);
+void  _Object_instVarNamed_(pVMObject object, pVMFrame frame);
 
 #endif CORE_OBJECT_H_

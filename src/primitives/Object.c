@@ -26,6 +26,8 @@ THE SOFTWARE.
 
 #include <vmobjects/VMObject.h>
 #include <vmobjects/VMFrame.h>
+#include <vmobjects/VMClass.h>
+#include <vmobjects/VMInvokable.h>
 
 #include <vm/Universe.h>
 
@@ -50,4 +52,99 @@ void  _Object_objectSize(pVMObject object, pVMFrame frame) {
 void  _Object_hashcode(pVMObject object, pVMFrame frame) {
     pVMObject self = SEND(frame, pop);
     SEND(frame, push, (pVMObject)Universe_new_integer(self->hash));
+}
+
+void  _Object_inspect(pVMObject object, pVMFrame frame) {
+    // NOT SUPPORTED
+    pVMObject self = SEND(frame, pop);
+    SEND(frame, push, false_object);
+}
+
+void  _Object_halt(pVMObject object, pVMFrame frame) {
+    // NOT SUPPORTED
+    pVMObject self = SEND(frame, pop);
+    SEND(frame, push, false_object);
+}
+
+void  _Object_perform_(pVMObject object, pVMFrame frame) {
+    pVMSymbol selector = (pVMSymbol)SEND(frame, pop);
+    pVMObject self = SEND(frame, get_stack_element, 0);
+    
+    pVMClass class = SEND(self, get_class);
+    pVMObject invokable = SEND(class, lookup_invokable, selector);
+    
+    TSEND(VMInvokable, invokable, invoke, frame);
+}
+
+void  _Object_perform_inSuperclass_(pVMObject object, pVMFrame frame) {
+    pVMClass  class    = (pVMClass) SEND(frame, pop);
+    pVMSymbol selector = (pVMSymbol)SEND(frame, pop);
+    
+    pVMObject invokable = SEND(class, lookup_invokable, selector);
+    
+    TSEND(VMInvokable, invokable, invoke, frame);
+}
+
+void  _Object_perform_withArguments_(pVMObject object, pVMFrame frame) {
+    pVMArray  args     = (pVMArray) SEND(frame, pop);
+    pVMSymbol selector = (pVMSymbol)SEND(frame, pop);
+    pVMObject self = SEND(frame, get_stack_element, 0);
+    
+    size_t num_args = SEND(args, get_number_of_indexable_fields);
+    for (size_t i = 0; i < num_args; i++) {
+        pVMObject arg = SEND(args, get_indexable_field, i);
+        SEND(frame, push, arg);
+    }
+    
+    pVMClass  class = SEND(self, get_class);
+    pVMObject invokable = SEND(class, lookup_invokable, selector);
+    
+    TSEND(VMInvokable, invokable, invoke, frame);
+}
+
+void  _Object_perform_withArguments_inSuperclass_(pVMObject object, pVMFrame frame) {
+    pVMClass  class    = (pVMClass) SEND(frame, pop);
+    pVMArray  args     = (pVMArray) SEND(frame, pop);
+    pVMSymbol selector = (pVMSymbol)SEND(frame, pop);
+    
+    size_t num_args = SEND(args, get_number_of_indexable_fields);
+    for (size_t i = 0; i < num_args; i++) {
+        pVMObject arg = SEND(args, get_indexable_field, i);
+        SEND(frame, push, arg);
+    }
+    
+    pVMObject invokable = SEND(class, lookup_invokable, selector);
+    
+    TSEND(VMInvokable, invokable, invoke, frame);
+}
+
+void _Object_instVarAt_(pVMObject object, pVMFrame frame) {
+    pVMInteger idx = (pVMInteger) SEND(frame, pop);
+    pVMObject  self = SEND(frame, pop);
+    
+    int32_t field_idx = SEND(idx, get_embedded_integer) - 1;
+    pVMObject value   = SEND(self, get_field, field_idx);
+    
+    SEND(frame, push, value);
+}
+
+void _Object_instVarAt_put_(pVMObject object, pVMFrame frame) {
+    pVMObject  value = SEND(frame, pop);
+    pVMInteger idx   = (pVMInteger) SEND(frame, pop);
+    pVMObject  self  = SEND(frame, get_stack_element, 0);
+    
+    int32_t field_idx = SEND(idx, get_embedded_integer) - 1;
+
+    
+    SEND(self, set_field, field_idx, value);
+}
+
+void _Object_instVarNamed_(pVMObject object, pVMFrame frame) {
+    pVMSymbol name = (pVMSymbol) SEND(frame, pop);
+    pVMObject self = SEND(frame, pop);
+    
+    int32_t field_idx = SEND(self, get_field_index, name);
+    pVMObject value   = SEND(self, get_field, field_idx);
+    
+    SEND(frame, push, value);
 }

@@ -299,7 +299,11 @@ void Integer_fromString_(pVMObject object, pVMFrame frame) {
 void  _Integer_sqrt(pVMObject object, pVMFrame frame) {
     pVMInteger self = (pVMInteger)SEND(frame, pop);
     double result = sqrt((double)SEND(self, get_embedded_integer));
-    SEND(frame, push, (pVMObject) Universe_new_double(result));
+    
+    if (result == rint(result))
+        _Integer__pushResult(object, frame, result);
+    else
+        SEND(frame, push, (pVMObject) Universe_new_double(result));
 }
 
 

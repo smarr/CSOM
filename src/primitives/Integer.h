@@ -42,6 +42,8 @@ void  _Integer_asString(pVMObject object, pVMFrame frame);
 void  _Integer_sqrt(pVMObject object, pVMFrame frame);
 void  _Integer_atRandom(pVMObject object, pVMFrame frame);
 
+void Integer_fromString_(pVMObject object, pVMFrame frame);
+
 void __Integer_init(void);
 
 #endif CORE_INTEGER_H_

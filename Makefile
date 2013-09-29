@@ -30,12 +30,6 @@
 
 export ROOT_DIR	:=$(PWD)
 export BUILD_DIR:=$(ROOT_DIR)/build
-export SRC_DIR	:=$(ROOT_DIR)/src
-export LIB_DIR	:=$(ROOT_DIR)/lib
-
-export ST_DIR	=$(ROOT_DIR)/Smalltalk
-export EX_DIR	=$(ROOT_DIR)/Examples
-export TEST_DIR	=$(ROOT_DIR)/TestSuite
 
 ifeq ($(OS),)
 # only Windows has OS predefined.

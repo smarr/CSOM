@@ -56,7 +56,7 @@ THE SOFTWARE.
 #ifdef __GNUC__
 void init(void) __attribute__((constructor));
 void fini(void) __attribute__((destructor));
-#elif
+#else
 void _init(void);
 void _fini(void);
 #pragma init _init
@@ -66,14 +66,14 @@ void _fini(void);
 // Library load initializer
 #ifdef __GNUC__
 void init(void) { ; /* noop */}
-#elif
+#else
 void _init(void) { ; /* noop */ }
 #endif __GNUC__
 
 // Library unload function
 #ifdef __GNUC__
 void fini(void) { ; /* noop */ }
-#elif
+#else
 void _fini(void) { ; /* noop */ }
 #endif __GNUC__
 

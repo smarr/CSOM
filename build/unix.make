@@ -3,8 +3,6 @@
 #
 #  Makefile by Tobias Pape
 #
-# $Id: unix.make 792 2009-04-06 08:07:33Z michael.haupt $
-#
 # Copyright (c) 2007 Michael Haupt, Tobias Pape
 # Software Architecture Group, Hasso Plattner Institute, Potsdam, Germany
 # http://www.hpi.uni-potsdam.de/swa/

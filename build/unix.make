@@ -27,9 +27,12 @@
 
 ## we need c99!
 
-CC			=gcc
-CFLAGS		=-m32 -Wno-endif-labels -std=gnu99 $(DBG_FLAGS) $(INCLUDES)
-LDFLAGS		=-m32 $(LIBRARIES)
+ifeq ($(CC),)
+	CC		= gcc
+endif
+
+CFLAGS		=-O3 -m32 -Wno-endif-labels -std=gnu99 $(DBG_FLAGS) $(INCLUDES)
+LDFLAGS		=-O3 -m32 $(LIBRARIES)
 
 INSTALL		=install
 

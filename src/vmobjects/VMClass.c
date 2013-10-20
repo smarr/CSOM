@@ -516,7 +516,7 @@ void set_primitives(pVMClass class, void* handle, const char* cname,
             // set routine
             SEND(the_primitive, set_routine, routine);
             the_primitive->empty = false;
-            internal_free(selector);
+            internal_free((void*) selector);
         }
     }
 }

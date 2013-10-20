@@ -835,7 +835,7 @@ void methodBlock(method_generation_context* mgenc) {
 pVMSymbol unarySelector(void) {
     const char* id = identifier();
     pVMSymbol result = Universe_symbol_for(id);
-    internal_free(id);
+    internal_free((void*) id);
     return result;
 }
 

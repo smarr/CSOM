@@ -37,8 +37,6 @@ THE SOFTWARE.
 
 
 pVMString VMString_new(const char* restrict chars) {
-    size_t a = sizeof(VMString);
-    size_t b = sizeof(char) * (strlen(chars) + 1);
     pVMString result = (pVMString)gc_allocate_object(
         sizeof(VMString) + sizeof(char) * (strlen(chars) + 1));
     if(result) {

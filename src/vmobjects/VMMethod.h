@@ -90,5 +90,4 @@ pVMMethod VMMethod_assemble(method_generation_context* mgenc);
 VTABLE(VMMethod)* VMMethod_vtable(void);
 
 
-#endif VMMETHOD_H_
-
+#endif // VMMETHOD_H_

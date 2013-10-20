@@ -75,4 +75,4 @@ static inline int32_t string_hash(const char* restrict string) {
 #include <platform.h>
 
 
-#endif DEFS_H_
+#endif // DEFS_H_

@@ -102,4 +102,4 @@ void     VMClass_assemble_system_class(class_generation_context*, pVMClass);
 VTABLE(VMClass)* VMClass_vtable(void);
 
 
-#endif VMCLASS_H_
+#endif // VMCLASS_H_

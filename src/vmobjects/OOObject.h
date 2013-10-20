@@ -60,7 +60,7 @@ THE SOFTWARE.
     ({ typeof(O) _O = (O); \
     (((VTABLE(TRAIT)*)(_O->_vtable->_ttable))->M((TRAIT*)_O , ##__VA_ARGS__)); \
     })
-#endif EXPERIMENTAL
+#endif // EXPERIMENTAL
 
 
 /** 
@@ -79,7 +79,7 @@ THE SOFTWARE.
 #else
 #define ASSIGN_TRAIT(T,C) \
     ((_##C##_vtable._ttable)=T##_vtable())
-#endif EXPERIMENTAL
+#endif // EXPERIMENTAL
 
 
 /** 
@@ -127,7 +127,7 @@ THE SOFTWARE.
 #define SUPPORTS(O,TRAIT) \
     ((VTABLE(TRAIT)*)((VTABLE(OOObject)*)((O)->_vtable)->_ttable) == \
         TRAIT##_vtable())
-#endif EXPERIMENTAL
+#endif // EXPERIMENTAL
 
 
 #define INIT(O, ...) \
@@ -181,4 +181,4 @@ VTABLE(OOObject)* OOObject_vtable(void);
 #define SIZE_DIFF_VMOBJECT(SUB) (OBJECT_SIZE_DIFF(SUB,VMObject)+1)
 
 
-#endif OOOBJECT_H_
+#endif // OOOBJECT_H_

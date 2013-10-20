@@ -37,7 +37,7 @@ void  _Array_length(pVMObject object, pVMFrame frame);
 void  Array_new_(pVMObject object, pVMFrame frame);
 
 
-#endif CORE_ARRAY_H_
+#endif // CORE_ARRAY_H_
 
 
 

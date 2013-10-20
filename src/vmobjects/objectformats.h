@@ -63,6 +63,6 @@ typedef void (*routine_fn)(pVMObject, pVMFrame);
 typedef bool (*supports_class_fn)(const char*);
 typedef void (*init_csp_fn)(void);
 
-#endif OBJECTFORMATS_H_
+#endif // OBJECTFORMATS_H_
 
 

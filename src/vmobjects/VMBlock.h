@@ -75,4 +75,4 @@ pVMPrimitive VMBlock_get_evaluation_primitive(int number_of_arguments);
 VTABLE(VMBlock)* VMBlock_vtable(void);
 
 
-#endif VMBLOCK_H_
+#endif // VMBLOCK_H_

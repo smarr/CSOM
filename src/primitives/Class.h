@@ -32,4 +32,4 @@ THE SOFTWARE.
 void  _Class_new(pVMObject object, pVMFrame frame);
 
 
-#endif CORE_CLASS_H_
+#endif // CORE_CLASS_H_

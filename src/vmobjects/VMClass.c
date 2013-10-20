@@ -433,7 +433,7 @@ void* load_lib(const pString restrict path) {
             #define    DL_LOADMODE RTLD_NOW
         #else
             #define    DL_LOADMODE RTLD_LAZY
-        #endif DEBUG
+        #endif // DEBUG
     #endif
     
     // static handle. will be returned

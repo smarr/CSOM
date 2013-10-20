@@ -89,5 +89,4 @@ void      VMObject_assert(bool);
 
 VTABLE(VMObject)* VMObject_vtable(void);
 
-#endif VMOBJECT_H_
-
+#endif // VMOBJECT_H_

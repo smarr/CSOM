@@ -37,6 +37,4 @@ pVMClass SourcecodeCompiler_compile_class_string(const char* stream,
                                                  pVMClass system_class);
 
 
-#endif SOURCECODECOMPILER_H_
-
-
+#endif // SOURCECODECOMPILER_H_

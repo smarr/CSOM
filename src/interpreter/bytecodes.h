@@ -98,6 +98,6 @@ static inline uint8_t bytecodes_get_bytecode_length(uint8_t bc) {
     return bytecode_lengths[bc];// Return the length of the given bytecode
 }
 
-#endif BYTECODES_H_
+#endif // BYTECODES_H_
 
 

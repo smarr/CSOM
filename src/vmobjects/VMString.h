@@ -60,4 +60,4 @@ pVMString VMString_new(const char* restrict chars);
 
 VTABLE(VMString)* VMString_vtable(void);
 
-#endif VMSTRING_H_
+#endif // VMSTRING_H_

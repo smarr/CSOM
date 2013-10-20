@@ -95,4 +95,4 @@ pString String_new_from(pString restrict string);
 VTABLE(String)* String_vtable();
 
 
-#endif STRING_H_
+#endif // STRING_H_

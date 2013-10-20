@@ -43,7 +43,4 @@ void _System_fullGC(pVMObject object, pVMFrame frame);
 void __System_init(void);
 extern struct timeval _System_start_time;
 
-#endif CORE_SYSTEM_H_
-
-
-
+#endif // CORE_SYSTEM_H_

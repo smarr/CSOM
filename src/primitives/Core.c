@@ -61,21 +61,21 @@ void _init(void);
 void _fini(void);
 #pragma init _init
 #pragma fini _fini
-#endif __GNUC__
+#endif // __GNUC__
 
 // Library load initializer
 #ifdef __GNUC__
 void init(void) { ; /* noop */}
 #else
 void _init(void) { ; /* noop */ }
-#endif __GNUC__
+#endif // __GNUC__
 
 // Library unload function
 #ifdef __GNUC__
 void fini(void) { ; /* noop */ }
 #else
 void _fini(void) { ; /* noop */ }
-#endif __GNUC__
+#endif // __GNUC__
 
 
 // Classes supported by this lib.

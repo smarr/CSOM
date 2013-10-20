@@ -117,4 +117,4 @@ pStringHashmap StringHashmap_new(void);
 VTABLE(StringHashmap)* StringHashmap_vtable(void);
 
 
-#endif STRINGHASHMAP_H_
+#endif // STRINGHASHMAP_H_

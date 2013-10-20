@@ -35,6 +35,4 @@ void      Symbol_table_insert(pVMSymbol);
 void      Symbol_table_init(void);
 void      Symbol_table_destruct(void);
 
-#endif SYMBOLTABLE_H_
-
-
+#endif // SYMBOLTABLE_H_

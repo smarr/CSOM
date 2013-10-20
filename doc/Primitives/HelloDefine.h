@@ -34,4 +34,4 @@
 
 #define A_STRING "muhhhhhhh"
 
-#endif HELLODEFINE_H_
+#endif // HELLODEFINE_H_

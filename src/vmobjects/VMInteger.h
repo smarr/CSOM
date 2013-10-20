@@ -61,6 +61,4 @@ pVMInteger VMInteger_new_with(const int32_t);
 
 VTABLE(VMInteger)* VMInteger_vtable(void);
 
-#endif VMINTEGER_H_
-
-
+#endif // VMINTEGER_H_

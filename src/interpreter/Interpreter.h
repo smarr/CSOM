@@ -38,4 +38,4 @@ pVMFrame  Interpreter_get_frame(void);
 pVMMethod Interpreter_get_method(void);
 pVMObject Interpreter_get_self(void);
 
-#endif INTERPRETER_H_
+#endif // INTERPRETER_H_

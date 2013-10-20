@@ -227,7 +227,7 @@ uint8_t _VMMethod_get_bytecode(void* _self, int index) {
     #ifdef DEBUG
         if(index >= SEND(self->bytecodes_length, get_embedded_integer))
             Universe_error_exit("[get] Method Bytecode Index out of range.");
-    #endif DEBUG
+    #endif // DEBUG
     /*
      * Bytecodes start at end of the internal array,
      * thus, at offset + number_of_constants
@@ -244,7 +244,7 @@ void _VMMethod_set_bytecode(void* _self, int index, uint8_t value) {
     #ifdef DEBUG
         if(index >= SEND(self->bytecodes_length, get_embedded_integer))
             Universe_error_exit("[set] Method Bytecode Index out of range.");  
-    #endif DEBUG
+    #endif // DEBUG
     /*
      * Bytecodes start at end of the internal array,
      * thus, at offset + number_of_constants

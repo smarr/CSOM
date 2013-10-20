@@ -78,4 +78,4 @@ pVMPrimitive VMPrimitive_assemble(method_generation_context* mgenc);
 VTABLE(VMPrimitive)* VMPrimitive_vtable(void);
 
 
-#endif VMPRIMITIVE_H_
+#endif // VMPRIMITIVE_H_

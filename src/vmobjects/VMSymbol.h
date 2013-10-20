@@ -62,4 +62,4 @@ pVMSymbol VMSymbol_new(const char* restrict);
 
 VTABLE(VMSymbol)* VMSymbol_vtable(void);
 
-#endif VMSYMBOL_H_
+#endif // VMSYMBOL_H_

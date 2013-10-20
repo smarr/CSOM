@@ -34,6 +34,4 @@ THE SOFTWARE.
 int  Signature_get_number_of_arguments(pVMSymbol);
 bool Signature_is_binary(pVMSymbol);
 
-#endif SIGNATURE_H_
-
-
+#endif // SIGNATURE_H_

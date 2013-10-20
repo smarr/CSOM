@@ -37,4 +37,4 @@ void  _String_equal(pVMObject object, pVMFrame frame);
 void  _String_primSubstringFrom_to_(pVMObject object, pVMFrame frame);
 
 
-#endif CORE_STRING_H_
+#endif // CORE_STRING_H_

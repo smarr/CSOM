@@ -31,7 +31,4 @@ THE SOFTWARE.
 
 void  _Symbol_asString(pVMObject object, pVMFrame frame);
 
-#endif CORE_SYMBOL_H_
-
-
-
+#endif // CORE_SYMBOL_H_

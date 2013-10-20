@@ -60,6 +60,4 @@ struct _VMInvokable {
 VTABLE(VMInvokable)* VMInvokable_vtable(void);
 
 
-#endif VMINVOKABLE_H_
-
-
+#endif // VMINVOKABLE_H_

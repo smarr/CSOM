@@ -64,4 +64,4 @@ pVMArray VMArray_new(size_t size);
 VTABLE(VMArray)* VMArray_vtable(void);
 
 
-#endif ARRAY_H_
+#endif // ARRAY_H_

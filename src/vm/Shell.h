@@ -33,6 +33,4 @@ void      Shell_set_bootstrap_method(pVMMethod);
 pVMMethod Shell_get_bootstrap_method(void);
 void      Shell_start(void);
 
-#endif SHELL_H_
-
-
+#endif // SHELL_H_

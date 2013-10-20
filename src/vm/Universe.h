@@ -116,4 +116,4 @@ const char**  Universe_handle_arguments(int* vm_argc, int argc,
 void          Universe_initialize(int argc, const char** argv);
 void          Universe_destruct(void);
 
-#endif UNIVERSE_H_
+#endif // UNIVERSE_H_

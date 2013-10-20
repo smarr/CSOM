@@ -88,4 +88,4 @@ bool    method_genc_find_field(method_generation_context* mgenc,
 uint8_t method_genc_compute_stack_depth(method_generation_context* mgenc);
 
 
-#endif GENERATIONCONTEXTS_H_
+#endif // GENERATIONCONTEXTS_H_

@@ -60,5 +60,4 @@ pVMEvaluationPrimitive VMEvaluationPrimitive_new(int argc);
 VTABLE(VMEvaluationPrimitive)* VMEvaluationPrimitive_vtable(void);
 
 
-#endif VMEVALUATIONPRIMITIVE_H_
-
+#endif // VMEVALUATIONPRIMITIVE_H_

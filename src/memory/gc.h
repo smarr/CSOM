@@ -70,6 +70,6 @@ char*  internal_allocate_string(const char* restrict str);
 void   internal_free(void* ptr);
 
 
-#endif GC_H_
+#endif // GC_H_
 
 

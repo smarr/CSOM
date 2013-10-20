@@ -56,4 +56,4 @@ void emit_RETURN_LOCAL(method_generation_context* mgenc);
 void emit_RETURN_NON_LOCAL(method_generation_context* mgenc);
 
 
-#endif BYTECODEGENERATION_H_
+#endif // BYTECODEGENERATION_H_

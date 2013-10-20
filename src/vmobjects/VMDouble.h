@@ -61,6 +61,4 @@ pVMDouble VMDouble_new_with(const double);
 
 VTABLE(VMDouble)* VMDouble_vtable(void);
 
-#endif VMDOUBLE_H_
-
-
+#endif // VMDOUBLE_H_

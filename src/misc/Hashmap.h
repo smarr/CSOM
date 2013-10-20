@@ -135,4 +135,4 @@ pHashmap Hashmap_new(void);
 VTABLE(Hashmap)* Hashmap_vtable(void);
 
 
-#endif HASHMAP_H_
+#endif // HASHMAP_H_

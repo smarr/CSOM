@@ -42,4 +42,4 @@ void Parser_init(const FILE* fp);
 void Parser_init_string(const char* stream);
 void Parser_classdef(class_generation_context* cgenc);
 
-#endif PARSER_H_
+#endif // PARSER_H_

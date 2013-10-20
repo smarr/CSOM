@@ -96,7 +96,7 @@ void print_header(void) {
 	"#define CSOM_WIN\n"
 #else
     "#error \"no currently supported platform\"\n" 
-#endif APPLE/linux/bsd/win32/sun
+#endif // APPLE/linux/bsd/win32/sun
 
 #if defined(sun)
 /* mingw should follow */
@@ -104,7 +104,7 @@ void print_header(void) {
 #endif
     
     "#define shared_extension \"" shared_extension "\"\n"
-    "\n// EOF \n#endif PLATFORM_H_\n");
+    "\n// EOF \n#endif // PLATFORM_H_\n");
 }
 
 int main(int argc, char **argv) {

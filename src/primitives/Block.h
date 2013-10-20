@@ -36,4 +36,4 @@ void  _Block_value_(pVMObject object, pVMFrame frame);
 void  _Block_value_with_(pVMObject object, pVMFrame frame);
 
 
-#endif CORE_BLOCK_H_
+#endif // CORE_BLOCK_H_

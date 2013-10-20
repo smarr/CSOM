@@ -104,4 +104,4 @@ pVMFrame VMFrame_new(size_t length);
 
 VTABLE(VMFrame)* VMFrame_vtable(void);
 
-#endif VMFRAME_H_
+#endif // VMFRAME_H_

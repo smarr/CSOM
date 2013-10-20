@@ -60,7 +60,7 @@ static inline void debug_info(const char* fmt, ...) {
     #ifdef DEBUG
         debug_prefix("INFO:"); 
         debug_pass(fmt);
-    #endif DEBUG
+    #endif // DEBUG
 }
 
 
@@ -68,7 +68,7 @@ static inline void debug_log(const char* fmt, ...) {
     #ifdef DEBUG
         debug_prefix("LOG:"); 
         debug_pass(fmt);    
-    #endif DEBUG
+    #endif // DEBUG
 }
 
 
@@ -100,4 +100,4 @@ static inline void debug_trace(const char* fmt, ...) {
 #undef debug_pass 
 
 
-#endif DEBUG_H_
+#endif // DEBUG_H_

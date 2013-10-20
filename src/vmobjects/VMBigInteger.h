@@ -61,5 +61,4 @@ pVMBigInteger VMBigInteger_new_with(const int64_t);
 
 VTABLE(VMBigInteger)* VMBigInteger_vtable(void);
 
-#endif VMBIGINTEGER_H_
-
+#endif // VMBIGINTEGER_H_

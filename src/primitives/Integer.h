@@ -46,4 +46,4 @@ void Integer_fromString_(pVMObject object, pVMFrame frame);
 
 void __Integer_init(void);
 
-#endif CORE_INTEGER_H_
+#endif // CORE_INTEGER_H_

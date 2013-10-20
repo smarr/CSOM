@@ -42,7 +42,7 @@ void  _BigInteger_lessthan(pVMObject object, pVMFrame frame);
 void  _BigInteger_asString(pVMObject object, pVMFrame frame);
 void  _BigInteger_sqrt(pVMObject object, pVMFrame frame);
 
-#endif CORE_BIGINTEGER_H_
+#endif // CORE_BIGINTEGER_H_
 
 
 

@@ -37,15 +37,25 @@ VTABLE(VMSymbol) {
 #define VMSYMBOL_VTABLE_FORMAT \
     VMOBJECT_VTABLE_FORMAT; \
     const char* (*get_plain_string)(void*); \
-    const char* (*get_chars)(void*)
+    const char* (*get_chars)(void*); \
+    size_t      (*get_cached_index)(void*, pVMClass); \
+    void        (*update_cached_index)(void*, pVMClass, size_t); \
+    pVMInvokable (*get_cached_invokable)(void*, pVMClass); \
+    void        (*update_cached_invokable)(void*, pVMClass, pVMInvokable)
     
     VMSYMBOL_VTABLE_FORMAT;
 };
+
 
 #pragma mark class definition
 
 #define SYMBOL_FORMAT \
    VMOBJECT_FORMAT; \
+   pVMClass cachedClass_index; /* for field index lookup */ \
+   intptr_t cachedIndex;       /* for field index lookup */ \
+   intptr_t nextCachePos; \
+   pVMInvokable cachedInvokable[3]; \
+   pVMClass cachedClass_invokable[3]; \
    char chars[0]
 
 
@@ -57,6 +67,7 @@ struct _VMSymbol {
 #pragma mark class methods
 
 pVMSymbol VMSymbol_new(const char* restrict);
+
 
 #pragma mark vtable initialization
 

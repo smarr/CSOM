@@ -41,6 +41,7 @@ THE SOFTWARE.
 pVMSymbol VMSymbol_new(const char* restrict string) {
     pVMSymbol result = (pVMSymbol)gc_allocate_object(
         sizeof(VMSymbol) + sizeof(char) * (strlen(string) + 1));
+
     if(result) {
         result->_vtable = VMSymbol_vtable();
         gc_start_uninterruptable_allocation();
@@ -56,19 +57,60 @@ pVMSymbol VMSymbol_new(const char* restrict string) {
  */
 void _VMSymbol_init(void* _self, ...) {
     pVMSymbol self = (pVMSymbol)_self;    
-    SUPER(VMObject, self, init, 1);
+    SUPER(VMObject, self, init, 10);
     
     va_list args;
     va_start(args, _self);
     const char* embed = va_arg(args, char*);
     va_end(args);
     strcpy(self->chars, embed);
+    self->cachedClass_index = NULL;
+    self->cachedClass_invokable[0] = NULL;
+    self->cachedClass_invokable[1] = NULL;
+    self->cachedClass_invokable[2] = NULL;
+    self->cachedIndex = -1;
+    self->nextCachePos = 0;
+    self->cachedInvokable[0] = NULL;
+    self->cachedInvokable[1] = NULL;
+    self->cachedInvokable[2] = NULL;
 }
 
 
 //
 //  Instance Methods (Starting with _VMSymbol_) 
 //
+
+size_t _VMSymbol_get_cached_index(void* _self, pVMClass cls) {
+    pVMSymbol self = (pVMSymbol)_self;
+    if (cls == self->cachedClass_index)
+        return self->cachedIndex;
+    return -1;
+}
+
+void _VMSymbol_update_cached_index(void* _self, pVMClass cls, size_t idx) {
+    pVMSymbol self = (pVMSymbol)_self;
+    self->cachedIndex = idx;
+    self->cachedClass_index = cls;
+}
+
+
+pVMInvokable _VMSymbol_get_cached_invokable(void* _self, pVMClass cls) {
+    pVMSymbol self = (pVMSymbol)_self;
+    if (cls == self->cachedClass_invokable[0])
+        return self->cachedInvokable[0];
+    else if (cls == self->cachedClass_invokable[1])
+        return self->cachedInvokable[1];
+    else if (cls == self->cachedClass_invokable[2])
+        return self->cachedInvokable[2];
+    return NULL;
+}
+
+void _VMSymbol_update_cached_invokable(void* _self, pVMClass cls, pVMInvokable invo) {
+    pVMSymbol self = (pVMSymbol)_self;
+    self->cachedInvokable[self->nextCachePos] = invo;
+    self->cachedClass_invokable[self->nextCachePos] = cls;
+    self->nextCachePos = (self->nextCachePos + 1) % 3;
+}
 
 
 const char* _VMSymbol_get_plain_string(void* _self) {
@@ -161,6 +203,10 @@ VTABLE(VMSymbol)* VMSymbol_vtable(void) {
         _VMSymbol_vtable.init             = METHOD(VMSymbol, init);        
         _VMSymbol_vtable.get_plain_string = METHOD(VMSymbol, get_plain_string);
         _VMSymbol_vtable.get_chars        = METHOD(VMSymbol, get_chars);
+        _VMSymbol_vtable.get_cached_index = METHOD(VMSymbol, get_cached_index);
+        _VMSymbol_vtable.update_cached_index = METHOD(VMSymbol, update_cached_index);
+        _VMSymbol_vtable.get_cached_invokable = METHOD(VMSymbol, get_cached_invokable);
+        _VMSymbol_vtable.update_cached_invokable = METHOD(VMSymbol, update_cached_invokable);
 
         VMSymbol_vtable_inited = true;
     }

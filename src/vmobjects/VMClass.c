@@ -272,15 +272,22 @@ void _VMClass_set_instance_invokable(void* _self, int idx, pVMObject value) {
 
 pVMObject _VMClass_lookup_invokable(void* _self, pVMSymbol signature) {
     pVMClass self = (pVMClass)_self;
-    pVMObject invokable = NULL;
+    pVMObject invokable = (pVMObject) SEND(signature, get_cached_invokable, self);
+    
+    if (invokable != NULL)
+        return invokable;
+    
     // lookup invokable with given signature in array of instance invokables
     for(int i = 0; i < SEND(self, get_number_of_instance_invokables); i++) {
-      // get the next invokable in the instance invokable array
-      invokable = SEND(self, get_instance_invokable, i);
-      // return the invokable if the signature matches
-      if(TSEND(VMInvokable, invokable, get_signature) == signature)
-          return invokable;
-    }    
+        // get the next invokable in the instance invokable array
+        invokable = SEND(self, get_instance_invokable, i);
+        
+        // return the invokable if the signature matches
+        if(TSEND(VMInvokable, invokable, get_signature) == signature) {
+            SEND(signature, update_cached_invokable, self, invokable);
+            return invokable;
+        }
+    }
     // traverse the super class chain by calling lookup on the super class
     if(SEND(self, has_super_class)) {
         invokable = SEND(self->super_class, lookup_invokable, signature);
@@ -294,11 +301,18 @@ pVMObject _VMClass_lookup_invokable(void* _self, pVMSymbol signature) {
 
 int _VMClass_lookup_field_index(void* _self, pVMSymbol field_name) {
     pVMClass self = (pVMClass)_self;
+    
+    long index = SEND(field_name, get_cached_index, self);
+    if (index != -1)
+		return index;
+    
     // lookup field with given name in array of instance fields
-    for(int i = SEND(self, get_number_of_instance_fields) - 1; i >= 0; i--) {
-      // return the current index if the name matches
-      if(field_name == SEND(self, get_instance_field_name, i))
-        return i;
+    for (int i = SEND(self, get_number_of_instance_fields) - 1; i >= 0; i--) {
+        // return the current index if the name matches
+        if (field_name == SEND(self, get_instance_field_name, i)) {
+            SEND(field_name, update_cached_index, self, i);
+            return i;
+        }
     }
     // field not found
     return -1;

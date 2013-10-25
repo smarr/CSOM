@@ -35,6 +35,7 @@ void  _Double_star(pVMObject object, pVMFrame frame);
 void  _Double_slashslash(pVMObject object, pVMFrame frame);
 void  _Double_percent(pVMObject object, pVMFrame frame);
 void  _Double_and(pVMObject object, pVMFrame frame);
+void  _Double_bitXor_(pVMObject object, pVMFrame frame);
 void  _Double_equal(pVMObject object, pVMFrame frame);
 void  _Double_lessthan(pVMObject object, pVMFrame frame);
 void  _Double_asString(pVMObject object, pVMFrame frame);

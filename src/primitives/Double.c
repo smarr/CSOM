@@ -98,6 +98,8 @@ void  _Double_percent(pVMObject object, pVMFrame frame) {
                                                      ((int64_t)left % 
                                                       (int64_t)right)));
 }
+
+
 void  _Double_and(pVMObject object, pVMFrame frame) {
     PREPARE_OPERANDS;
     SEND(frame, push, (pVMObject)Universe_new_double((double)
@@ -105,6 +107,13 @@ void  _Double_and(pVMObject object, pVMFrame frame) {
                                                       (int64_t)right)));
 }
 
+
+void  _Double_bitXor_(pVMObject object, pVMFrame frame) {
+    PREPARE_OPERANDS;
+    SEND(frame, push, (pVMObject)Universe_new_double((double)
+                                                     ((int64_t)left ^
+                                                      (int64_t)right)));
+}
 
 
 /*

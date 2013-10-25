@@ -41,7 +41,7 @@ THE SOFTWARE.
 
 
 // number of fields helper
-void set_number_of_fields(void* _self, int value);
+static void set_number_of_fields(void* _self, int value);
 
 
 //
@@ -151,7 +151,7 @@ int _VMObject_get_number_of_fields(void* _self) {
 
 
 // number of fields helper
-void set_number_of_fields(void* _self, int value) {
+static void set_number_of_fields(void* _self, int value) {
     pVMObject self = (pVMObject)_self;
     self->num_of_fields = value;
     

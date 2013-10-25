@@ -33,8 +33,6 @@ THE SOFTWARE.
 
 #include <misc/Hashmap.h>
 
-#include <compiler/GenerationContexts.h>
-
 #include <stdbool.h>
 
 

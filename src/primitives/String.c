@@ -34,6 +34,8 @@ THE SOFTWARE.
 
 #include <vm/Universe.h>
 
+#include <memory/gc.h>
+
 #include "String.h"
 
 #include <string.h>

@@ -31,12 +31,11 @@ THE SOFTWARE.
 #include "VMInteger.h"
 #include "VMInvokable.h"
 
-#include <interpreter/bytecodes.h>
-
 #include <memory/gc.h>
 
 #include <vm/Universe.h>
 
+#include <interpreter/bytecodes.h>
 #include <interpreter/Interpreter.h>
 
 #include <misc/debug.h>

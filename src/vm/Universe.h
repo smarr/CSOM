@@ -73,8 +73,8 @@ extern short dump_bytecodes;
 extern short gc_verbosity;
  
  
-void          Universe_exit(int);
-void          Universe_error_exit(const char* restrict);
+void          Universe_exit(int)                        __attribute__((noreturn));
+void          Universe_error_exit(const char* restrict) __attribute__((noreturn));
 
 void          Universe_assert(bool);
 

@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "Block.h"
 #include "Class.h"
 #include "Double.h"
+#include "Frame.h"
 #include "Integer.h"
 #include "Object.h"
 #include "String.h"
@@ -85,6 +86,7 @@ static char* supported_classes[] = {
     "Block", //this is Block1..3
     "Class",
     "Double",
+    "Frame",
     "Integer",
     "Object",
     "String",

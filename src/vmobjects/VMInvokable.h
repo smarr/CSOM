@@ -41,7 +41,6 @@ VTABLE(VMInvokable) {
     void      (*invoke)(void*, pVMFrame);
     bool      (*is_primitive)(void*);
     pVMSymbol (*get_signature)(void*);
-    void      (*set_signature)(void*, pVMSymbol);
     pVMClass  (*get_holder)(void*);
     void      (*set_holder)(void*, pVMClass);
     int       (*get_size_of_object)(void*);

@@ -112,8 +112,6 @@ VTABLE(VMInteger)* VMInteger_vtable(void) {
         _VMInteger_vtable.init = METHOD(VMInteger, init);
         _VMInteger_vtable.get_embedded_integer =
             METHOD(VMInteger, get_embedded_integer);
-        _VMInteger_vtable.set_embedded_integer =
-            METHOD(VMInteger, set_embedded_integer);
         
         _VMInteger_vtable.mark_references = 
             METHOD(VMInteger, mark_references);

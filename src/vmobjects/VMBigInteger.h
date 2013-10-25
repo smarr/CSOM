@@ -34,8 +34,7 @@ THE SOFTWARE.
 VTABLE(VMBigInteger) {
 #define VMBIGINTEGER_VTABLE_FORMAT \
     VMOBJECT_VTABLE_FORMAT; \
-    int64_t (*get_embedded_biginteger)(void*); \
-    void    (*set_embedded_biginteger)(void*, const int64_t)
+    int64_t (*get_embedded_biginteger)(void*)
         
     VMBIGINTEGER_VTABLE_FORMAT;
 };

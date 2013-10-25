@@ -380,11 +380,8 @@ void Universe_initialize(int argc, const char** argv) {
     
     // create a fake bootstrap method to simplify later frame traversal
     pVMMethod bootstrap_method =
-        Universe_new_method(Universe_symbol_for("bootstrap"), 1, 0);
+        Universe_new_method(Universe_symbol_for("bootstrap"), 1, 0, 0, 2);
     SEND(bootstrap_method, set_bytecode, 0, BC_HALT);
-    SEND(bootstrap_method, set_number_of_locals, 0);
-    SEND(bootstrap_method, set_maximum_number_of_stack_elements, 2);
-    //SEND((pVMArray)bootstrap_method, set_number_of_indexable_fields, 0);
     TSEND(VMInvokable, bootstrap_method, set_holder, system_class);
     
      
@@ -403,7 +400,8 @@ void Universe_initialize(int argc, const char** argv) {
     pVMArray arguments_array = Universe_new_array_from_argv(argc, argv);
         
     // create a fake bootstrap frame with the system object on the stack
-    pVMFrame bootstrap_frame = Interpreter_push_new_frame(bootstrap_method);
+    Interpreter_initialize(nil_object);
+    pVMFrame bootstrap_frame = Interpreter_push_new_frame(bootstrap_method, (pVMFrame) nil_object);
     SEND(bootstrap_frame, push, system_object);
     SEND(bootstrap_frame, push, (pVMObject)arguments_array);
             
@@ -503,13 +501,9 @@ pVMArray Universe_new_array_from_argv(int argc, const char** argv) {
 
 pVMBlock Universe_new_block(pVMMethod method, pVMFrame context, int arguments) {
     // Allocate a new block and set its class to be the block class
-    pVMBlock result = VMBlock_new();
+    pVMBlock result = VMBlock_new(method, context);
     SEND((pVMObject)result, set_class,
          Universe_get_block_class_with_args(arguments));
-    
-    // Set the method and context of block
-    SEND(result, set_method, method);
-    SEND(result, set_context, context);
     
     // Return the freshly allocated block
     return result;
@@ -533,7 +527,7 @@ pVMClass Universe_new_class(pVMClass class_of_class) {
 }
 
 
-pVMFrame Universe_new_frame(pVMFrame previous_frame, pVMMethod method) {
+pVMFrame Universe_new_frame(pVMFrame previous_frame, pVMMethod method, pVMFrame context) {
     // Compute the maximum number of stack locations (including arguments,
     // locals and extra buffer to support doesNotUnderstand) and set the number
     // of indexable fields accordingly
@@ -542,15 +536,8 @@ pVMFrame Universe_new_frame(pVMFrame previous_frame, pVMMethod method) {
                  SEND(method, get_maximum_number_of_stack_elements) + 2;
     
     // Allocate a new frame and set its class to be the frame class
-    pVMFrame result = VMFrame_new(length);
+    pVMFrame result = VMFrame_new(length, method, context, previous_frame);
     SEND((pVMObject)result, set_class, frame_class);
-    
-    //SEND((pVMArray)result, set_number_of_indexable_fields, length);
-    
-    // Set the method of the frame and the previous frame
-    SEND(result, set_method, method);
-    if(previous_frame != NULL) 
-        SEND(result, set_previous_frame, previous_frame);
     
     // Reset the stack pointer and the bytecode index
     SEND(result, reset_stack_pointer);
@@ -562,14 +549,14 @@ pVMFrame Universe_new_frame(pVMFrame previous_frame, pVMMethod method) {
 
 
 pVMMethod Universe_new_method(pVMSymbol signature, size_t number_of_bytecodes,
-                              size_t number_of_constants) {
+                              size_t number_of_constants, size_t number_of_locals,
+                              size_t max_number_of_stack_elements) {
     // Allocate a new method and set its class to be the method class
-    pVMMethod result = VMMethod_new(number_of_bytecodes, number_of_constants);
+    pVMMethod result = VMMethod_new(number_of_bytecodes, number_of_constants,
+                                    number_of_locals,
+                                    max_number_of_stack_elements, signature);
     SEND((pVMObject)result, set_class, method_class);
     
-    // Set the signature and the number of bytecodes
-    TSEND(VMInvokable, result, set_signature, signature);
-        
     // Return the freshly allocated method
     return result;
 }

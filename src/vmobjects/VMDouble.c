@@ -84,14 +84,6 @@ double _VMDouble_get_embedded_double(void* _self) {
     return self->embedded_double;
 }
 
-
-// embedded double will be duplicated
-void _VMDouble_set_embedded_double(void* _self, const double embedded) {
-    pVMDouble self = (pVMDouble)_self;
-    self->embedded_double = embedded;
-}
-
-
 void _VMDouble_mark_references(void* _self) {
     pVMDouble self = (pVMDouble) _self;
     SUPER(VMObject, self, mark_references);
@@ -111,8 +103,6 @@ VTABLE(VMDouble)* VMDouble_vtable(void) {
         _VMDouble_vtable.init                = METHOD(VMDouble, init);
         _VMDouble_vtable.get_embedded_double =
             METHOD(VMDouble, get_embedded_double);
-        _VMDouble_vtable.set_embedded_double =
-            METHOD(VMDouble, set_embedded_double);
         
         _VMDouble_vtable.mark_references = 
             METHOD(VMDouble, mark_references);

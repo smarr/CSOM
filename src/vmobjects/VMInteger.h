@@ -34,8 +34,7 @@ THE SOFTWARE.
 VTABLE(VMInteger) {
 #define VMINTEGER_VTABLE_FORMAT \
     VMOBJECT_VTABLE_FORMAT; \
-    int32_t (*get_embedded_integer)(void*); \
-    void    (*set_embedded_integer)(void*, const int32_t)
+    int32_t (*get_embedded_integer)(void*)
         
     VMINTEGER_VTABLE_FORMAT;
 };

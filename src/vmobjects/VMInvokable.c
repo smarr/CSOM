@@ -57,20 +57,6 @@ pVMSymbol _VMInvokable_get_signature(void* _self) {
 }
 
 
-void _VMInvokable_set_signature(void* _self, pVMSymbol sig) {
-    #ifdef DEBUG
-    {
-        debug_info("\t\t'%s'\n", SEND(sig, get_chars));
-    }
-    #endif
-    ((pVMInvokable)_self)->signature = sig;
-    if(!TSEND(VMInvokable, (pVMInvokable)_self, is_primitive))
-        // if method, cache number of arguments
-        SEND((pVMMethod)_self, set_number_of_arguments, 
-             Signature_get_number_of_arguments(sig));
-}
-
-
 pVMClass _VMInvokable_get_holder(void* _self) {
     return ((pVMInvokable)_self)->holder;
 }
@@ -103,7 +89,6 @@ VTABLE(VMInvokable)* VMInvokable_vtable(void) {
         _VMInvokable_vtable.invoke        = METHOD(VMInvokable, invoke);
         _VMInvokable_vtable.is_primitive  = METHOD(VMInvokable, is_primitive);
         _VMInvokable_vtable.get_signature = METHOD(VMInvokable, get_signature);
-        _VMInvokable_vtable.set_signature = METHOD(VMInvokable, set_signature);
         _VMInvokable_vtable.get_holder    = METHOD(VMInvokable, get_holder);
         _VMInvokable_vtable.set_holder    = METHOD(VMInvokable, set_holder);
         

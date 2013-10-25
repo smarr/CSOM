@@ -333,7 +333,7 @@ void Disassembler_dump_bytecode(pVMFrame frame, pVMMethod method, int bc_idx) {
             break;
         }
         case BC_POP: {
-            size_t sp = SEND(frame->stack_pointer, get_embedded_integer);
+            size_t sp = frame->stack_pointer;
             pVMObject o = SEND((pVMArray)frame, get_indexable_field, sp);
             pVMClass c = SEND(o, get_class);
             pVMSymbol cname = SEND(c, get_name);
@@ -344,7 +344,7 @@ void Disassembler_dump_bytecode(pVMFrame frame, pVMMethod method, int bc_idx) {
             break;            
         }            
         case BC_POP_LOCAL: {
-            size_t sp = SEND(frame->stack_pointer, get_embedded_integer);
+            size_t sp = frame->stack_pointer;
             pVMObject o = SEND((pVMArray)frame, get_indexable_field, sp);
             pVMClass c = SEND(o, get_class);
             pVMSymbol cname = SEND(c, get_name);
@@ -356,7 +356,7 @@ void Disassembler_dump_bytecode(pVMFrame frame, pVMMethod method, int bc_idx) {
             break;            
         }
         case BC_POP_ARGUMENT: {
-            size_t sp = SEND(frame->stack_pointer, get_embedded_integer);
+            size_t sp = frame->stack_pointer;
             pVMObject o = SEND((pVMArray)frame, get_indexable_field, sp);
             pVMClass c = SEND(o, get_class);
             pVMSymbol cname = SEND(c, get_name);
@@ -368,7 +368,7 @@ void Disassembler_dump_bytecode(pVMFrame frame, pVMMethod method, int bc_idx) {
             break;
         }
         case BC_POP_FIELD: {
-            size_t sp = SEND(frame->stack_pointer, get_embedded_integer);
+            size_t sp = frame->stack_pointer;
             pVMObject o = SEND((pVMArray)frame, get_indexable_field, sp);
             pVMSymbol name = (pVMSymbol)SEND(method, get_constant, bc_idx);
             pVMClass c = SEND(o, get_class);

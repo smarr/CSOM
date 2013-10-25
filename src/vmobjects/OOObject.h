@@ -178,7 +178,7 @@ VTABLE(OOObject)* OOObject_vtable(void);
     (sizeof(SUB)/sizeof(void*)-sizeof(SUPER)/sizeof(void*))
     
     
-#define SIZE_DIFF_VMOBJECT(SUB) (OBJECT_SIZE_DIFF(SUB,VMObject)+1)
+#define SIZE_DIFF_VMOBJECT(SUB) (OBJECT_SIZE_DIFF(SUB,VMObject))
 
 
 #endif // OOOBJECT_H_

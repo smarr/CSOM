@@ -118,8 +118,6 @@ VTABLE(VMBigInteger)* VMBigInteger_vtable(void) {
         
         _VMBigInteger_vtable.get_embedded_biginteger =
             METHOD(VMBigInteger, get_embedded_biginteger);
-        _VMBigInteger_vtable.set_embedded_biginteger =
-            METHOD(VMBigInteger, set_embedded_biginteger);
 			
 		_VMBigInteger_vtable.mark_references = 
             METHOD(VMBigInteger, mark_references);

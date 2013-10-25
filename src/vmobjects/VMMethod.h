@@ -42,13 +42,10 @@ VTABLE(VMMethod) {
 #define VMMETHOD_VTABLE_FORMAT \
     VMARRAY_VTABLE_FORMAT; \
     int       (*get_number_of_locals)(void*); \
-    void      (*set_number_of_locals)(void*, int); \
     int       (*get_maximum_number_of_stack_elements)(void*); \
-    void      (*set_maximum_number_of_stack_elements)(void*, int); \
     void      (*set_holder_all)(void*, pVMClass); \
     pVMObject (*get_constant)(void*, int); \
     int       (*get_number_of_arguments)(void*); \
-    void      (*set_number_of_arguments)(void*, int); \
     int       (*get_number_of_bytecodes)(void*); \
     uint8_t   (*get_bytecode)(void*, int); \
     void      (*set_bytecode)(void*, int, uint8_t); \
@@ -65,11 +62,10 @@ VTABLE(VMMethod) {
     ARRAY_FORMAT; \
     pVMSymbol  signature; \
     pVMClass   holder; \
-    pVMInteger number_of_locals; \
-    pVMInteger maximum_number_of_stack_elements; \
-    pVMInteger bytecodes_length; \
-    pVMInteger number_of_arguments
-
+    size_t     number_of_locals; \
+    size_t     maximum_number_of_stack_elements; \
+    size_t     bytecodes_length; \
+    size_t     number_of_arguments
 
 struct _VMMethod {
     VTABLE(VMMethod)* _vtable;
@@ -80,7 +76,10 @@ struct _VMMethod {
 #pragma mark class methods
 
 
-pVMMethod VMMethod_new(size_t number_of_constants, size_t number_of_bytecodes);
+pVMMethod VMMethod_new(size_t number_of_constants, size_t number_of_bytecodes,
+                       size_t number_of_locals,
+                       size_t max_number_of_stack_elements,
+                       pVMSymbol signature);
 pVMMethod VMMethod_assemble(method_generation_context* mgenc);
 
 

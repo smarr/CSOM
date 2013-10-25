@@ -34,8 +34,7 @@ THE SOFTWARE.
 VTABLE(VMDouble) {
 #define VMDOUBLE_VTABLE_FORMAT \
     VMOBJECT_VTABLE_FORMAT; \
-    double (*get_embedded_double)(void*); \
-    void   (*set_embedded_double)(void*, const double)
+    double (*get_embedded_double)(void*)
         
     VMDOUBLE_VTABLE_FORMAT;
 };

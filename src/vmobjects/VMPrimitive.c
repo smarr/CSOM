@@ -98,7 +98,7 @@ void _VMPrimitive_init(void* _self, ...) {
     SEND(self, set_class, primitive_class);
     
     // Set the signature of this primitive
-    TSEND(VMInvokable, self, set_signature, va_arg(args, pVMSymbol));
+    self->signature = va_arg(args, pVMSymbol);
     va_end(args);
     
     // set routine to NULL

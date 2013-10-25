@@ -50,17 +50,14 @@ VTABLE(VMFrame) {
 #define VMFRAME_VTABLE_FORMAT \
     VMARRAY_VTABLE_FORMAT; \
     pVMFrame  (*get_previous_frame)(void*); \
-    void      (*set_previous_frame)(void*, pVMFrame); \
     void      (*clear_previous_frame)(void*); \
     bool      (*has_previous_frame)(void*); \
     bool      (*is_bootstrap_frame)(void*); \
     pVMFrame  (*get_context)(void*); \
-    void      (*set_context)(void*, pVMFrame); \
     bool      (*has_context)(void*); \
     pVMFrame  (*get_context_level)(void*, int); \
     pVMFrame  (*get_outer_context)(void*); \
     pVMMethod (*get_method)(void*); \
-    void      (*set_method)(void*, pVMMethod); \
     pVMObject (*pop)(void*); \
     void      (*push)(void*, pVMObject); \
     void      (*reset_stack_pointer)(void*); \
@@ -86,10 +83,9 @@ VTABLE(VMFrame) {
     pVMFrame   previous_frame; \
     pVMFrame   context; \
     pVMMethod  method; \
-    pVMInteger stack_pointer; \
-    pVMInteger bytecode_index; \
-    pVMInteger local_offset
-
+    size_t     stack_pointer; \
+    size_t     bytecode_index; \
+    size_t     local_offset
 
 struct _VMFrame {
     VTABLE(VMFrame)* _vtable;
@@ -98,7 +94,7 @@ struct _VMFrame {
 
 #pragma mark class methods
 
-pVMFrame VMFrame_new(size_t length);
+pVMFrame VMFrame_new(size_t length, pVMMethod method, pVMFrame context, pVMFrame previous_frame);
 
 #pragma mark vtable initialization
 

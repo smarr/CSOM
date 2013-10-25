@@ -46,7 +46,6 @@ VTABLE(VMObject) {
     pVMSymbol (*get_field_name)(void*, int); \
     int       (*get_field_index)(void*, pVMSymbol); \
     int       (*get_number_of_fields)(void*); \
-    void      (*set_number_of_fields)(void*, int); \
     int       (*get_default_number_of_fields)(void*); \
     void      (*send)(void*, pVMSymbol, pVMObject*, int); \
     pVMObject (*get_field)(void*, int); \
@@ -61,17 +60,17 @@ VTABLE(VMObject) {
 #define VMOBJECT_FORMAT \
     OOOBJECT_FORMAT; \
     int        num_of_fields;\
-    pVMObject  fields[0]; \
-    pVMClass   class
+    pVMClass   class; \
+    pVMObject  fields[0]
     
 
 /*
  * This is the number of fields visible to Smalltalk objects from the Smalltalk
  * side of the world. The sizes of the VMObject and OOObject structs are
- * subtracted. Moreover, 1 is subtracted to reflect the presence of the
- * "num_of_fields" field.
+ * subtracted. Moreover, 2 is subtracted to reflect the presence of the
+ * "num_of_fields" field, and the class field which are not visible.
  */
-#define NUMBER_OF_OBJECT_FIELDS (OBJECT_SIZE_DIFF(VMObject,OOObject)-1)
+#define NUMBER_OF_OBJECT_FIELDS (OBJECT_SIZE_DIFF(VMObject,OOObject)-2)
 
 
 struct _VMObject {

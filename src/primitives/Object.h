@@ -43,4 +43,6 @@ void  _Object_instVarAt_(pVMObject object, pVMFrame frame);
 void  _Object_instVarAt_put_(pVMObject object, pVMFrame frame);
 void  _Object_instVarNamed_(pVMObject object, pVMFrame frame);
 
+void  _Object_class(pVMObject object, pVMFrame frame);
+
 #endif // CORE_OBJECT_H_

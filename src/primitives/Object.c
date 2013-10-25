@@ -148,3 +148,10 @@ void _Object_instVarNamed_(pVMObject object, pVMFrame frame) {
     
     SEND(frame, push, value);
 }
+
+void  _Object_class(pVMObject object, pVMFrame frame) {
+    pVMObject self = SEND(frame, pop);
+    
+    pVMClass cls = SEND(self, get_class);
+    SEND(frame, push, (pVMObject) cls);
+}

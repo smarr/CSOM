@@ -130,9 +130,8 @@ void  routine(pVMObject object, pVMFrame frame) {
     pVMFrame context = SEND(block, get_context);
     
     // Push a new frame and set its context to be the one specified in the block
-    pVMFrame new_frame = Interpreter_push_new_frame(SEND(block, get_method));
+    pVMFrame new_frame = Interpreter_push_new_frame(SEND(block, get_method), context);
     SEND(new_frame, copy_arguments_from, frame);
-    SEND(new_frame, set_context, context);    
 }
 
 

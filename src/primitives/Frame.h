@@ -1,12 +1,8 @@
-#ifndef INTERPRETER_H_
-#define INTERPRETER_H_
+#ifndef CORE_FRAME_H_
+#define CORE_FRAME_H_
 
 /*
- * $Id: Interpreter.h 116 2007-09-20 13:29:40Z tobias.pape $
- *
-Copyright (c) 2007 Michael Haupt, Tobias Pape
-Software Architecture Group, Hasso Plattner Institute, Potsdam, Germany
-http://www.hpi.uni-potsdam.de/swa/
+Copyright (c) 2013 Stefan Marr <git@stefan-marr.de>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,17 +22,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
   */
- 
-#include <vmobjects/VMFrame.h>
-#include <vmobjects/VMMethod.h>
-#include <vmobjects/VMObject.h>
 
-void      Interpreter_initialize(pVMObject nilObject);
-void      Interpreter_start(void);
-pVMFrame  Interpreter_push_new_frame(pVMMethod method, pVMFrame context);
-void      Interpreter_set_frame(pVMFrame frame);
-pVMFrame  Interpreter_get_frame(void);
-pVMMethod Interpreter_get_method(void);
-pVMObject Interpreter_get_self(void);
+#include <vmobjects/OOObject.h>
 
-#endif // INTERPRETER_H_
+void  _Frame_method(pVMObject object, pVMFrame frame);
+void  _Frame_previousFrame(pVMObject object, pVMFrame frame);
+
+#endif // CORE_FRAME_H_

@@ -62,6 +62,9 @@ extern pVMClass system_class;
 extern pVMClass block_class;
 extern pVMClass double_class;
 
+extern pVMClass true_class;
+extern pVMClass false_class;
+
 extern pVMSymbol doesNotUnderstand_sym;
 extern pVMSymbol unknownGlobal_sym;
 extern pVMSymbol escapedBlock_sym;
@@ -85,8 +88,8 @@ pVMArray      Universe_new_array_list(pList list);
 pVMArray      Universe_new_array_from_argv(int, const char**);
 pVMBlock      Universe_new_block(pVMMethod, pVMFrame, int);
 pVMClass      Universe_new_class(pVMClass);
-pVMFrame      Universe_new_frame(pVMFrame, pVMMethod);
-pVMMethod     Universe_new_method(pVMSymbol, size_t, size_t);
+pVMFrame      Universe_new_frame(pVMFrame, pVMMethod, pVMFrame);
+pVMMethod     Universe_new_method(pVMSymbol, size_t, size_t, size_t, size_t);
 pVMObject     Universe_new_instance(pVMClass);
 pVMInteger    Universe_new_integer(int32_t);
 pVMBigInteger Universe_new_biginteger(int64_t);

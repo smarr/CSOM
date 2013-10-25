@@ -40,12 +40,12 @@ THE SOFTWARE.
 /**
  * Create a new VMBlock
  */
-pVMBlock VMBlock_new(void) {
+pVMBlock VMBlock_new(pVMMethod method, pVMFrame context) {
     pVMBlock result = (pVMBlock)gc_allocate_object(sizeof(VMBlock));
     if(result) {
         result->_vtable = VMBlock_vtable();
         gc_start_uninterruptable_allocation();
-        INIT(result);
+        INIT(result, method, context);
         gc_end_uninterruptable_allocation();
     }
     return result;
@@ -63,6 +63,13 @@ pVMPrimitive VMBlock_get_evaluation_primitive(int number_of_arguments) {
 void _VMBlock_init(void* _self, ...) {
     pVMBlock self = (pVMBlock)_self;
     SUPER(VMObject, self, init, SIZE_DIFF_VMOBJECT(VMBlock));
+    
+    va_list args;
+    va_start(args, _self);
+    self->method  = va_arg(args,pVMMethod);
+    self->context = va_arg(args,pVMFrame);
+    
+    va_end(args);
 }
 
 
@@ -77,23 +84,10 @@ pVMMethod _VMBlock_get_method(void* _self) {
 }
 
 
-void _VMBlock_set_method(void* _self, pVMMethod method) {
-    pVMBlock self = (pVMBlock)_self;
-    self->method = method;
-}
-
-
 pVMFrame _VMBlock_get_context(void* _self) {
     pVMBlock self = (pVMBlock)_self;
     // Get the context of this block
     return self->context;
-}
-
-
-void _VMBlock_set_context(void* _self, pVMFrame value) {
-    pVMBlock self = (pVMBlock)_self;
-    // Set the context of this block
-    self->context = value;
 }
 
 
@@ -120,9 +114,7 @@ VTABLE(VMBlock)* VMBlock_vtable(void) {
         _VMBlock_vtable.init            = METHOD(VMBlock, init);        
        
         _VMBlock_vtable.get_method  = METHOD(VMBlock, get_method);
-        _VMBlock_vtable.set_method  = METHOD(VMBlock, set_method);
         _VMBlock_vtable.get_context = METHOD(VMBlock, get_context);
-        _VMBlock_vtable.set_context = METHOD(VMBlock, set_context);
         
         _VMBlock_vtable.mark_references = 
             METHOD(VMBlock, mark_references);

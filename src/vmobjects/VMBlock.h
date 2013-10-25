@@ -39,9 +39,7 @@ VTABLE(VMBlock) {
 #define VMBLOCK_VTABLE_FORMAT \
     VMOBJECT_VTABLE_FORMAT; \
     pVMMethod (*get_method)(void*); \
-    void      (*set_method)(void*, pVMMethod); \
-    pVMFrame  (*get_context)(void*); \
-    void      (*set_context)(void*, pVMFrame)
+    pVMFrame  (*get_context)(void*)
     
     VMBLOCK_VTABLE_FORMAT;
 };
@@ -65,7 +63,7 @@ struct _VMBlock {
 #pragma mark class methods
 
 
-pVMBlock VMBlock_new(void);
+pVMBlock VMBlock_new(pVMMethod method, pVMFrame context);
 pVMPrimitive VMBlock_get_evaluation_primitive(int number_of_arguments);
 
 

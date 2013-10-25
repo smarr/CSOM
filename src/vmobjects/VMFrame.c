@@ -48,13 +48,13 @@ THE SOFTWARE.
 /**
  * Create a new VMFrame
  */
-pVMFrame VMFrame_new(size_t length) {
+pVMFrame VMFrame_new(size_t length, pVMMethod method, pVMFrame context, pVMFrame previous_frame) {
     pVMFrame result = (pVMFrame)gc_allocate_object(
         sizeof(VMFrame) + sizeof(pVMObject) * length);
     if(result) {
         result->_vtable = VMFrame_vtable();
         gc_start_uninterruptable_allocation();
-        INIT(result,length);
+        INIT(result, length, method, context, previous_frame);
         gc_end_uninterruptable_allocation();
     }
     return result;
@@ -71,11 +71,14 @@ void _VMFrame_init(void* _self, ...) {
     va_start(args, _self);
     
     SUPER(VMArray, _self, init, va_arg(args, size_t));
+    self->method         = va_arg(args, pVMMethod);
+    self->context        = va_arg(args, pVMFrame);
+    self->previous_frame = va_arg(args, pVMFrame);
     
     va_end(args);
-    self->local_offset = Universe_new_integer(0);
-    self->bytecode_index = Universe_new_integer(0);
-    self->stack_pointer = Universe_new_integer(0);    
+    self->local_offset   = 0;
+    self->bytecode_index = 0;
+    self->stack_pointer  = 0;
 }
 
 
@@ -86,12 +89,6 @@ void _VMFrame_init(void* _self, ...) {
 pVMFrame _VMFrame_get_previous_frame(void* _self) {
     pVMFrame self = (pVMFrame)_self;
     return self->previous_frame;
-}
-
-
-void _VMFrame_set_previous_frame(void* _self, pVMFrame previous_frame) {
-    pVMFrame self = (pVMFrame)_self;
-    self->previous_frame = previous_frame;
 }
 
 
@@ -116,12 +113,6 @@ bool _VMFrame_is_bootstrap_frame(void* _self) {
 pVMFrame _VMFrame_get_context(void* _self) {
     pVMFrame self = (pVMFrame)_self;
     return self->context;
-}
-
-
-void _VMFrame_set_context(void* _self, pVMFrame context) {
-    pVMFrame self = (pVMFrame)_self;
-    self->context = context;
 }
 
 
@@ -159,24 +150,18 @@ pVMMethod _VMFrame_get_method(void* _self) {
 }
 
 
-void    _VMFrame_set_method(void* _self, pVMMethod method) {
-    pVMFrame self = (pVMFrame)_self;
-    self->method = method;
-}
-
-
 pVMObject _VMFrame_pop(void* _self) {
     pVMFrame self = (pVMFrame)_self;
-    int sp = SEND(self->stack_pointer, get_embedded_integer);
-    SEND(self->stack_pointer, set_embedded_integer, sp - 1);
+    int sp = self->stack_pointer;
+    self->stack_pointer = sp - 1;
     return SEND(self, get_indexable_field, sp);
 }
 
 
 void _VMFrame_push(void* _self, pVMObject value) {
     pVMFrame self = (pVMFrame)_self;
-    size_t sp = SEND(self->stack_pointer, get_embedded_integer) + 1;
-    SEND(self->stack_pointer, set_embedded_integer, sp);
+    size_t sp = self->stack_pointer + 1;
+    self->stack_pointer = sp;
     SEND(self, set_indexable_field, sp, value);
 }
 
@@ -186,36 +171,36 @@ void _VMFrame_reset_stack_pointer(void* _self) {
     // arguments are stored in front of local variables
     pVMMethod meth = SEND(self, get_method);
     size_t lo = SEND(meth, get_number_of_arguments);
-    SEND(self->local_offset, set_embedded_integer, lo);
+    self->local_offset = lo;
   
     // Set the stack pointer to its initial value thereby clearing the stack
     size_t num_lo = SEND(meth, get_number_of_locals);
-    SEND(self->stack_pointer, set_embedded_integer, lo + num_lo - 1);
+    self->stack_pointer = lo + num_lo - 1;
 }
 
 
 int _VMFrame_get_bytecode_index(void* _self) {
     pVMFrame self = (pVMFrame)_self;
-    return SEND(self->bytecode_index, get_embedded_integer);
+    return self->bytecode_index;
 }
 
 
 void _VMFrame_set_bytecode_index(void* _self, int index) {
     pVMFrame self = (pVMFrame)_self;
-    SEND(self->bytecode_index, set_embedded_integer, index);
+    self->bytecode_index = index;
 }
 
 
 pVMObject _VMFrame_get_stack_element(void* _self, int index) {
     pVMFrame self = (pVMFrame)_self;
-    size_t sp = SEND(self->stack_pointer, get_embedded_integer);
+    size_t sp = self->stack_pointer;
     return SEND(self, get_indexable_field, sp - index);
 }
 
 
 void _VMFrame_set_stack_element(void* _self, int index, pVMObject value) {
     pVMFrame self = (pVMFrame)_self;
-    size_t sp = SEND(self->stack_pointer, get_embedded_integer);
+    size_t sp = self->stack_pointer;
     SEND(self, set_indexable_field, sp - index, value);    
 }
 
@@ -223,7 +208,7 @@ void _VMFrame_set_stack_element(void* _self, int index, pVMObject value) {
 pVMObject _VMFrame_get_local(void* _self, int index, int context_level) {
     pVMFrame self = (pVMFrame)_self;
     pVMFrame context = SEND(self, get_context_level, context_level);
-    size_t lo = SEND(context->local_offset, get_embedded_integer);
+    size_t lo = context->local_offset;
     return SEND(context, get_indexable_field, lo + index);
 }
 
@@ -233,7 +218,7 @@ void _VMFrame_set_local(void* _self, int index, int context_level,
 ) {
     pVMFrame self = (pVMFrame)_self;
     pVMFrame context = SEND(self, get_context_level, context_level);
-    size_t lo = SEND(context->local_offset, get_embedded_integer);
+    size_t lo = context->local_offset;
     SEND(context, set_indexable_field, lo + index, value);
 }
 
@@ -295,7 +280,7 @@ void _VMFrame_print_stack_trace(void* _self) {
     pVMSymbol holderSym = SEND(holder, get_name);
     
     // sending bytecode
-    int bc_idx = SEND(self->bytecode_index, get_embedded_integer);
+    int bc_idx = self->bytecode_index;
     if(!SEND(self, is_bootstrap_frame)) 
         bc_idx -= 2; // length of SEND / SUPER_SEND
     uint8_t bc = SEND(method, get_bytecode, bc_idx);
@@ -331,9 +316,6 @@ void _VMFrame_mark_references(void* _self) {
 	gc_mark_object(self->previous_frame);
 	gc_mark_object(self->context);
     gc_mark_object(self->method);
-    gc_mark_object(self->stack_pointer);
-    gc_mark_object(self->bytecode_index);
-    gc_mark_object(self->local_offset);
 	SUPER(VMArray, self, mark_references);
 }
 
@@ -352,7 +334,6 @@ VTABLE(VMFrame)* VMFrame_vtable(void) {
     *((VTABLE(VMArray)*)&_VMFrame_vtable) = *VMArray_vtable();
     _VMFrame_vtable.init               = METHOD(VMFrame, init);        
     _VMFrame_vtable.get_previous_frame = METHOD(VMFrame, get_previous_frame);
-    _VMFrame_vtable.set_previous_frame = METHOD(VMFrame, set_previous_frame);
     _VMFrame_vtable.clear_previous_frame = 
         METHOD(VMFrame, clear_previous_frame);
     _VMFrame_vtable.has_previous_frame =
@@ -360,12 +341,10 @@ VTABLE(VMFrame)* VMFrame_vtable(void) {
     _VMFrame_vtable.is_bootstrap_frame =
         METHOD(VMFrame, is_bootstrap_frame);
     _VMFrame_vtable.get_context = METHOD(VMFrame, get_context);
-    _VMFrame_vtable.set_context = METHOD(VMFrame, set_context);
     _VMFrame_vtable.has_context = METHOD(VMFrame, has_context);
     _VMFrame_vtable.get_context_level = METHOD(VMFrame, get_context_level);
     _VMFrame_vtable.get_outer_context = METHOD(VMFrame, get_outer_context);
     _VMFrame_vtable.get_method = METHOD(VMFrame, get_method);
-    _VMFrame_vtable.set_method = METHOD(VMFrame, set_method);
     _VMFrame_vtable.pop = METHOD(VMFrame, pop);
     _VMFrame_vtable.push = METHOD(VMFrame, push);
     _VMFrame_vtable.reset_stack_pointer = METHOD(VMFrame, reset_stack_pointer);

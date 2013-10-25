@@ -87,7 +87,9 @@ void Shell_start() {
     printf("SOM Shell. Type \"" QUIT_CMD "\" to exit.\n");
 
     // Create a fake bootstrap frame
-    current_frame = Interpreter_push_new_frame(Shell_get_bootstrap_method());
+    Interpreter_initialize(nil_object);
+    current_frame = Interpreter_push_new_frame(Shell_get_bootstrap_method(),
+                                               (pVMFrame) nil_object);
     // Remember the first bytecode index, e.g. index of the halt instruction
     bytecode_index = SEND(current_frame, get_bytecode_index);
 

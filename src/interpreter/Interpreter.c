@@ -366,6 +366,10 @@ void do_return_non_local() {
 
 #pragma mark extern callable Interpreter funtions
 
+void Interpreter_initialize(pVMObject nilObject) {
+    _SETFRAME((pVMFrame) nilObject);
+}
+
 void Interpreter_start(void) {
     // iterate over the bytecodes
     while(true) {
@@ -411,8 +415,8 @@ void Interpreter_start(void) {
 }
 
 
-pVMFrame Interpreter_push_new_frame(pVMMethod method) {
-    _SETFRAME(Universe_new_frame(_FRAME, method));
+pVMFrame Interpreter_push_new_frame(pVMMethod method, pVMFrame context) {
+    _SETFRAME(Universe_new_frame(_FRAME, method, context));
     return _FRAME;
 }
 

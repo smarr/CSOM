@@ -700,6 +700,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = SOMCore;
+				SYMROOT = build/Smalltalk;
 				USE_HEADERMAP = NO;
 				ZERO_LINK = YES;
 			};

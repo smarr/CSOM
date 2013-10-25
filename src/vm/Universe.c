@@ -80,6 +80,9 @@ pVMClass system_class;
 pVMClass block_class;
 pVMClass double_class;
 
+pVMClass true_class;
+pVMClass false_class;
+
 pVMSymbol doesNotUnderstand_sym;
 pVMSymbol unknownGlobal_sym;
 pVMSymbol escapedBlock_sym;
@@ -351,12 +354,13 @@ void Universe_initialize(int argc, const char** argv) {
     block_class = Universe_load_class(Universe_symbol_for("Block"));
     
     // setup the true and false objects
-    true_object = Universe_new_instance(
-                    Universe_load_class(Universe_symbol_for("True"))
-                );
-    false_object = Universe_new_instance(
-                    Universe_load_class(Universe_symbol_for("False"))
-                );
+    pVMSymbol trueSymbol = Universe_symbol_for("True");
+    true_class  = Universe_load_class(trueSymbol);
+    true_object = Universe_new_instance(true_class);
+    
+    pVMSymbol falseSymbol = Universe_symbol_for("False");
+    false_class  = Universe_load_class(falseSymbol);
+    false_object = Universe_new_instance(false_class);
     
     // load the system class and create an instance of it
     system_class = Universe_load_class(Universe_symbol_for("System"));
@@ -371,6 +375,9 @@ void Universe_initialize(int argc, const char** argv) {
                         (pVMObject)system_class);
     Universe_set_global(Universe_symbol_for("Block"), 
                         (pVMObject)block_class);
+    
+    Universe_set_global(trueSymbol,  (pVMObject) true_class);
+    Universe_set_global(falseSymbol, (pVMObject) false_class);
     
     // initialize symbols required by the interpreter
     doesNotUnderstand_sym = Universe_symbol_for("doesNotUnderstand:arguments:");

@@ -102,12 +102,6 @@ pVMMethod VMMethod_assemble(method_generation_context* mgenc) {
 void _VMMethod_init(void* _self, ...) {
     pVMMethod self = (pVMMethod)_self;
 
-    /* Not used. see statement in .h-file
-    _self->receiver_class_table= NULL;
-    _self->invoked_methods= NULL;
-    _self->receiver_class_index= 0;
-    _self->invocation_count= 0;
-    */
     va_list args;
     va_start(args, _self);
     

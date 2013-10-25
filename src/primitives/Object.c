@@ -56,13 +56,13 @@ void  _Object_hashcode(pVMObject object, pVMFrame frame) {
 
 void  _Object_inspect(pVMObject object, pVMFrame frame) {
     // NOT SUPPORTED
-    pVMObject self = SEND(frame, pop);
+    SEND(frame, pop);
     SEND(frame, push, false_object);
 }
 
 void  _Object_halt(pVMObject object, pVMFrame frame) {
     // NOT SUPPORTED
-    pVMObject self = SEND(frame, pop);
+    SEND(frame, pop);
     SEND(frame, push, false_object);
 }
 

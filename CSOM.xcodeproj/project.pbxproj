@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A99B1071814406000D024F6 /* Frame.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A99B1051814406000D024F6 /* Frame.c */; };
 		E1990DA20C4949400043EABA /* AUTHORS in Copy Files For Run */ = {isa = PBXBuildFile; fileRef = E1990D9E0C4949400043EABA /* AUTHORS */; };
 		E1990DA30C4949400043EABA /* INSTALL in Copy Files For Run */ = {isa = PBXBuildFile; fileRef = E1990D9F0C4949400043EABA /* INSTALL */; };
 		E1990DA40C4949400043EABA /* LICENSE in Copy Files For Run */ = {isa = PBXBuildFile; fileRef = E1990DA00C4949400043EABA /* LICENSE */; };
@@ -90,6 +91,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0A99B1051814406000D024F6 /* Frame.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Frame.c; sourceTree = "<group>"; };
+		0A99B1061814406000D024F6 /* Frame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Frame.h; sourceTree = "<group>"; };
 		8DD76FB20486AB0100D96B5E /* CSOM */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CSOM; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6A0FF2C0290799A04C91782 /* CSOM.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; name = CSOM.1; path = doc/CSOM.1; sourceTree = "<group>"; };
 		E1990D9E0C4949400043EABA /* AUTHORS */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = AUTHORS; sourceTree = "<group>"; };
@@ -434,6 +437,8 @@
 				F6F2056B0C7DB2B40074678D /* Core.c */,
 				F6F2056C0C7DB2B40074678D /* Double.c */,
 				F6F2056D0C7DB2B40074678D /* Double.h */,
+				0A99B1051814406000D024F6 /* Frame.c */,
+				0A99B1061814406000D024F6 /* Frame.h */,
 				F6F205700C7DB2B40074678D /* Integer.c */,
 				F6F205710C7DB2B40074678D /* Integer.h */,
 				F6F205740C7DB2B40074678D /* Object.c */,
@@ -575,6 +580,7 @@
 				F6F205800C7DB2B50074678D /* Array.c in Sources */,
 				F6F205810C7DB2B50074678D /* BigInteger.c in Sources */,
 				F6F205820C7DB2B50074678D /* Block.c in Sources */,
+				0A99B1071814406000D024F6 /* Frame.c in Sources */,
 				F6F205830C7DB2B50074678D /* Class.c in Sources */,
 				F6F205840C7DB2B50074678D /* Core.c in Sources */,
 				F6F205850C7DB2B50074678D /* Double.c in Sources */,

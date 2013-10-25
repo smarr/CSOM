@@ -268,9 +268,9 @@ void formula(method_generation_context* mgenc);
 void nestedTerm(method_generation_context* mgenc);
 void literal(method_generation_context* mgenc);
 void literalNumber(method_generation_context* mgenc);
-uint32_t literalDecimal(void);
-int32_t negativeDecimal(void);
-uint32_t literalInteger(void);
+uint64_t literalDecimal(void);
+ int64_t negativeDecimal(void);
+uint64_t literalInteger(void);
 void literalSymbol(method_generation_context* mgenc);
 void literalString(method_generation_context* mgenc);
 pVMSymbol selector(void);
@@ -1168,32 +1168,37 @@ void literal(method_generation_context* mgenc) {
 
 
 void literalNumber(method_generation_context* mgenc) {
-    int32_t val;
+    int64_t val;
     if(sym == Minus)
         val = negativeDecimal();
     else
         val = literalDecimal();
     
-    pVMInteger literal = Universe_new_integer(val);
+    pVMObject literal;
+    if (val < INT32_MIN || val > INT32_MAX)
+        literal = (pVMObject) Universe_new_biginteger(val);
+    else
+        literal = (pVMObject) Universe_new_integer(val);
+    
     SEND(mgenc->literals, addIfAbsent, literal);
     
     emit_PUSH_CONSTANT(mgenc, (pVMObject)literal);
 }
 
 
-uint32_t literalDecimal(void) {
+uint64_t literalDecimal(void) {
     return literalInteger();
 }
 
 
-int32_t negativeDecimal(void) {
+int64_t negativeDecimal(void) {
     expect(Minus);
     return -literalInteger();
 }
 
 
-uint32_t literalInteger(void) {
-    uint32_t i = (uint32_t) strtoul(text, NULL, 10);
+uint64_t literalInteger(void) {
+    uint64_t i = strtoull(text, NULL, 10);
     expect(Integer);
     return i;
 }

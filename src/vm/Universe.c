@@ -761,20 +761,19 @@ pVMClass Universe_get_block_class_with_args(int number_of_arguments) {
 
 pVMClass Universe_load_class(pVMSymbol name) {
     // Check if the requested class is already in the dictionary of globals
-    if(Universe_has_global(name)) 
+    if (Universe_has_global(name)) 
         return (pVMClass)Universe_get_global(name);
     
     // Load the class
     pVMClass result = Universe_load_class_basic(name, NULL);
         
-    // check class loading.
-    if(!result) {
-        debug_error("can't load class:\t'%s'\n", SEND(name, get_chars));
-        Universe_exit(ERR_FAIL);
+    // we fail silently, it is not fatal that loading a class failed
+    if (!result) {
+		return (pVMClass) nil_object;
     }
 
     // Load primitives (if necessary) and return the resulting class
-    if(SEND(result, has_primitives) || SEND(result->class, has_primitives)) 
+    if (SEND(result, has_primitives) || SEND(result->class, has_primitives)) 
         SEND(result, load_primitives, class_path, cp_count);
     return result;
 }

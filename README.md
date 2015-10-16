@@ -36,7 +36,7 @@ Afterwards, the tests can be executed with:
    
 A simple Hello World program is executed with:
 
-    ./som.sh -cp Smalltalk Examples/Hello/Hello.som
+    ./som.sh -cp Smalltalk Examples/Hello.som
 
 The debug version of CSOM can be built using the `debug` target:
 

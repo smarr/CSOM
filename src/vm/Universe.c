@@ -273,6 +273,8 @@ const char** Universe_handle_arguments(
 
                 // guaranteed not to be used/referenced any more
                 internal_free(ext_path_tokens);
+            } else {
+                argv[i] = strdup(argv[i]);
             }
             // will not be referenced, because copied
             SEND(tmp_string, free);

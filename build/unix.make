@@ -153,6 +153,9 @@ $(OSTOOL): $(BUILD_DIR)/ostool.c
 $(SRC_DIR)/platform.h: $(OSTOOL)
 	@($(OSTOOL) i >$(SRC_DIR)/platform.h)
 
+core-lib/.gitignore:
+	git submodule update --init
+
 #
 #
 #
@@ -160,7 +163,7 @@ $(SRC_DIR)/platform.h: $(OSTOOL)
 #
 
 
-$(SRC_DIR)/CSOM: $(CSOM_OBJ)
+$(SRC_DIR)/CSOM: core-lib/.gitignore $(CSOM_OBJ)
 	@echo Linking CSOM
 	$(CC) $(LDFLAGS) `$(OSTOOL) l`\
 		-o `$(OSTOOL) x "$(CSOM_NAME)"` \

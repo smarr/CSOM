@@ -4,7 +4,7 @@ WebAssembly CSOM
  - install [emscripten](http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html)
  - load core `git submodule update --init`
  - build with: `emmake make clean && emmake make`
- - run with: `node CSOM.js`
+ - run with: `node CSOM.js -cp Smalltalk Examples/Hello.som`
 
 Known Issues
 ------------

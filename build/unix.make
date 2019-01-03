@@ -133,6 +133,12 @@ profiling : DBG_FLAGS=-g -pg
 profiling : LDFLAGS+=-pg
 profiling: all
 
+emscripten : MAIN_MODULE=-s MAIN_MODULE=1 -s WASM=1
+emscripten : SIDE_MODULE=-s SIDE_MODULE=1 -s WASM=1
+emscripten : CC=emcc
+emscripten : LDFLAGS+=
+emscripten : DEF_EMSCRIPTEN=-D__EMSCRIPTEN__
+emscripten: all
 
 .c.pic.o:
 	$(CC) $(CFLAGS) -fPIC -g -c $< -o $*.pic.o
@@ -148,7 +154,8 @@ clobber: $(OSTOOL) clean
 	rm -f $(SRC_DIR)/platform.h
 
 $(OSTOOL): $(BUILD_DIR)/ostool.c
-	cc -g -Wno-endif-labels -o $(OSTOOL) $(BUILD_DIR)/ostool.c
+	# using cc directly to avoid using emcc for emscripten
+	cc -g -Wno-endif-labels -o $(OSTOOL) $(DEF_EMSCRIPTEN) $(BUILD_DIR)/ostool.c
 
 $(SRC_DIR)/platform.h: $(OSTOOL)
 	@($(OSTOOL) i >$(SRC_DIR)/platform.h)
@@ -165,17 +172,17 @@ core-lib/.gitignore:
 
 $(SRC_DIR)/CSOM: core-lib/.gitignore $(CSOM_OBJ)
 	@echo Linking CSOM
-	$(CC) -s MAIN_MODULE=1 -s WASM=1 $(LDFLAGS) `$(OSTOOL) l`\
+	$(CC) $(MAIN_MODULE) $(LDFLAGS) `$(OSTOOL) l`\
 		-o `$(OSTOOL) x "$(CSOM_NAME)"` \
 		$(CSOM_OBJ) $(CSOM_LIBS) 
 	@echo CSOM done.
 
 CORE: $(SRC_DIR)/CSOM $(PRIMITIVES_OBJ)
 	@echo Linking SOMCore lib
-	$(CC) -s SIDE_MODULE=1 -s WASM=1 $(LDFLAGS) `$(OSTOOL) l "$(CORE_NAME)"` \
+	$(CC) $(SIDE_MODULE) $(LDFLAGS) `$(OSTOOL) l "$(CORE_NAME)"` \
 		-o `$(OSTOOL) s "$(CORE_NAME)"`\
 		$(PRIMITIVES_OBJ) $(CORE_LIBS)
-	mv "$(CORE_NAME).wasm" $(ST_DIR)
+	mv `$(OSTOOL) s "$(CORE_NAME)"` $(ST_DIR)
 	@touch CORE
 	@echo SOMCore done.
 

@@ -32,12 +32,20 @@ THE SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
-#if defined(__GNUC__)
-#if defined(__APPLE__) && defined(__MACH__)
+#if defined(__EMSCRIPTEN__)
 #	define executable_extension ".js"
+#	define LF_program " -Wl,--export-dynamic "
+#	define LF_shared " -fPIC -shared -undefined=dynamic_lookup -dynamiclib -Wl,-single_module -Wl,-Y,1455 "
+#	define LF_shared_name  " -Wl,-soname,"
+#   define LF_combine_objects ""
+#   define LF_combine_libs ""
+
+#elif defined(__GNUC__)
+#if defined(__APPLE__) && defined(__MACH__)
+#	define executable_extension ""
 #	define LF_program ""
-#	define LF_shared " -fPIC -mmacosx-version-min=10.4" \
-                     " -dynamiclib" \
+#	define LF_shared " -fPIC " \
+                     " -undefined dynamic_lookup -dynamiclib" \
                      " -Wl,-single_module -Wl,-Y,1455 "
 #	define LF_shared_name  " -install_name "
 #   define LF_combine_objects ""
@@ -70,12 +78,7 @@ THE SOFTWARE.
 #   define LF_combine_libs ""
 
 #else
-#	define executable_extension ".js"
-#	define LF_program " -Wl,--export-dynamic "
-#	define LF_shared " -fPIC -shared"
-#	define LF_shared_name  " -Wl,-soname,"
-#   define LF_combine_objects ""
-#   define LF_combine_libs ""
+#	   error "no currently supported platform"
 /*# APPLE/linux/bsd/win32/sun */
 #endif
 #else
@@ -83,7 +86,11 @@ THE SOFTWARE.
 /*#  defined(__GNUC__) */
 #endif
 
-#define shared_extension ".js"
+#if defined(__EMSCRIPTEN__)
+#define shared_extension ".wasm"
+#else
+#define shared_extension ".csp"
+#endif
 
 void print_header(void) {
     printf(
@@ -108,7 +115,7 @@ void print_header(void) {
     "#define NEED_STRSEP\n\n"
 #endif
     
-    "#define shared_extension \".wasm\"\n"
+    "#define shared_extension \"" shared_extension "\"\n"
     "\n// EOF \n#endif // PLATFORM_H_\n");
 }
 

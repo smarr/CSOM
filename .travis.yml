@@ -15,29 +15,17 @@ matrix:
       compiler:
         - clang
     - env: TASK="make emscripten" COMPILER=emcc
-      compiler:
-        - clang
       language: node_js
       node_js:
         - node
-      addons:
-        apt:
-          packages:
-            - libstdc++6
-            - gcc-4.8
+      sudo: required
+      services:
+        - docker
       before_install:
-        - |
-            export NODE_JS_EXE=`which node`
-            git clone https://github.com/juj/emsdk.git
-            cd emsdk
-            ./emsdk install sdk-1.38.21-64bit
-            ./emsdk activate sdk-1.38.21-64bit
-            source ./emsdk_env.sh
-            cd ..
+        - docker run -e PWD=/src -dit --name emscripten -v $(pwd):/src trzeci/emscripten:sdk-incoming-64bit bash
       script:
-        - |
-          make emscripten
-          ${NODE_JS_EXE} CSOM.js -cp Smalltalk TestSuite/TestHarness.som
+        - docker exec -it emscripten make emscripten
+        - node CSOM.js -cp Smalltalk TestSuite/TestHarness.som
 
 script:
     - export CC=${COMPILER} # hack around a Travis issue

@@ -24,16 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
   */
 
-#include <emscripten-init.h>
-
 #include <memory/gc.h>
 
 #include <vm/Universe.h>
 
 int main(int argc, char** argv) {
     printf("This is CSOM.\n");
-
-    init_filesystem();
 
     int vm_argc = 0;    
     const char** vm_argv =

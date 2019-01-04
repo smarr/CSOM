@@ -123,7 +123,7 @@ OSTOOL			= $(BUILD_DIR)/ostool.exe
 
 .PHONY: clean clobber test
 
-all: $(OSTOOL) $(SRC_DIR)/platform.h $(SRC_DIR)/CSOM CORE
+all: $(OSTOOL) $(SRC_DIR)/platform.h CORE $(SRC_DIR)/CSOM
 
 
 debug : DBG_FLAGS=-DDEBUG -g
@@ -172,16 +172,16 @@ core-lib/.gitignore:
 #
 
 
-$(SRC_DIR)/CSOM: core-lib/.gitignore $(CSOM_OBJ)
+$(SRC_DIR)/CSOM: core-lib/.gitignore $(CSOM_OBJ) CORE
 	@echo Linking CSOM
-	$(CC) $(MAIN_MODULE) $(LDFLAGS) `$(OSTOOL) l`\
+	$(CC) $(MAIN_MODULE) $(DBG_FLAGS) $(LDFLAGS) `$(OSTOOL) l`\
 		-o `$(OSTOOL) x "$(CSOM_NAME)"` \
 		$(CSOM_OBJ) $(CSOM_LIBS) 
 	@echo CSOM done.
 
-CORE: $(SRC_DIR)/CSOM $(PRIMITIVES_OBJ)
+CORE: $(PRIMITIVES_OBJ)
 	@echo Linking SOMCore lib
-	$(CC) $(SIDE_MODULE) $(LDFLAGS) `$(OSTOOL) l "$(CORE_NAME)"` \
+	$(CC) $(SIDE_MODULE) $(DBG_FLAGS) $(LDFLAGS) `$(OSTOOL) l "$(CORE_NAME)"` \
 		-o `$(OSTOOL) s "$(CORE_NAME)"`\
 		$(PRIMITIVES_OBJ) $(CORE_LIBS)
 	mv `$(OSTOOL) s "$(CORE_NAME)"` $(ST_DIR)

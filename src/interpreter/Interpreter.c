@@ -52,7 +52,7 @@ static pVMFrame frame;
 
 #pragma mark private bytecode handlers.
 
-pVMFrame pop_frame(void) {
+static pVMFrame pop_frame(void) {
     // Save a reference to the top frame
     pVMFrame result = _FRAME;
     
@@ -67,7 +67,7 @@ pVMFrame pop_frame(void) {
 }
 
 
-void pop_frame_and_push_result(pVMObject result) {
+static void pop_frame_and_push_result(pVMObject result) {
     // Pop the top frame from the interpreter frame stack and compute the number
     // of arguments
     pVMFrame prev_frame = pop_frame();
@@ -83,7 +83,7 @@ void pop_frame_and_push_result(pVMObject result) {
 }
 
 
-void sendXXX(pVMSymbol signature, pVMClass receiver_class) {
+static void send(pVMSymbol signature, pVMClass receiver_class) {
     // Lookup the invokable with the given signature
     pVMObject invokable = (pVMObject)SEND(receiver_class,
                                           lookup_invokable, signature);
@@ -118,14 +118,14 @@ void sendXXX(pVMSymbol signature, pVMClass receiver_class) {
 
 #pragma mark  Bytecode handling functions
 
-void do_dup(void) {
+static void do_dup(void) {
     // Handle the dup bytecode
     pVMObject elem = SEND(_FRAME, get_stack_element, 0);
     SEND(_FRAME, push, elem);
 }
 
 
-void do_push_local(int bytecode_index) {
+static void do_push_local(int bytecode_index) {
     // Handle the push local bytecode
     pVMMethod method = _METHOD;
     uint8_t bc1 = SEND(method, get_bytecode, bytecode_index + 1);
@@ -137,7 +137,7 @@ void do_push_local(int bytecode_index) {
 }
 
 
-void do_push_argument(int bytecode_index) {
+static void do_push_argument(int bytecode_index) {
     // Handle the push argument bytecode
     pVMMethod method = _METHOD;
     uint8_t bc1 = SEND(method, get_bytecode, bytecode_index + 1);
@@ -149,7 +149,7 @@ void do_push_argument(int bytecode_index) {
 }
 
 
-void do_push_field(int bytecode_index) {
+static void do_push_field(int bytecode_index) {
     pVMMethod method = _METHOD;
     // Handle the push field bytecode
     pVMSymbol field_name =
@@ -165,7 +165,7 @@ void do_push_field(int bytecode_index) {
 }
 
 
-void do_push_block(int bytecode_index) {
+static void do_push_block(int bytecode_index) {
     pVMMethod method = _METHOD;
     // Handle the push block bytecode
     pVMMethod block_method = (pVMMethod)SEND(method, 
@@ -180,7 +180,7 @@ void do_push_block(int bytecode_index) {
 }
 
 
-void do_push_constant(int bytecode_index) {
+static void do_push_constant(int bytecode_index) {
     pVMMethod method = _METHOD;
     
     // Handle the push constant bytecode
@@ -189,7 +189,7 @@ void do_push_constant(int bytecode_index) {
 }
 
 
-void do_push_global(int bytecode_index) {
+static void do_push_global(int bytecode_index) {
     pVMMethod method = _METHOD;
     // Handle the push global bytecode
     pVMSymbol global_name = (pVMSymbol)SEND(method,
@@ -210,13 +210,13 @@ void do_push_global(int bytecode_index) {
 }
 
 
-void do_pop(void) {
+static void do_pop(void) {
     // Handle the pop bytecode
     SEND(_FRAME, pop);
 }
 
 
-void do_pop_local(int bytecode_index) {
+static void do_pop_local(int bytecode_index) {
     pVMMethod method = _METHOD;
     // Handle the pop local bytecode
     uint8_t bc1 = SEND(method, get_bytecode, bytecode_index + 1);
@@ -228,7 +228,7 @@ void do_pop_local(int bytecode_index) {
 }
 
 
-void do_pop_argument(int bytecode_index) {
+static void do_pop_argument(int bytecode_index) {
     pVMMethod method = _METHOD;
     // Handle the pop argument bytecode
     uint8_t bc1 = SEND(method, get_bytecode, bytecode_index + 1);
@@ -239,7 +239,7 @@ void do_pop_argument(int bytecode_index) {
 }
 
 
-void do_pop_field(int bytecode_index) {
+static void do_pop_field(int bytecode_index) {
     pVMMethod method = _METHOD;
     // Handle the pop field bytecode
     pVMSymbol field_name = (pVMSymbol)SEND(method, 
@@ -255,7 +255,7 @@ void do_pop_field(int bytecode_index) {
 }
 
 
-void do_send(int bytecode_index) {
+static void do_send(int bytecode_index) {
     pVMMethod method = _METHOD;
     // Handle the send bytecode
     pVMSymbol signature = (pVMSymbol)SEND(method, 
@@ -269,11 +269,11 @@ void do_send(int bytecode_index) {
         SEND(_FRAME, get_stack_element, number_of_arguments - 1);
 
     // Send the message
-    sendXXX(signature, SEND(receiver, get_class));
+    send(signature, SEND(receiver, get_class));
 }
 
 
-void do_super_send(int bytecode_index) {
+static void do_super_send(int bytecode_index) {
     pVMMethod method = _METHOD;
     // Handle the super send bytecode
     pVMSymbol signature = (pVMSymbol)SEND(method, 
@@ -317,7 +317,7 @@ void do_super_send(int bytecode_index) {
 }
 
 
-void do_return_local() {
+static void do_return_local() {
     // Handle the return local bytecode
     pVMObject result = SEND(_FRAME, pop);
                     
@@ -326,7 +326,7 @@ void do_return_local() {
 }
 
 
-void do_return_non_local() {
+static void do_return_non_local() {
     // Handle the return non local bytecode
     pVMObject result = SEND(_FRAME, pop);
                     

@@ -6,9 +6,39 @@ before_install:
 install:
     - sudo apt-get install libc6-dev-i386
 
-compiler:
-  - clang
-  - gcc
+matrix:
+  include:
+    - env: TASK="make test" COMPILER=gcc
+      compiler:
+        - gcc
+    - env: TASK="make test" COMPILER=clang
+      compiler:
+        - clang
+    - env: TASK="make emscripten" COMPILER=emcc
+      compiler:
+        - clang
+      language: node_js
+      node_js:
+        - node
+      addons:
+        apt:
+          packages:
+            - libstdc++6
+            - gcc-4.8
+      before_install:
+        - |
+            export NODE_JS_EXE=`which node`
+            git clone https://github.com/juj/emsdk.git
+            cd emsdk
+            ./emsdk install sdk-1.38.21-64bit
+            ./emsdk activate sdk-1.38.21-64bit
+            source ./emsdk_env.sh
+            cd ..
+      script:
+        - |
+          make emscripten
+          ${NODE_JS_EXE} CSOM.js -cp Smalltalk TestSuite/TestHarness.som
 
 script:
-    - make test
+    - export CC=${COMPILER} # hack around a Travis issue
+    - ${TASK}

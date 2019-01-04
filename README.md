@@ -47,6 +47,16 @@ distributed under the MIT License. Please see the LICENSE file for details.
 Additional documentation, detailing for instance the object model and how to
 implement primitives, is available in the `doc` folder.
 
+WebAssembly CSOM
+----------------
+
+CSOM can be compiled using GCC, Clang, but also emscripten.
+With emscripten, it can run on Node.js as follows:
+
+ - install [emscripten](http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html) and set it up for compilation.
+   One easy way is using Docker, as in the .travis.yml. Another is with [emsdk](https://github.com/juj/emsdk/)
+ - build with: `make emscripten`
+ - run with: `node CSOM.js -cp Smalltalk Examples/Hello.som`
 
 Build Status
 ------------

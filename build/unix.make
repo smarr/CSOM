@@ -123,7 +123,7 @@ OSTOOL			= $(BUILD_DIR)/ostool.exe
 
 .PHONY: clean clobber test
 
-all: $(OSTOOL) $(SRC_DIR)/platform.h $(SRC_DIR)/CSOM CORE
+all: $(OSTOOL) $(SRC_DIR)/platform.h CORE $(SRC_DIR)/CSOM
 
 
 debug : DBG_FLAGS=-DDEBUG -g
@@ -133,6 +133,14 @@ profiling : DBG_FLAGS=-g -pg
 profiling : LDFLAGS+=-pg
 profiling: all
 
+# emscripten : DBG_FLAGS=-g
+emscripten : EXP_FN=-s EXPORTED_FUNCTIONS="['_strcmp']" -s ENVIRONMENT=node -s EXPORT_ALL=1 -s LINKABLE=1 -s WASM=1 -s EXIT_RUNTIME=1
+emscripten : MAIN_MODULE=-s MAIN_MODULE=1 --embed-file Smalltalk --embed-file Examples --embed-file TestSuite $(EXP_FN)
+emscripten : SIDE_MODULE=-s SIDE_MODULE=1 $(EXP_FN)
+emscripten : CC=emcc
+emscripten : LDFLAGS+=
+emscripten : DEF_EMSCRIPTEN=-D__EMSCRIPTEN__
+emscripten: all
 
 .c.pic.o:
 	$(CC) $(CFLAGS) -fPIC -g -c $< -o $*.pic.o
@@ -148,7 +156,8 @@ clobber: $(OSTOOL) clean
 	rm -f $(SRC_DIR)/platform.h
 
 $(OSTOOL): $(BUILD_DIR)/ostool.c
-	$(CC) -g -Wno-endif-labels -o $(OSTOOL) $(BUILD_DIR)/ostool.c
+	# using cc directly to avoid using emcc for emscripten
+	cc -g -Wno-endif-labels -o $(OSTOOL) $(DEF_EMSCRIPTEN) $(BUILD_DIR)/ostool.c
 
 $(SRC_DIR)/platform.h: $(OSTOOL)
 	@($(OSTOOL) i >$(SRC_DIR)/platform.h)
@@ -163,16 +172,16 @@ core-lib/.gitignore:
 #
 
 
-$(SRC_DIR)/CSOM: core-lib/.gitignore $(CSOM_OBJ)
+$(SRC_DIR)/CSOM: core-lib/.gitignore $(CSOM_OBJ) CORE
 	@echo Linking CSOM
-	$(CC) $(LDFLAGS) `$(OSTOOL) l`\
+	$(CC) $(MAIN_MODULE) $(DBG_FLAGS) $(LDFLAGS) `$(OSTOOL) l`\
 		-o `$(OSTOOL) x "$(CSOM_NAME)"` \
 		$(CSOM_OBJ) $(CSOM_LIBS) 
 	@echo CSOM done.
 
-CORE: $(SRC_DIR)/CSOM $(PRIMITIVES_OBJ)
+CORE: $(PRIMITIVES_OBJ)
 	@echo Linking SOMCore lib
-	$(CC) $(LDFLAGS) `$(OSTOOL) l "$(CORE_NAME)"` \
+	$(CC) $(SIDE_MODULE) $(DBG_FLAGS) $(LDFLAGS) `$(OSTOOL) l "$(CORE_NAME)"` \
 		-o `$(OSTOOL) s "$(CORE_NAME)"`\
 		$(PRIMITIVES_OBJ) $(CORE_LIBS)
 	mv `$(OSTOOL) s "$(CORE_NAME)"` $(ST_DIR)

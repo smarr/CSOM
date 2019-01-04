@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 int main(int argc, char** argv) {
     printf("This is CSOM.\n");
-    
+
     int vm_argc = 0;    
     const char** vm_argv =
         Universe_handle_arguments(&vm_argc, argc, (const char**)argv);

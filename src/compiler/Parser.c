@@ -221,64 +221,64 @@ static char* symnames[] = {
 #pragma mark intern Prototypes
 
 
-void fillbuffer(void);
-bool eob(void);
-void skipWhiteSpace(void);
-void skipComment(void);
-void getsym(void);
-void peek(void);
-bool symIn(Symbol* ss);
-bool accept(Symbol s);
-bool acceptOneOf(Symbol* ss);
-bool expect(Symbol s);
-bool expectOneOf(Symbol* ss);
-void SingleOperator(void);
-void classdef(void);
-void instanceFields(class_generation_context* cgenc);
-void classFields(class_generation_context* cgenc);
-void method(method_generation_context* mgenc);
-void primitiveBlock(void);
-void pattern(method_generation_context* mgenc);
-void unaryPattern(method_generation_context* mgenc);
-void binaryPattern(method_generation_context* mgenc);
-void keywordPattern(method_generation_context* mgenc);
-void methodBlock(method_generation_context* mgenc);
-pVMSymbol unarySelector(void);
-pVMSymbol binarySelector(void);
-char* identifier(void);
-pString keyword(void);
-char* argument(void);
-void blockContents(method_generation_context* mgenc);
-void locals(method_generation_context* mgenc);
-void blockBody(method_generation_context* mgenc, bool seen_period);
-void result(method_generation_context* mgenc);
-void expression(method_generation_context* mgenc);
-void assignation(method_generation_context* mgenc);
-void assignments(method_generation_context* mgenc, pList l);
-pString assignment(method_generation_context* mgenc);
-void evaluation(method_generation_context* mgenc);
-void primary(method_generation_context* mgenc, bool* super);
-char* variable(void);
-void messages(method_generation_context* mgenc, bool super);
-void unaryMessage(method_generation_context* mgenc, bool super);
-void binaryMessage(method_generation_context* mgenc, bool super);
-void binaryOperand(method_generation_context* mgenc, bool* super);
-void keywordMessage(method_generation_context* mgenc, bool super);
-void formula(method_generation_context* mgenc);
-void nestedTerm(method_generation_context* mgenc);
-void literal(method_generation_context* mgenc);
-void literalNumber(method_generation_context* mgenc);
-uint64_t literalDecimal(void);
- int64_t negativeDecimal(void);
-uint64_t literalInteger(void);
-void literalSymbol(method_generation_context* mgenc);
-void literalString(method_generation_context* mgenc);
-pVMSymbol selector(void);
-pVMSymbol keywordSelector(void);
-char* string(void);
-void nestedBlock(method_generation_context* mgenc);
-void blockPattern(method_generation_context* mgenc);
-void blockArguments(method_generation_context* mgenc);
+static void fillbuffer(void);
+static bool eob(void);
+static void skipWhiteSpace(void);
+static void skipComment(void);
+static void getsym(void);
+static void peek(void);
+static bool symIn(Symbol* ss);
+static bool accept(Symbol s);
+static bool acceptOneOf(Symbol* ss);
+static bool expect(Symbol s);
+static bool expectOneOf(Symbol* ss);
+static void SingleOperator(void);
+static void classdef(void);
+static void instanceFields(class_generation_context* cgenc);
+static void classFields(class_generation_context* cgenc);
+static void method(method_generation_context* mgenc);
+static void primitiveBlock(void);
+static void pattern(method_generation_context* mgenc);
+static void unaryPattern(method_generation_context* mgenc);
+static void binaryPattern(method_generation_context* mgenc);
+static void keywordPattern(method_generation_context* mgenc);
+static void methodBlock(method_generation_context* mgenc);
+static pVMSymbol unarySelector(void);
+static pVMSymbol binarySelector(void);
+static char* identifier(void);
+static pString keyword(void);
+static char* argument(void);
+static void blockContents(method_generation_context* mgenc);
+static void locals(method_generation_context* mgenc);
+static void blockBody(method_generation_context* mgenc, bool seen_period);
+static void result(method_generation_context* mgenc);
+static void expression(method_generation_context* mgenc);
+static void assignation(method_generation_context* mgenc);
+static void assignments(method_generation_context* mgenc, pList l);
+static pString assignment(method_generation_context* mgenc);
+static void evaluation(method_generation_context* mgenc);
+static void primary(method_generation_context* mgenc, bool* super);
+static char* variable(void);
+static void messages(method_generation_context* mgenc, bool super);
+static void unaryMessage(method_generation_context* mgenc, bool super);
+static void binaryMessage(method_generation_context* mgenc, bool super);
+static void binaryOperand(method_generation_context* mgenc, bool* super);
+static void keywordMessage(method_generation_context* mgenc, bool super);
+static void formula(method_generation_context* mgenc);
+static void nestedTerm(method_generation_context* mgenc);
+static void literal(method_generation_context* mgenc);
+static void literalNumber(method_generation_context* mgenc);
+static uint64_t literalDecimal(void);
+static int64_t negativeDecimal(void);
+static uint64_t literalInteger(void);
+static void literalSymbol(method_generation_context* mgenc);
+static void literalString(method_generation_context* mgenc);
+static pVMSymbol selector(void);
+static pVMSymbol keywordSelector(void);
+static char* string(void);
+static void nestedBlock(method_generation_context* mgenc);
+static void blockPattern(method_generation_context* mgenc);
+static void blockArguments(method_generation_context* mgenc);
 
 
 //
@@ -289,15 +289,15 @@ void blockArguments(method_generation_context* mgenc);
 #pragma mark File local variables
 
 
-FILE* infile;
+static FILE* infile;
 
-Symbol sym;
-char symc;
+static Symbol sym;
+static char symc;
 static char text[BUFSIZ];
 
-bool peekDone;
-Symbol nextSym;
-char nextSymc;
+static bool peekDone;
+static Symbol nextSym;
+static char nextSymc;
 static char nextText[BUFSIZ];
 
 
@@ -307,7 +307,7 @@ static char nextText[BUFSIZ];
 
 
 static char buf[BUFSIZ];
-int bufp;
+static int bufp;
 
 
 #pragma mark Stream handling

@@ -6,9 +6,27 @@ before_install:
 install:
     - sudo apt-get install libc6-dev-i386
 
-compiler:
-  - clang
-  - gcc
+matrix:
+  include:
+    - env: TASK="make test" COMPILER=gcc
+      compiler:
+        - gcc
+    - env: TASK="make test" COMPILER=clang
+      compiler:
+        - clang
+    - env: TASK="make emscripten" COMPILER=emcc
+      language: node_js
+      node_js:
+        - node
+      sudo: required
+      services:
+        - docker
+      before_install:
+        - docker run -e PWD=/src -dit --name emscripten -v $(pwd):/src trzeci/emscripten:sdk-incoming-64bit bash
+      script:
+        - docker exec -it emscripten make emscripten
+        - node CSOM.js -cp Smalltalk TestSuite/TestHarness.som
 
 script:
-    - make test
+    - export CC=${COMPILER} # hack around a Travis issue
+    - ${TASK}

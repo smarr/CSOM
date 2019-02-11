@@ -6,17 +6,17 @@
 # Copyright (c) 2007 Michael Haupt, Tobias Pape
 # Software Architecture Group, Hasso Plattner Institute, Potsdam, Germany
 # http://www.hpi.uni-potsdam.de/swa/
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -98,7 +98,7 @@ LIBRARIES       =
 ############## Collections.
 
 CSOM_OBJ		=  $(MEMORY_OBJ) $(MISC_OBJ) $(VMOBJECTS_OBJ) \
-					$(COMPILER_OBJ) $(INTERPRETER_OBJ) $(VM_OBJ) 
+					$(COMPILER_OBJ) $(INTERPRETER_OBJ) $(VM_OBJ)
 OBJECTS			= $(CSOM_OBJ) $(PRIMITIVES_OBJ)
 
 SOURCES			=  $(COMPILER_SRC) $(INTERPRETER_SRC) $(MEMORY_SRC) \
@@ -172,14 +172,14 @@ core-lib/.gitignore:
 #
 
 
-$(SRC_DIR)/CSOM: core-lib/.gitignore $(CSOM_OBJ) CORE
+$(SRC_DIR)/CSOM: $(CSOM_OBJ) CORE
 	@echo Linking CSOM
 	$(CC) $(MAIN_MODULE) $(DBG_FLAGS) $(LDFLAGS) `$(OSTOOL) l`\
 		-o `$(OSTOOL) x "$(CSOM_NAME)"` \
-		$(CSOM_OBJ) $(CSOM_LIBS) 
+		$(CSOM_OBJ) $(CSOM_LIBS)
 	@echo CSOM done.
 
-CORE: $(PRIMITIVES_OBJ)
+CORE: core-lib/.gitignore $(PRIMITIVES_OBJ)
 	@echo Linking SOMCore lib
 	$(CC) $(SIDE_MODULE) $(DBG_FLAGS) $(LDFLAGS) `$(OSTOOL) l "$(CORE_NAME)"` \
 		-o `$(OSTOOL) s "$(CORE_NAME)"`\
@@ -198,7 +198,7 @@ install: all
 	cp -R $(EX_DIR) $(TEST_DIR) $(DEST_SHARE)
 	@echo shared components.
 	@echo done.
-	
+
 uninstall:
 	@echo removing Library and shared Components
 	rm -Rf $(DEST_SHARE) $(DEST_LIB)

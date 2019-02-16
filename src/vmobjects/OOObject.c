@@ -39,7 +39,7 @@ void _OOObject_init(void* _self, ...) {
     pOOObject self = (pOOObject)_self;
     // top level Object.
     // set the hashcode
-    self->hash = (int32_t)self;
+    self->hash = (intptr_t)self;
 }
 
 
@@ -53,7 +53,7 @@ void _OOObject_free(void* _self) {
 }
 
 
-int32_t _OOObject_object_size(void* _self) {
+intptr_t _OOObject_object_size(void* _self) {
     return ((pOOObject)_self)->object_size;
 }
 

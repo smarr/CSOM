@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -11,7 +11,6 @@
 		E1990DA20C4949400043EABA /* AUTHORS in Copy Files For Run */ = {isa = PBXBuildFile; fileRef = E1990D9E0C4949400043EABA /* AUTHORS */; };
 		E1990DA30C4949400043EABA /* INSTALL in Copy Files For Run */ = {isa = PBXBuildFile; fileRef = E1990D9F0C4949400043EABA /* INSTALL */; };
 		E1990DA40C4949400043EABA /* LICENSE in Copy Files For Run */ = {isa = PBXBuildFile; fileRef = E1990DA00C4949400043EABA /* LICENSE */; };
-		E1990DA50C4949400043EABA /* README in Copy Files For Run */ = {isa = PBXBuildFile; fileRef = E1990DA10C4949400043EABA /* README */; };
 		E1C127DB0DBCA8A400653CC2 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = E1C127DA0DBCA8A400653CC2 /* main.c */; };
 		F61FF4080C8439F200178340 /* Interpreter.c in Sources */ = {isa = PBXBuildFile; fileRef = F61FF4070C8439F100178340 /* Interpreter.c */; };
 		F61FF8A60C856E9600178340 /* StringHashmap.c in Sources */ = {isa = PBXBuildFile; fileRef = F61FF8A40C856E9600178340 /* StringHashmap.c */; };
@@ -83,7 +82,6 @@
 				E1990DA20C4949400043EABA /* AUTHORS in Copy Files For Run */,
 				E1990DA30C4949400043EABA /* INSTALL in Copy Files For Run */,
 				E1990DA40C4949400043EABA /* LICENSE in Copy Files For Run */,
-				E1990DA50C4949400043EABA /* README in Copy Files For Run */,
 			);
 			name = "Copy Files For Run";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -98,7 +96,6 @@
 		E1990D9E0C4949400043EABA /* AUTHORS */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = AUTHORS; sourceTree = "<group>"; };
 		E1990D9F0C4949400043EABA /* INSTALL */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = INSTALL; sourceTree = "<group>"; };
 		E1990DA00C4949400043EABA /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
-		E1990DA10C4949400043EABA /* README */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
 		E1C127DA0DBCA8A400653CC2 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		E1F124AA0CE487B7000F5179 /* GenerationContexts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenerationContexts.h; sourceTree = "<group>"; };
 		E1F124AF0CE48964000F5179 /* GenerationContexts.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GenerationContexts.c; sourceTree = "<group>"; };
@@ -277,7 +274,6 @@
 				E1990D9E0C4949400043EABA /* AUTHORS */,
 				E1990D9F0C4949400043EABA /* INSTALL */,
 				E1990DA00C4949400043EABA /* LICENSE */,
-				E1990DA10C4949400043EABA /* README */,
 				F63B567E0B64CC80003C3C69 /* Smalltalk */,
 				F63B56990B64CCB0003C3C69 /* TestSuite */,
 				F63B565C0B64CC6E003C3C69 /* Examples */,
@@ -502,7 +498,7 @@
 				LastUpgradeCheck = 0500;
 			};
 			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "CSOM" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 10.0";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
@@ -616,7 +612,7 @@
 				HEADER_SEARCH_PATHS = src;
 				LIBRARY_SEARCH_PATHS = "";
 				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/lib\"";
-				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				OTHER_LDFLAGS = "-ldl";
 				PRODUCT_NAME = CSOM;
 				USE_HEADERMAP = NO;
@@ -635,7 +631,7 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = src;
 				LIBRARY_SEARCH_PATHS = "";
-				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_NAME = CSOM;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = "-Wall";
@@ -645,8 +641,7 @@
 		1DEB928A08733DD80010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -658,15 +653,13 @@
 				LIBRARY_SEARCH_PATHS = lib;
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
-				VALID_ARCHS = i386;
 			};
 			name = Debug;
 		};
 		1DEB928B08733DD80010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -677,7 +670,6 @@
 				LIBRARY_SEARCH_PATHS = lib;
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
-				VALID_ARCHS = i386;
 			};
 			name = Release;
 		};

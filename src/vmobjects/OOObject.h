@@ -148,7 +148,7 @@ VTABLE(OOObject) {
     void*   _ttable; \
     void    (*init)(void* _self, ...); \
     void    (*free)(void* _self); \
-    int32_t (*object_size)(void* _self)
+    intptr_t (*object_size)(void* _self)
         
     OOOBJECT_VTABLE_FORMAT;
 };
@@ -158,9 +158,9 @@ struct _OOObject {
     VTABLE(OOObject)* _vtable;
     
 #define OOOBJECT_FORMAT \
-    int32_t object_size; \
-    int32_t gc_field; \
-    int32_t hash
+    intptr_t object_size; \
+    intptr_t gc_field; \
+    intptr_t hash
 
     OOOBJECT_FORMAT;
 };

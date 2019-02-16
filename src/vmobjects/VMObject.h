@@ -59,7 +59,7 @@ VTABLE(VMObject) {
 
 #define VMOBJECT_FORMAT \
     OOOBJECT_FORMAT; \
-    int        num_of_fields;\
+    intptr_t   num_of_fields;\
     pVMClass   class; \
     pVMObject  fields[0]
     

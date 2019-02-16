@@ -31,6 +31,16 @@
 export ROOT_DIR	:=$(PWD)
 export BUILD_DIR:=$(ROOT_DIR)/build
 
+export ARCH?=32bit
+
+ifeq ($(ARCH),32bit)
+  COMPILER_ARCH=-m32
+endif
+ifeq ($(ARCH),64bit)
+  COMPILER_ARCH=-m64
+endif
+
+
 ifeq ($(OS),)
 # only Windows has OS predefined.
 	UNAME		:= $(shell uname -s)

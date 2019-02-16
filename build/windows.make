@@ -30,8 +30,8 @@
 ## we need c99!
 
 CC			=gcc
-CFLAGS		=-m32 -Wno-endif-labels -std=gnu99 $(DBG_FLAGS) $(INCLUDES)
-LDFLAGS		=-m32 $(LIBRARIES)
+CFLAGS		=$(COMPILER_ARCH) -Wno-endif-labels -std=gnu99 $(DBG_FLAGS) $(INCLUDES)
+LDFLAGS		=$(COMPILER_ARCH) $(LIBRARIES)
 
 INSTALL		=install
 

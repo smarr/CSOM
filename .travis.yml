@@ -8,12 +8,19 @@ install:
 
 matrix:
   include:
-    - env: TASK="make test" COMPILER=gcc
+    - env: TASK="make test" COMPILER=gcc ARCH=32bit
       compiler:
         - gcc
-    - env: TASK="make test" COMPILER=clang
+    - env: TASK="make test" COMPILER=gcc ARCH=64bit
+      compiler:
+        - gcc
+    - env: TASK="make test" COMPILER=clang ARCH=32bit
       compiler:
         - clang
+    - env: TASK="make test" COMPILER=clang ARCH=64bit
+      compiler:
+        - clang
+
     - env: TASK="make emscripten" COMPILER=emcc
       language: node_js
       node_js:

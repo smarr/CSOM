@@ -73,13 +73,13 @@ void* object_space = NULL;
 /*
  * the size of the heap used by gc_allocate (standard: 1 MB)
  */
-int OBJECT_SPACE_SIZE = 1048576;
+intptr_t OBJECT_SPACE_SIZE = 1048576;
 
 
 /*
  * will be adjusted when gc is initialized
  */
-int BUFFERSIZE_FOR_UNINTERRUPTABLE = 50000; 
+intptr_t BUFFERSIZE_FOR_UNINTERRUPTABLE = 50000;
 
 
 /*
@@ -201,8 +201,8 @@ void gc_mark_object(void* _self) {
 void gc_show_memory() {
     pVMObject pointer = object_space;
     free_list_entry* current_entry = first_free_entry;
-    int object_size = 0;
-    int object_aligner = 0;
+    intptr_t object_size = 0;
+    intptr_t object_aligner = 0;
     int line_count = 2;
     
     fprintf(stderr,"\n########\n# SHOW #\n########\n1 ");
@@ -221,7 +221,7 @@ void gc_show_memory() {
                 free_list_entry* next = current_entry->next;
                 object_size = next->size;
             }
-            fprintf(stderr,"[%d]",object_size);
+            fprintf(stderr, "[%ld]", object_size);
         } else {
             pVMObject object = (pVMObject) pointer;
             
@@ -232,7 +232,7 @@ void gc_show_memory() {
                 fprintf(stderr,"-xx-");
             } else {
                 pVMSymbol class_name = SEND(SEND(object, get_class), get_name);
-                fprintf(stderr,"-%d %s %p-", object_size, SEND(class_name, get_plain_string), object);
+                fprintf(stderr,"-%ld %s %p-", object_size, SEND(class_name, get_plain_string), object);
             }
         }
         // aligns the output by inserting a line break after 36 objects
@@ -241,7 +241,7 @@ void gc_show_memory() {
             fprintf(stderr,"\n%d ", line_count++);
             object_aligner = 0;
         }
-        pointer = (void*)((int)pointer + object_size);
+        pointer = (void*)((intptr_t)pointer + object_size);
     } while ((void*)pointer < (void*)(object_space + OBJECT_SPACE_SIZE));    
 }
 
@@ -311,7 +311,7 @@ void gc_collect() {
             }
         }
         // set the pointer to the next object in the heap
-        pointer = (void*)((int)pointer + object_size);
+        pointer = (void*)((intptr_t)pointer + object_size);
 
     } while ((void*)pointer < (void*)(object_space + OBJECT_SPACE_SIZE));
 
@@ -384,7 +384,7 @@ void* gc_allocate(size_t size) {
             
             result = entry;
             // create new entry and assign data
-            free_list_entry* replace_entry =  (free_list_entry*) ((int)entry + size);
+            free_list_entry* replace_entry =  (free_list_entry*) ((intptr_t)entry + size);
             
             replace_entry->size = old_entry_size - size;
             replace_entry->next = old_next;
@@ -407,7 +407,7 @@ void* gc_allocate(size_t size) {
     }
            
     if(!result) {
-        fprintf(stderr, "Failed to allocate %d bytes. Panic.\n", (int)size);
+        fprintf(stderr, "Failed to allocate %ld bytes. Panic.\n", size);
         Universe_exit(-1);
     }
     memset(result, 0, size);
@@ -454,7 +454,7 @@ void gc_merge_free_spaces() {
     size_of_free_heap = 0;
 
     while (entry->next != NULL) {
-        if (((int)entry + (int)(entry->size)) == (int)(entry->next)) {
+        if (((intptr_t)entry + (intptr_t)(entry->size)) == (intptr_t)(entry->next)) {
             entry_to_append = entry->next;
             new_size = entry->size + entry_to_append->size;
             new_next = entry_to_append->next;
@@ -481,7 +481,7 @@ void* internal_allocate(size_t size) {
         return NULL;
     void* result = malloc(size);
     if(!result) {
-        debug_error("Failed to allocate %d bytes. Panic.\n", (int)size);
+        debug_error("Failed to allocate %ld bytes. Panic.\n", size);
         Universe_exit(-1);
     }
     memset(result, 0, size);
@@ -505,13 +505,13 @@ char* internal_allocate_string(const char* restrict str) {
  */
 void gc_initialize() { 
     // Buffersize is adjusted to the size of the heap (10%)
-    BUFFERSIZE_FOR_UNINTERRUPTABLE = (int) (OBJECT_SPACE_SIZE * 0.1);
+    BUFFERSIZE_FOR_UNINTERRUPTABLE = (intptr_t) (OBJECT_SPACE_SIZE * 0.1);
 
     // allocation of the heap
     object_space = malloc(OBJECT_SPACE_SIZE);
     if (!object_space) {
-        fprintf(stderr, "Failed to allocate the initial %d bytes for the GC. Panic.\n",
-                (int) OBJECT_SPACE_SIZE);
+        fprintf(stderr, "Failed to allocate the initial %ld bytes for the GC. Panic.\n",
+                OBJECT_SPACE_SIZE);
         Universe_exit(-1);
     } 
     memset(object_space, 0, OBJECT_SPACE_SIZE);
@@ -603,7 +603,7 @@ void reset_alloc_stat(void) {
  */
 void gc_stat(void) {
     fprintf(stderr, "-- GC statistics --\n");
-    fprintf(stderr, "* heap size %d B (%d kB, %.2f MB)\n",
+    fprintf(stderr, "* heap size %ld B (%ld kB, %.2f MB)\n",
         OBJECT_SPACE_SIZE, _KB(OBJECT_SPACE_SIZE), _MB(OBJECT_SPACE_SIZE));
     fprintf(stderr, "* performed %d collections\n", num_collections);
 }

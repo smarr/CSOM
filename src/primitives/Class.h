@@ -30,6 +30,10 @@ THE SOFTWARE.
 #include <vmobjects/OOObject.h>
 
 void  _Class_new(pVMObject object, pVMFrame frame);
+void  _Class_name(pVMObject object, pVMFrame frame);
+void  _Class_superclass(pVMObject object, pVMFrame frame);
+void  _Class_fields(pVMObject object, pVMFrame frame);
+void  _Class_methods(pVMObject object, pVMFrame frame);
 
 
 #endif // CORE_CLASS_H_

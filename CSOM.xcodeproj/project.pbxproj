@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A775BBA221859D800CB6FA5 /* Method.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A775BB9221859D800CB6FA5 /* Method.c */; };
 		0A99B1071814406000D024F6 /* Frame.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A99B1051814406000D024F6 /* Frame.c */; };
 		E1990DA20C4949400043EABA /* AUTHORS in Copy Files For Run */ = {isa = PBXBuildFile; fileRef = E1990D9E0C4949400043EABA /* AUTHORS */; };
 		E1990DA30C4949400043EABA /* INSTALL in Copy Files For Run */ = {isa = PBXBuildFile; fileRef = E1990D9F0C4949400043EABA /* INSTALL */; };
@@ -89,6 +90,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0A775BB8221859C000CB6FA5 /* Method.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Method.h; sourceTree = "<group>"; };
+		0A775BB9221859D800CB6FA5 /* Method.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Method.c; sourceTree = "<group>"; };
 		0A99B1051814406000D024F6 /* Frame.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Frame.c; sourceTree = "<group>"; };
 		0A99B1061814406000D024F6 /* Frame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Frame.h; sourceTree = "<group>"; };
 		8DD76FB20486AB0100D96B5E /* CSOM */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CSOM; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -445,6 +448,8 @@
 				F6F2057C0C7DB2B40074678D /* Symbol.h */,
 				F6F2057D0C7DB2B40074678D /* System.c */,
 				F6F2057E0C7DB2B40074678D /* System.h */,
+				0A775BB8221859C000CB6FA5 /* Method.h */,
+				0A775BB9221859D800CB6FA5 /* Method.c */,
 			);
 			name = primitives;
 			path = src/primitives;
@@ -578,6 +583,7 @@
 				F6F205820C7DB2B50074678D /* Block.c in Sources */,
 				0A99B1071814406000D024F6 /* Frame.c in Sources */,
 				F6F205830C7DB2B50074678D /* Class.c in Sources */,
+				0A775BBA221859D800CB6FA5 /* Method.c in Sources */,
 				F6F205840C7DB2B50074678D /* Core.c in Sources */,
 				F6F205850C7DB2B50074678D /* Double.c in Sources */,
 				F6F205870C7DB2B50074678D /* Integer.c in Sources */,

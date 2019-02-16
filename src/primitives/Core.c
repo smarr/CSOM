@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "Double.h"
 #include "Frame.h"
 #include "Integer.h"
+#include "Method.h"
 #include "Object.h"
 #include "String.h"
 #include "Symbol.h"
@@ -88,6 +89,7 @@ static char* supported_classes[] = {
     "Double",
     "Frame",
     "Integer",
+    "Method",
     "Object",
     "String",
     "Symbol",

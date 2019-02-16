@@ -31,8 +31,8 @@ ifeq ($(CC),)
 	CC		= gcc
 endif
 
-CFLAGS		=-O3 -m32 -Wno-endif-labels -std=gnu99 $(DBG_FLAGS) $(INCLUDES)
-LDFLAGS		=-O3 -m32 $(LIBRARIES)
+CFLAGS		=-O3 $(COMPILER_ARCH) -Wno-endif-labels -std=gnu99 $(DBG_FLAGS) $(INCLUDES)
+LDFLAGS		=-O3 $(COMPILER_ARCH) $(LIBRARIES)
 
 INSTALL		=install
 

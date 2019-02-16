@@ -33,10 +33,10 @@ THE SOFTWARE.
 #include "Block.h"
 #include "Class.h"
 #include "Double.h"
-#include "Frame.h"
 #include "Integer.h"
 #include "Method.h"
 #include "Object.h"
+#include "Primitive.h"
 #include "String.h"
 #include "Symbol.h"
 #include "System.h"
@@ -90,6 +90,7 @@ static char* supported_classes[] = {
     "Integer",
     "Method",
     "Object",
+    "Primitive",
     "String",
     "Symbol",
     "System",

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0A775BBA221859D800CB6FA5 /* Method.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A775BB9221859D800CB6FA5 /* Method.c */; };
+		0A775BBD2218CE4C00CB6FA5 /* Primitive.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A775BBC2218CE4C00CB6FA5 /* Primitive.c */; };
 		E1990DA20C4949400043EABA /* AUTHORS in Copy Files For Run */ = {isa = PBXBuildFile; fileRef = E1990D9E0C4949400043EABA /* AUTHORS */; };
 		E1990DA30C4949400043EABA /* INSTALL in Copy Files For Run */ = {isa = PBXBuildFile; fileRef = E1990D9F0C4949400043EABA /* INSTALL */; };
 		E1990DA40C4949400043EABA /* LICENSE in Copy Files For Run */ = {isa = PBXBuildFile; fileRef = E1990DA00C4949400043EABA /* LICENSE */; };
@@ -89,6 +90,8 @@
 /* Begin PBXFileReference section */
 		0A775BB8221859C000CB6FA5 /* Method.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Method.h; sourceTree = "<group>"; };
 		0A775BB9221859D800CB6FA5 /* Method.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Method.c; sourceTree = "<group>"; };
+		0A775BBB2218CE4C00CB6FA5 /* Primitive.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Primitive.h; sourceTree = "<group>"; };
+		0A775BBC2218CE4C00CB6FA5 /* Primitive.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Primitive.c; sourceTree = "<group>"; };
 		8DD76FB20486AB0100D96B5E /* CSOM */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CSOM; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6A0FF2C0290799A04C91782 /* CSOM.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; name = CSOM.1; path = doc/CSOM.1; sourceTree = "<group>"; };
 		E1990D9E0C4949400043EABA /* AUTHORS */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = AUTHORS; sourceTree = "<group>"; };
@@ -435,6 +438,8 @@
 				F6F2057E0C7DB2B40074678D /* System.h */,
 				0A775BB8221859C000CB6FA5 /* Method.h */,
 				0A775BB9221859D800CB6FA5 /* Method.c */,
+				0A775BBB2218CE4C00CB6FA5 /* Primitive.h */,
+				0A775BBC2218CE4C00CB6FA5 /* Primitive.c */,
 			);
 			name = primitives;
 			path = src/primitives;
@@ -563,6 +568,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F6F205800C7DB2B50074678D /* Array.c in Sources */,
+				0A775BBD2218CE4C00CB6FA5 /* Primitive.c in Sources */,
 				F6F205820C7DB2B50074678D /* Block.c in Sources */,
 				F6F205830C7DB2B50074678D /* Class.c in Sources */,
 				0A775BBA221859D800CB6FA5 /* Method.c in Sources */,

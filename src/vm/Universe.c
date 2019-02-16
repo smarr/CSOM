@@ -71,7 +71,6 @@ pVMClass integer_class;
 pVMClass array_class;
 pVMClass method_class;
 pVMClass symbol_class;
-pVMClass frame_class;
 pVMClass primitive_class;
 pVMClass string_class;
 pVMClass system_class;
@@ -309,7 +308,6 @@ void Universe_initialize(int argc, const char** argv) {
     symbol_class    = Universe_new_system_class();
     method_class    = Universe_new_system_class();
     integer_class   = Universe_new_system_class();
-    frame_class     = Universe_new_system_class();
     primitive_class = Universe_new_system_class();
     string_class    = Universe_new_system_class();
     double_class    = Universe_new_system_class();
@@ -326,7 +324,6 @@ void Universe_initialize(int argc, const char** argv) {
     Universe_initialize_system_class(method_class, array_class, "Method");
     Universe_initialize_system_class(symbol_class, object_class, "Symbol");
     Universe_initialize_system_class(integer_class, object_class, "Integer");
-    Universe_initialize_system_class(frame_class, array_class, "Frame");
     Universe_initialize_system_class(primitive_class, object_class,
                                      "Primitive");
     Universe_initialize_system_class(string_class, object_class, "String");
@@ -341,7 +338,6 @@ void Universe_initialize(int argc, const char** argv) {
     Universe_load_system_class(method_class);
     Universe_load_system_class(symbol_class);
     Universe_load_system_class(integer_class);
-    Universe_load_system_class(frame_class);
     Universe_load_system_class(primitive_class);
     Universe_load_system_class(string_class);
     Universe_load_system_class(double_class);
@@ -540,7 +536,7 @@ pVMFrame Universe_new_frame(pVMFrame previous_frame, pVMMethod method, pVMFrame 
     
     // Allocate a new frame and set its class to be the frame class
     pVMFrame result = VMFrame_new(length, method, context, previous_frame);
-    SEND((pVMObject)result, set_class, frame_class);
+    SEND((pVMObject)result, set_class, (pVMClass)nil_object);
     
     // Reset the stack pointer and the bytecode index
     SEND(result, reset_stack_pointer);

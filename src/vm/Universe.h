@@ -54,7 +54,6 @@ extern pVMClass integer_class;
 extern pVMClass array_class;
 extern pVMClass method_class;
 extern pVMClass symbol_class;
-extern pVMClass frame_class;
 extern pVMClass primitive_class;
 extern pVMClass string_class;
 extern pVMClass system_class;

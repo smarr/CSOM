@@ -43,7 +43,6 @@ THE SOFTWARE.
 #include <vmobjects/VMArray.h>
 #include <vmobjects/VMInvokable.h>
 #include <vmobjects/VMBlock.h>
-#include <vmobjects/VMBigInteger.h>
 #include <vmobjects/VMInteger.h>
 #include <vmobjects/VMDouble.h>
 #include <vmobjects/VMString.h>
@@ -69,7 +68,6 @@ pVMClass metaclass_class;
 
 pVMClass nil_class;
 pVMClass integer_class;
-pVMClass biginteger_class;
 pVMClass array_class;
 pVMClass method_class;
 pVMClass symbol_class;
@@ -311,7 +309,6 @@ void Universe_initialize(int argc, const char** argv) {
     symbol_class    = Universe_new_system_class();
     method_class    = Universe_new_system_class();
     integer_class   = Universe_new_system_class();
-    biginteger_class= Universe_new_system_class();
     frame_class     = Universe_new_system_class();
     primitive_class = Universe_new_system_class();
     string_class    = Universe_new_system_class();
@@ -329,8 +326,6 @@ void Universe_initialize(int argc, const char** argv) {
     Universe_initialize_system_class(method_class, array_class, "Method");
     Universe_initialize_system_class(symbol_class, object_class, "Symbol");
     Universe_initialize_system_class(integer_class, object_class, "Integer");
-    Universe_initialize_system_class(biginteger_class, object_class,
-                                     "BigInteger");
     Universe_initialize_system_class(frame_class, array_class, "Frame");
     Universe_initialize_system_class(primitive_class, object_class,
                                      "Primitive");
@@ -346,7 +341,6 @@ void Universe_initialize(int argc, const char** argv) {
     Universe_load_system_class(method_class);
     Universe_load_system_class(symbol_class);
     Universe_load_system_class(integer_class);
-    Universe_load_system_class(biginteger_class);
     Universe_load_system_class(frame_class);
     Universe_load_system_class(primitive_class);
     Universe_load_system_class(string_class);
@@ -582,20 +576,10 @@ pVMObject Universe_new_instance(pVMClass instance_class) {
 }
 
 
-pVMInteger Universe_new_integer(int32_t value) {
+pVMInteger Universe_new_integer(int64_t value) {
     // Allocate a new integer and set its class to be the integer class
     pVMInteger result = VMInteger_new_with(value);
     SEND((pVMObject)result, set_class, integer_class);
-    
-    // Return the freshly allocated integer
-    return result;
-}
-
-
-pVMBigInteger Universe_new_biginteger(int64_t value) {
-    // Allocate a new integer and set its class to be the integer class
-    pVMBigInteger result = VMBigInteger_new_with(value);
-    SEND((pVMObject)result, set_class, biginteger_class);
     
     // Return the freshly allocated integer
     return result;

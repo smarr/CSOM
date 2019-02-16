@@ -1174,11 +1174,7 @@ void literalNumber(method_generation_context* mgenc) {
     else
         val = literalDecimal();
     
-    pVMObject literal;
-    if (val < INT32_MIN || val > INT32_MAX)
-        literal = (pVMObject) Universe_new_biginteger(val);
-    else
-        literal = (pVMObject) Universe_new_integer(val);
+    pVMObject literal = (pVMObject) Universe_new_integer(val);
     
     SEND(mgenc->literals, addIfAbsent, literal);
     

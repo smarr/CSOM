@@ -54,7 +54,6 @@ VTABLE(String) {
     int           (*charAt)(void*, size_t position); \
     pString       (*substring)(void*, size_t start, size_t end); \
     pVMInteger    (*toInteger)(void*); \
-    pVMBigInteger (*toBigInteger)(void*); \
     pVMDouble     (*toDouble)(void*); \
     pString*      (*tokenize)(void*, size_t* length, \
                               const char* restrict delimiters);

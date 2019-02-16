@@ -47,7 +47,6 @@ THE SOFTWARE.
 #include <vmobjects/VMClass.h>
 #include <vmobjects/VMString.h>
 #include <vmobjects/VMDouble.h>
-#include <vmobjects/VMBigInteger.h>
 
 
 #include <interpreter/Interpreter.h>

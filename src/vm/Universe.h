@@ -51,7 +51,6 @@ extern pVMClass metaclass_class;
   
 extern pVMClass nil_class;
 extern pVMClass integer_class;
-extern pVMClass biginteger_class;
 extern pVMClass array_class;
 extern pVMClass method_class;
 extern pVMClass symbol_class;
@@ -91,8 +90,7 @@ pVMClass      Universe_new_class(pVMClass);
 pVMFrame      Universe_new_frame(pVMFrame, pVMMethod, pVMFrame);
 pVMMethod     Universe_new_method(pVMSymbol, size_t, size_t, size_t, size_t);
 pVMObject     Universe_new_instance(pVMClass);
-pVMInteger    Universe_new_integer(int32_t);
-pVMBigInteger Universe_new_biginteger(int64_t);
+pVMInteger    Universe_new_integer(int64_t);
 pVMDouble     Universe_new_double(double);
 pVMClass      Universe_new_metaclass_class(void);
 pVMString     Universe_new_string(const char*);

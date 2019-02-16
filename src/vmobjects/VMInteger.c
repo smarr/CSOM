@@ -51,7 +51,7 @@ pVMInteger VMInteger_new(void) {
 /** 
  * Create a new VMInteger with initial value
  */
-pVMInteger VMInteger_new_with(const int32_t integer) {
+pVMInteger VMInteger_new_with(const int64_t integer) {
     pVMInteger result = (pVMInteger)gc_allocate_object(sizeof(VMInteger));
     if(result) {
         result->_vtable = VMInteger_vtable();
@@ -71,7 +71,7 @@ void _VMInteger_init(void* _self, ...) {
     SUPER(VMObject, self, init, 0);
     
     va_list args; va_start(args, _self);
-    self->embedded_integer = va_arg(args, int32_t);
+    self->embedded_integer = va_arg(args, int64_t);
     self->hash = self->embedded_integer;
     va_end(args);
 }
@@ -80,13 +80,13 @@ void _VMInteger_init(void* _self, ...) {
 //  Instance Methods (Starting with _VMInteger_) 
 //
 //
-int32_t _VMInteger_get_embedded_integer(void* _self) {
+int64_t _VMInteger_get_embedded_integer(void* _self) {
     pVMInteger self = (pVMInteger)_self;
     return self->embedded_integer;
 }
 
 
-void _VMInteger_set_embedded_integer(void* _self, const int32_t embedded) {
+void _VMInteger_set_embedded_integer(void* _self, const int64_t embedded) {
     pVMInteger self = (pVMInteger)_self;
     self->embedded_integer = embedded;
     self->hash = self->embedded_integer;

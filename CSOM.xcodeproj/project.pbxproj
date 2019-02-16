@@ -34,7 +34,6 @@
 		F6F204890C7DA4320074678D /* Signature.c in Sources */ = {isa = PBXBuildFile; fileRef = F6F2041B0C7DA4320074678D /* Signature.c */; };
 		F6F2048B0C7DA4320074678D /* Symboltable.c in Sources */ = {isa = PBXBuildFile; fileRef = F6F2041D0C7DA4320074678D /* Symboltable.c */; };
 		F6F2048D0C7DA4320074678D /* VMArray.c in Sources */ = {isa = PBXBuildFile; fileRef = F6F2041F0C7DA4320074678D /* VMArray.c */; };
-		F6F2048F0C7DA4320074678D /* VMBigInteger.c in Sources */ = {isa = PBXBuildFile; fileRef = F6F204210C7DA4320074678D /* VMBigInteger.c */; };
 		F6F204910C7DA4320074678D /* VMBlock.c in Sources */ = {isa = PBXBuildFile; fileRef = F6F204230C7DA4320074678D /* VMBlock.c */; };
 		F6F204930C7DA4320074678D /* VMClass.c in Sources */ = {isa = PBXBuildFile; fileRef = F6F204250C7DA4320074678D /* VMClass.c */; };
 		F6F204950C7DA4320074678D /* VMDouble.c in Sources */ = {isa = PBXBuildFile; fileRef = F6F204270C7DA4320074678D /* VMDouble.c */; };
@@ -48,7 +47,6 @@
 		F6F204A50C7DA4320074678D /* VMString.c in Sources */ = {isa = PBXBuildFile; fileRef = F6F204370C7DA4320074678D /* VMString.c */; };
 		F6F204A70C7DA4320074678D /* VMSymbol.c in Sources */ = {isa = PBXBuildFile; fileRef = F6F204390C7DA4320074678D /* VMSymbol.c */; };
 		F6F205800C7DB2B50074678D /* Array.c in Sources */ = {isa = PBXBuildFile; fileRef = F6F205630C7DB2B40074678D /* Array.c */; };
-		F6F205810C7DB2B50074678D /* BigInteger.c in Sources */ = {isa = PBXBuildFile; fileRef = F6F205650C7DB2B40074678D /* BigInteger.c */; };
 		F6F205820C7DB2B50074678D /* Block.c in Sources */ = {isa = PBXBuildFile; fileRef = F6F205670C7DB2B40074678D /* Block.c */; };
 		F6F205830C7DB2B50074678D /* Class.c in Sources */ = {isa = PBXBuildFile; fileRef = F6F205690C7DB2B40074678D /* Class.c */; };
 		F6F205840C7DB2B50074678D /* Core.c in Sources */ = {isa = PBXBuildFile; fileRef = F6F2056B0C7DB2B40074678D /* Core.c */; };
@@ -155,8 +153,6 @@
 		F6F2041E0C7DA4320074678D /* Symboltable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Symboltable.h; path = src/vmobjects/Symboltable.h; sourceTree = SOURCE_ROOT; };
 		F6F2041F0C7DA4320074678D /* VMArray.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = VMArray.c; path = src/vmobjects/VMArray.c; sourceTree = SOURCE_ROOT; };
 		F6F204200C7DA4320074678D /* VMArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VMArray.h; path = src/vmobjects/VMArray.h; sourceTree = SOURCE_ROOT; };
-		F6F204210C7DA4320074678D /* VMBigInteger.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = VMBigInteger.c; path = src/vmobjects/VMBigInteger.c; sourceTree = SOURCE_ROOT; };
-		F6F204220C7DA4320074678D /* VMBigInteger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VMBigInteger.h; path = src/vmobjects/VMBigInteger.h; sourceTree = SOURCE_ROOT; };
 		F6F204230C7DA4320074678D /* VMBlock.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = VMBlock.c; path = src/vmobjects/VMBlock.c; sourceTree = SOURCE_ROOT; };
 		F6F204240C7DA4320074678D /* VMBlock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VMBlock.h; path = src/vmobjects/VMBlock.h; sourceTree = SOURCE_ROOT; };
 		F6F204250C7DA4320074678D /* VMClass.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = VMClass.c; path = src/vmobjects/VMClass.c; sourceTree = SOURCE_ROOT; };
@@ -183,8 +179,6 @@
 		F6F2043A0C7DA4320074678D /* VMSymbol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VMSymbol.h; path = src/vmobjects/VMSymbol.h; sourceTree = SOURCE_ROOT; };
 		F6F205630C7DB2B40074678D /* Array.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Array.c; path = src/primitives/Array.c; sourceTree = SOURCE_ROOT; };
 		F6F205640C7DB2B40074678D /* Array.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Array.h; path = src/primitives/Array.h; sourceTree = SOURCE_ROOT; };
-		F6F205650C7DB2B40074678D /* BigInteger.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = BigInteger.c; path = src/primitives/BigInteger.c; sourceTree = SOURCE_ROOT; };
-		F6F205660C7DB2B40074678D /* BigInteger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BigInteger.h; path = src/primitives/BigInteger.h; sourceTree = SOURCE_ROOT; };
 		F6F205670C7DB2B40074678D /* Block.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Block.c; path = src/primitives/Block.c; sourceTree = SOURCE_ROOT; };
 		F6F205680C7DB2B40074678D /* Block.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Block.h; path = src/primitives/Block.h; sourceTree = SOURCE_ROOT; };
 		F6F205690C7DB2B40074678D /* Class.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Class.c; path = src/primitives/Class.c; sourceTree = SOURCE_ROOT; };
@@ -390,8 +384,6 @@
 				F6F2041E0C7DA4320074678D /* Symboltable.h */,
 				F6F2041F0C7DA4320074678D /* VMArray.c */,
 				F6F204200C7DA4320074678D /* VMArray.h */,
-				F6F204210C7DA4320074678D /* VMBigInteger.c */,
-				F6F204220C7DA4320074678D /* VMBigInteger.h */,
 				F6F204230C7DA4320074678D /* VMBlock.c */,
 				F6F204240C7DA4320074678D /* VMBlock.h */,
 				F6F204250C7DA4320074678D /* VMClass.c */,
@@ -427,8 +419,6 @@
 				F68A5BC60DAE399300715FE8 /* %Primitive.c% */,
 				F6F205630C7DB2B40074678D /* Array.c */,
 				F6F205640C7DB2B40074678D /* Array.h */,
-				F6F205650C7DB2B40074678D /* BigInteger.c */,
-				F6F205660C7DB2B40074678D /* BigInteger.h */,
 				F6F205670C7DB2B40074678D /* Block.c */,
 				F6F205680C7DB2B40074678D /* Block.h */,
 				F6F205690C7DB2B40074678D /* Class.c */,
@@ -552,7 +542,6 @@
 				F6F204890C7DA4320074678D /* Signature.c in Sources */,
 				F6F2048B0C7DA4320074678D /* Symboltable.c in Sources */,
 				F6F2048D0C7DA4320074678D /* VMArray.c in Sources */,
-				F6F2048F0C7DA4320074678D /* VMBigInteger.c in Sources */,
 				F6F204910C7DA4320074678D /* VMBlock.c in Sources */,
 				F6F204930C7DA4320074678D /* VMClass.c in Sources */,
 				F6F204950C7DA4320074678D /* VMDouble.c in Sources */,
@@ -579,7 +568,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F6F205800C7DB2B50074678D /* Array.c in Sources */,
-				F6F205810C7DB2B50074678D /* BigInteger.c in Sources */,
 				F6F205820C7DB2B50074678D /* Block.c in Sources */,
 				0A99B1071814406000D024F6 /* Frame.c in Sources */,
 				F6F205830C7DB2B50074678D /* Class.c in Sources */,

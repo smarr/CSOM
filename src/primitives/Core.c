@@ -30,7 +30,6 @@ THE SOFTWARE.
 #include <string.h>
 
 #include "Array.h"
-#include "BigInteger.h"
 #include "Block.h"
 #include "Class.h"
 #include "Double.h"

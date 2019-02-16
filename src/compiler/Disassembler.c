@@ -35,7 +35,6 @@ THE SOFTWARE.
 #include <interpreter/Interpreter.h>
 
 #include <vmobjects/VMArray.h>
-#include <vmobjects/VMBigInteger.h>
 #include <vmobjects/VMBlock.h>
 #include <vmobjects/VMClass.h>
 #include <vmobjects/VMDouble.h>
@@ -75,11 +74,8 @@ static inline void _Disassembler_dispatch(pVMObject o) {
             debug_print("\"%s\"", SEND((pVMString)o, get_chars));
         } else if(c == double_class)
             debug_print("%g", SEND((pVMDouble)o, get_embedded_double));
-        else if(c == biginteger_class)
-            debug_print("%lld", SEND((pVMBigInteger)o,
-                                     get_embedded_biginteger));
         else if(c == integer_class)
-            debug_print("%d", SEND((pVMInteger)o, get_embedded_integer));
+            debug_print("%lld", SEND((pVMInteger)o, get_embedded_integer));
         else if(c == symbol_class) {
             debug_print("#%s", SEND((pVMSymbol)o, get_chars));
         } else

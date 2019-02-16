@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include <vmobjects/VMFrame.h>
 #include <vmobjects/VMDouble.h>
 #include <vmobjects/VMInteger.h>
-#include <vmobjects/VMBigInteger.h>
 
 #include <vm/Universe.h>
 
@@ -49,8 +48,6 @@ double coerce_double(pVMObject x) {
         return SEND((pVMDouble)x, get_embedded_double);
     else if(IS_A(x, VMInteger))
         return (double)SEND((pVMInteger)x, get_embedded_integer);
-    else if(IS_A(x, VMBigInteger))
-        return (double)SEND((pVMBigInteger)x, get_embedded_biginteger);
     else
         Universe_error_exit("Attempt to apply Double operation to non-number.");
 }
@@ -160,11 +157,7 @@ void _Double_sqrt(pVMObject object, pVMFrame frame) {
 
 void _Double_round(pVMObject object, pVMFrame frame) {
     pVMDouble self = (pVMDouble)SEND(frame, pop);
-    long int rounded = lround(SEND(self, get_embedded_double));
-    
-    // Check with integer bounds and push:
-    if(rounded > INT32_MAX || rounded < INT32_MIN)
-        SEND(frame, push, (pVMObject)Universe_new_biginteger(rounded));
-    else
-        SEND(frame, push, (pVMObject)Universe_new_integer((int32_t)rounded));
+    int64_t rounded = lround(SEND(self, get_embedded_double));
+
+    SEND(frame, push, (pVMObject)Universe_new_integer((int64_t)rounded));
 }

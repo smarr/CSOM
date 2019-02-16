@@ -36,7 +36,6 @@ THE SOFTWARE.
 #include <vmobjects/VMFrame.h>
 #include <vmobjects/VMDouble.h>
 #include <vmobjects/VMInteger.h>
-#include <vmobjects/VMBigInteger.h>
 #include <vmobjects/VMString.h>
 
 #include <vm/Universe.h>
@@ -51,11 +50,7 @@ THE SOFTWARE.
  * of an Integer operation).
  */
 #define CHECK_COERCION(obj,receiver,op) ({ \
-    if(IS_A(rightObj, VMBigInteger)) { \
-        _Integer__resendAsBigInteger( \
-            object, (op), (receiver), (pVMBigInteger)(obj)); \
-        return; \
-    } else if(IS_A(rightObj, VMDouble)) { \
+    if(IS_A(rightObj, VMDouble)) { \
         _Integer__resendAsDouble( \
             object, (op), (receiver), (pVMDouble)(obj)); \
         return; \
@@ -70,28 +65,7 @@ THE SOFTWARE.
 
 static inline void _Integer__pushResult(pVMObject object, pVMFrame frame, 
                               int64_t result) {
-    // Check with integer bounds and push:
-    if(result > INT32_MAX || result < INT32_MIN)
-        SEND(frame, push, (pVMObject)Universe_new_biginteger(result));
-    else
-        SEND(frame, push, (pVMObject)Universe_new_integer((int32_t)result));
-}
-
-
-void _Integer__resendAsBigInteger(pVMObject object, 
-                                  const char* restrict operator,
-                                  pVMInteger left, pVMBigInteger right) {
-    // Construct left value as BigInteger:
-    pVMBigInteger leftBigInteger = 
-        Universe_new_biginteger((int64_t)SEND(left, get_embedded_integer));
-    
-    // Resend message:
-    pVMObject operands[] = { (pVMObject)right };
-    
-    pVMSymbol op = Universe_symbol_for(operator);
-    SEND((pVMObject)leftBigInteger, send, op, operands, 1);
-    // no reference
-    SEND(op, free);
+    SEND(frame, push, (pVMObject)Universe_new_integer(result));
 }
 
 
@@ -278,7 +252,7 @@ void  _Integer_asString(pVMObject object, pVMFrame frame) {
     pVMInteger self = (pVMInteger)SEND(frame, pop);
     // temporary storage for the number string
     // use c99 snprintf-goodie
-    int32_t integer = SEND(self,  get_embedded_integer);
+    int64_t integer = SEND(self,  get_embedded_integer);
     char* strbuf = (char *)internal_allocate(snprintf(0, 0, "%d", integer) +1);
     sprintf(strbuf, "%d", integer);
     SEND(frame, push, (pVMObject)Universe_new_string(strbuf));
@@ -290,7 +264,7 @@ void Integer_fromString_(pVMObject object, pVMFrame frame) {
     pVMString self = (pVMString)SEND(frame, pop);
     SEND(frame, pop);
     
-    int32_t integer = atoi(SEND(self, get_chars));
+    int64_t integer = atol(SEND(self, get_chars));
     
     SEND(frame, push, (pVMObject)Universe_new_integer(integer));
 }

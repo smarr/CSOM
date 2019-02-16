@@ -107,7 +107,7 @@ void  _System_ticks(pVMObject object, pVMFrame frame) {
     
     int64_t ticks = ((now.tv_sec - _System_start_time.tv_sec) * 1000 * 1000) + //seconds
                     ((now.tv_usec - _System_start_time.tv_usec)); //µseconds
-    SEND(frame, push, (pVMObject)Universe_new_biginteger(ticks));
+    SEND(frame, push, (pVMObject)Universe_new_integer(ticks));
 }
 
 

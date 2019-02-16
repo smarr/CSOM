@@ -34,7 +34,7 @@ THE SOFTWARE.
 VTABLE(VMInteger) {
 #define VMINTEGER_VTABLE_FORMAT \
     VMOBJECT_VTABLE_FORMAT; \
-    int32_t (*get_embedded_integer)(void*)
+    int64_t (*get_embedded_integer)(void*)
         
     VMINTEGER_VTABLE_FORMAT;
 };
@@ -46,7 +46,7 @@ struct _VMInteger {
 
 #define INTEGER_FORMAT \
     VMOBJECT_FORMAT; \
-    int32_t embedded_integer
+    int64_t embedded_integer
     
     INTEGER_FORMAT;
 };
@@ -54,7 +54,7 @@ struct _VMInteger {
 #pragma mark class methods
 
 pVMInteger VMInteger_new(void);
-pVMInteger VMInteger_new_with(const int32_t);
+pVMInteger VMInteger_new_with(const int64_t);
 
 #pragma mark vtable initialization
 

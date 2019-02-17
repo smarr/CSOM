@@ -388,7 +388,7 @@ void skipComment(void) {
 #define _ISOP(C) \
     ((C) == '~' || (C) == '&' || (C) == '|' || (C) == '*' || (C) == '/' || \
      (C) == '\\' || (C) == '+' || (C) == '=' || (C) == '>' || (C) == '<' || \
-     (C) == ',' || (C) == '@' || (C) == '%')
+     (C) == ',' || (C) == '@' || (C) == '%' || (C) == '-')
 #define _MATCH(C, S) \
     if(_BC == (C)) { sym = (S); symc = _BC; sprintf(text, "%c", _BC); bufp++;}
 #define SEPARATOR "----"
@@ -456,6 +456,31 @@ void lexString() {
     *--t = 0;
 }
 
+void lexOperator() {
+    if(_ISOP(buf[bufp + 1])) {
+        sym = OperatorSequence;
+        symc = 0;
+        char* t = text;
+        while(_ISOP(_BC))
+            *t++ = buf[bufp++];
+        *t = 0;
+    }
+    else _MATCH('~', Not)
+    else _MATCH('&', And)
+    else _MATCH('|', Or)
+    else _MATCH('*', Star)
+    else _MATCH('/', Div)
+    else _MATCH('\\', Mod)
+    else _MATCH('+', Plus)
+    else _MATCH('=', Equal)
+    else _MATCH('>', More)
+    else _MATCH('<', Less)
+    else _MATCH(',', Comma)
+    else _MATCH('@', At)
+    else _MATCH('%', Per)
+    else _MATCH('-', Minus)
+}
+
 void getsym(void) {
     if(peekDone) {
         peekDone = false;
@@ -503,34 +528,11 @@ void getsym(void) {
             *t = 0;
             sym = Separator;
         } else {
-            bufp++;
-            sym = Minus;
-            symc = '-';
-            sprintf(text, "-");
+            lexOperator();
         }
     }
     else if(_ISOP(_BC)) {
-        if(_ISOP(buf[bufp + 1])) {
-            sym = OperatorSequence;
-            symc = 0;
-            char* t = text;
-            while(_ISOP(_BC))
-                *t++ = buf[bufp++];
-            *t = 0;
-        }
-        else _MATCH('~', Not)
-        else _MATCH('&', And)
-        else _MATCH('|', Or)
-        else _MATCH('*', Star)
-        else _MATCH('/', Div)
-        else _MATCH('\\', Mod)
-        else _MATCH('+', Plus)
-        else _MATCH('=', Equal)
-        else _MATCH('>', More)
-        else _MATCH('<', Less)
-        else _MATCH(',', Comma)
-        else _MATCH('@', At)
-        else _MATCH('%', Per)
+        lexOperator();
     }
     else if(!strncmp(buf + bufp, PRIMITIVE, strlen(PRIMITIVE))) {
         bufp += strlen(PRIMITIVE);

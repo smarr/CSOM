@@ -40,3 +40,21 @@ void  _Symbol_asString(pVMObject object, pVMFrame frame) {
     const char* chars = SEND(sym, get_chars);
     SEND(frame, push, (pVMObject)Universe_new_string(chars));    
 }
+
+
+void _Symbol_equal(pVMObject object, pVMFrame frame) {
+  pVMObject op1 = SEND(frame, pop);
+  pVMSymbol op2 = (pVMSymbol)SEND(frame, pop);
+
+  pVMClass op1_class = SEND(op1, get_class);
+
+  pVMObject result;
+  if (op1_class == symbol_class) {
+    if ((pVMSymbol) op1 == op2) {
+      SEND(frame, push, true_object);
+      return;
+    }
+  }
+
+  SEND(frame, push, false_object);
+}

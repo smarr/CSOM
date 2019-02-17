@@ -267,6 +267,7 @@ static void keywordMessage(method_generation_context* mgenc, bool super);
 static void formula(method_generation_context* mgenc);
 static void nestedTerm(method_generation_context* mgenc);
 static void literal(method_generation_context* mgenc);
+static pVMObject literalArray(void);
 static pVMObject literalNumber(void);
 static pVMObject literalDecimal(bool);
 static pVMObject negativeDecimal(void);
@@ -532,6 +533,13 @@ void peek(void) {
     symc = saveSymc;
     strcpy(text, saveText);
     peekDone = true;
+}
+
+
+void peekIfNecessary() {
+    if (!peekDone) {
+        peek();
+    }
 }
 
 
@@ -1155,7 +1163,12 @@ static pVMObject get_object_for_current_literal() {
     pVMObject literal_obj;
     switch(sym) {
         case Pound:
+            peekIfNecessary();
+            if (nextSym == NewTerm) {
+                literal_obj = literalArray();
+            } else {
                 literal_obj = literalSymbol();
+            }
             break;
         case STString:
             literal_obj = literalString();
@@ -1225,6 +1238,26 @@ pVMObject literalString() {
     internal_free(s);
     
     return (pVMObject)str;
+}
+
+
+pVMObject literalArray() {
+    pList literal_values = List_new();
+
+    expect(Pound);
+    expect(NewTerm);
+
+    while (sym != EndTerm) {
+        SEND(literal_values, add, get_object_for_current_literal());
+    }
+
+    expect(EndTerm);
+
+    pVMArray arr = Universe_new_array_list(literal_values);
+
+    SEND(literal_values, free);
+
+    return (pVMObject)arr;
 }
 
 

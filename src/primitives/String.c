@@ -81,8 +81,9 @@ void  _String_length(pVMObject object, pVMFrame frame) {
 void  _String_equal(pVMObject object, pVMFrame frame) {
     pVMObject op1 = SEND(frame, pop);
     pVMString op2 = (pVMString)SEND(frame, pop);
-    
-    if((SEND(op1, get_class) == string_class)) {
+
+    pVMClass op1_class = SEND(op1, get_class);
+    if((op1_class == string_class) || op1_class == symbol_class) {
         if(strcmp(SEND(op2, get_chars), SEND((pVMString)op1, get_chars)) == 0) {
             SEND(frame, push, true_object);
             return;

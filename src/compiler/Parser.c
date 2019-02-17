@@ -454,6 +454,8 @@ void lexEscapeChar(char** t) {
         case '\'': *(*t)++ = current; break;
         case '\\': *(*t)++ = current; break;
     }
+
+    bufp++;
 }
 
 void lexStringChar(char** t) {

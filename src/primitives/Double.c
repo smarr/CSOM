@@ -161,3 +161,30 @@ void _Double_round(pVMObject object, pVMFrame frame) {
 
     SEND(frame, push, (pVMObject)Universe_new_integer((int64_t)rounded));
 }
+
+
+void _Double_asInteger(pVMObject object, pVMFrame frame) {
+  pVMDouble self = (pVMDouble)SEND(frame, pop);
+  double dbl = SEND(self, get_embedded_double);
+  SEND(frame, push, (pVMObject)Universe_new_integer((int64_t)dbl));
+}
+
+
+void _Double_cos(pVMObject object, pVMFrame frame) {
+  pVMDouble self = (pVMDouble)SEND(frame, pop);
+  double result = cos(SEND(self, get_embedded_double));
+  SEND(frame, push, (pVMObject)Universe_new_double(result));
+}
+
+
+void _Double_sin(pVMObject object, pVMFrame frame) {
+  pVMDouble self = (pVMDouble)SEND(frame, pop);
+  double result = sin(SEND(self, get_embedded_double));
+  SEND(frame, push, (pVMObject)Universe_new_double(result));
+}
+
+
+void Double_PositiveInfinity(pVMObject object, pVMFrame frame) {
+  SEND(frame, pop);
+  SEND(frame, push, (pVMObject)Universe_new_double(INFINITY));
+}

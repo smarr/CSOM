@@ -49,9 +49,9 @@ void gc_set_heap_size(uint32_t heap_size);
 void gc_mark_object(void* _self);
 
 
-void gc_collect();
-void gc_start_uninterruptable_allocation();
-void gc_end_uninterruptable_allocation();
+void gc_collect(void);
+void gc_start_uninterruptable_allocation(void);
+void gc_end_uninterruptable_allocation(void);
 
 
 void*  gc_allocate(size_t size);
@@ -62,7 +62,7 @@ void   gc_free(void* ptr);
 
 void gc_stat(void);
 
-void gc_finalize();
+void gc_finalize(void);
 
 
 void*  internal_allocate(size_t size);

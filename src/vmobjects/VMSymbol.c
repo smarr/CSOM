@@ -55,7 +55,6 @@ pVMSymbol VMSymbol_new(const char* restrict string) {
  * Initialize a VMSymbol
  */
 void _VMSymbol_init(void* _self, ...) {
-    pVMSymbol self = (pVMSymbol)_self;
     va_list args;
     va_start(args, _self);
 

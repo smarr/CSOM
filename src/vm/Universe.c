@@ -136,7 +136,6 @@ static int get_path_class_ext(pString **tokens, pString arg) {
     (*tokens)[1] = SEND(arg, substring, fp_index + 1, ssep_index);
     
     return ERR_SUCCESS;
-    
 }
 
 
@@ -177,7 +176,6 @@ static int add_class_path(const pString restrict cp) {
     class_path[cp_count++] = cp;
     
     return ERR_SUCCESS;    
-    
 }
 
 
@@ -295,9 +293,11 @@ void Universe_initialize(int argc, const char** argv) {
     globals_dictionary = Hashmap_new();
     // init the Symboltable
     Symbol_table_init();
+
     ///////////////////////////////////
     //     allocate the nil object
     nil_object = VMObject_new();
+
     // allocate the Metaclass classes
     metaclass_class = Universe_new_metaclass_class(); 
     // allocate the rest of the system classes
@@ -311,10 +311,10 @@ void Universe_initialize(int argc, const char** argv) {
     primitive_class = Universe_new_system_class();
     string_class    = Universe_new_system_class();
     double_class    = Universe_new_system_class();
-        
+
     // setup the class reference for the nil object
     SEND(nil_object, set_class, nil_class);
-        
+
     // initialize the system classes.
     Universe_initialize_system_class(object_class, NULL, "Object");
     Universe_initialize_system_class(class_class, object_class, "Class");
@@ -328,7 +328,7 @@ void Universe_initialize(int argc, const char** argv) {
     Universe_initialize_system_class(string_class, object_class, "String");
     Universe_initialize_system_class(symbol_class, string_class, "Symbol");
     Universe_initialize_system_class(double_class, object_class, "Double");
-    
+
     // load methods and fields into the system classes
     Universe_load_system_class(object_class);
     Universe_load_system_class(class_class);
@@ -344,33 +344,33 @@ void Universe_initialize(int argc, const char** argv) {
 
     // load the generic block class
     block_class = Universe_load_class(Universe_symbol_for("Block"));
-    
+
     // setup the true and false objects
     pVMSymbol trueSymbol = Universe_symbol_for("True");
     true_class  = Universe_load_class(trueSymbol);
     true_object = Universe_new_instance(true_class);
-    
+
     pVMSymbol falseSymbol = Universe_symbol_for("False");
     false_class  = Universe_load_class(falseSymbol);
     false_object = Universe_new_instance(false_class);
-    
+
     // load the system class and create an instance of it
     system_class = Universe_load_class(Universe_symbol_for("System"));
     pVMObject system_object = Universe_new_instance(system_class);
-    
+
     // put special objects and classes into the dictionary of globals
     Universe_set_global(Universe_symbol_for("nil"), nil_object);
     Universe_set_global(Universe_symbol_for("true"), true_object);
     Universe_set_global(Universe_symbol_for("false"), false_object);
     Universe_set_global(Universe_symbol_for("system"), system_object);
-    Universe_set_global(Universe_symbol_for("System"), 
+    Universe_set_global(Universe_symbol_for("System"),
                         (pVMObject)system_class);
-    Universe_set_global(Universe_symbol_for("Block"), 
+    Universe_set_global(Universe_symbol_for("Block"),
                         (pVMObject)block_class);
-    
+
     Universe_set_global(trueSymbol,  (pVMObject) true_class);
     Universe_set_global(falseSymbol, (pVMObject) false_class);
-    
+
     // initialize symbols required by the interpreter
     doesNotUnderstand_sym = Universe_symbol_for("doesNotUnderstand:arguments:");
     unknownGlobal_sym = Universe_symbol_for("unknownGlobal:");

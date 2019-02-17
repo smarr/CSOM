@@ -26,7 +26,7 @@ THE SOFTWARE.
  
 #include "Hashmap.h"
 
-#include "debug.h"
+#include <misc/debug.h>
 
 #include <memory/gc.h>
 

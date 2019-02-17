@@ -95,7 +95,7 @@ free_list_entry* first_free_entry = NULL;
 int uninterruptable_counter = 0;
 
 
-int size_of_free_heap = 0;
+size_t size_of_free_heap = 0;
 
 
 //
@@ -147,7 +147,7 @@ void gc_mark_reachable_objects() {
     pHashmapElem elem = NULL;
     
     // iterate over the globals to mark all of them
-    for(int i=0; i < globals->size; i++) {
+    for(size_t i = 0; i < globals->size; i++) {
         elem = (pHashmapElem) globals->elems[i];
         if (elem != NULL) {
             gc_mark_object(elem->key);
@@ -258,7 +258,7 @@ void gc_collect() {
     //gc_show_memory();
     pVMObject pointer = object_space;
     free_list_entry* current_entry = first_free_entry;
-    int object_size = 0;
+    size_t object_size = 0;
 
     do {
         // we need to find the last free entry before the pointer
@@ -378,7 +378,7 @@ void* gc_allocate(size_t size) {
         // free_entry?
         if (entry->size >= (size + sizeof(struct _free_list_entry))) {
             // save data from found entry
-            int old_entry_size = entry->size;
+            size_t old_entry_size = entry->size;
             free_list_entry* old_next = entry->next;
             
             result = entry;
@@ -396,7 +396,7 @@ void* gc_allocate(size_t size) {
             // no space was left
             // running the GC here will most certainly result in data loss!
             fprintf(stderr,"Not enough heap! Data loss is possible\n");
-            fprintf(stderr, "FREE-Size: %d, uninterruptable_counter: %d\n",
+            fprintf(stderr, "FREE-Size: %zd, uninterruptable_counter: %d\n",
                 size_of_free_heap, uninterruptable_counter);
             
             gc_collect();
@@ -447,7 +447,7 @@ void gc_free(void* ptr) {
 void gc_merge_free_spaces() {
     free_list_entry* entry = first_free_entry;
     free_list_entry* entry_to_append = NULL;
-    int new_size = 0;
+    size_t new_size = 0;
     free_list_entry* new_next = NULL;
     
     size_of_free_heap = 0;

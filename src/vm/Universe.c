@@ -103,7 +103,7 @@ static int  get_path_class_ext(pString **tokens, pString arg);
 
 //file-local variables
 static pString* class_path=NULL;
-static int cp_count=0;
+static size_t cp_count=0;
 static pHashmap globals_dictionary=NULL;
 
 ///////////////////////////////////
@@ -113,9 +113,9 @@ static int get_path_class_ext(pString **tokens, pString arg) {
 #define EXT_TOKENS 2    
 
     // index last path/file separator
-    int fp_index = SEND(arg, lastIndexOfChar, *file_separator);
+    intptr_t fp_index = SEND(arg, lastIndexOfChar, *file_separator);
     // index of filename/suffix separator
-    int ssep_index = SEND(arg, lastIndexOfChar, '.');
+    intptr_t ssep_index = SEND(arg, lastIndexOfChar, '.');
     
     if(fp_index < 0) { //no new path
         return ERR_FAIL;    
@@ -458,7 +458,7 @@ pVMSymbol Universe_symbol_for(const char* restrict string) {
 }
 
 
-pVMArray Universe_new_array(int size) {
+pVMArray Universe_new_array(int64_t size) {
     // Allocate a new array and set its class to be the array class
     pVMArray result = VMArray_new((size_t)size);
     SEND((pVMObject)result, set_class, array_class);
@@ -498,7 +498,7 @@ pVMArray Universe_new_array_from_argv(int argc, const char** argv) {
 }
 
 
-pVMBlock Universe_new_block(pVMMethod method, pVMFrame context, int arguments) {
+pVMBlock Universe_new_block(pVMMethod method, pVMFrame context, int64_t arguments) {
     // Allocate a new block and set its class to be the block class
     pVMBlock result = VMBlock_new(method, context);
     SEND((pVMObject)result, set_class,
@@ -511,7 +511,7 @@ pVMBlock Universe_new_block(pVMMethod method, pVMFrame context, int arguments) {
 
 pVMClass Universe_new_class(pVMClass class_of_class) {
     // Allocate a new class and set its class to be the given class class
-    int num_fields = SEND(class_of_class, get_number_of_instance_fields);
+    int64_t num_fields = SEND(class_of_class, get_number_of_instance_fields);
     pVMClass result;
     
     if(num_fields) //this is a normal class as class class
@@ -530,9 +530,9 @@ pVMFrame Universe_new_frame(pVMFrame previous_frame, pVMMethod method, pVMFrame 
     // Compute the maximum number of stack locations (including arguments,
     // locals and extra buffer to support doesNotUnderstand) and set the number
     // of indexable fields accordingly
-    int length = SEND(method, get_number_of_arguments) +
-                 SEND(method, get_number_of_locals) +
-                 SEND(method, get_maximum_number_of_stack_elements) + 2;
+    int64_t length = SEND(method, get_number_of_arguments) +
+                     SEND(method, get_number_of_locals) +
+                     SEND(method, get_maximum_number_of_stack_elements) + 2;
     
     // Allocate a new frame and set its class to be the frame class
     pVMFrame result = VMFrame_new(length, method, context, previous_frame);
@@ -714,11 +714,11 @@ pVMClass Universe_get_block_class(void) {
 }
 
 
-pVMClass Universe_get_block_class_with_args(int number_of_arguments) {
+pVMClass Universe_get_block_class_with_args(int64_t number_of_arguments) {
     // Compute the name of the block class with the given number of arguments
     char block_name[7];
     Universe_assert(number_of_arguments <10); // buffer overflow otherwise
-    sprintf(block_name, "Block%d", number_of_arguments);
+    sprintf(block_name, "Block%lld", number_of_arguments);
     pVMSymbol name = Universe_symbol_for(block_name);
     
     // Lookup the specific block class in the dictionary of globals and return

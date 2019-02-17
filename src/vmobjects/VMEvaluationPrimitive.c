@@ -51,7 +51,7 @@ pVMSymbol compute_signature_string(int argc);
 /** 
  * Create a new VMEvaluationPrimitive
  */
-pVMEvaluationPrimitive VMEvaluationPrimitive_new(int argc) {
+pVMEvaluationPrimitive VMEvaluationPrimitive_new(int64_t argc) {
     pVMEvaluationPrimitive result = (pVMEvaluationPrimitive)gc_allocate_object(
         sizeof(VMEvaluationPrimitive));
     if(result) {
@@ -123,7 +123,7 @@ pVMSymbol compute_signature_string(int argc) {
 void  routine(pVMObject object, pVMFrame frame) {
     pVMEvaluationPrimitive self = (pVMEvaluationPrimitive)object;
     // Get the block (the receiver) from the stack
-    int num_args = SEND(self->number_of_arguments, get_embedded_integer);
+    int64_t num_args = SEND(self->number_of_arguments, get_embedded_integer);
     pVMBlock block = (pVMBlock)SEND(frame, get_stack_element, num_args - 1);
     
     // Get the context of the block...

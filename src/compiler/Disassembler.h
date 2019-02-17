@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 void Disassembler_dump(pVMClass class);
 void Disassembler_dump_method(pVMMethod method, const char* indent);
-void Disassembler_dump_bytecode(pVMFrame frame, pVMMethod method, int bc_idx);
+void Disassembler_dump_bytecode(pVMFrame frame, pVMMethod method, size_t bc_idx);
 
 #endif // DISASSEMBELR_H_
 

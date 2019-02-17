@@ -79,7 +79,7 @@ void Shell_start() {
 #define QUIT_CMD_L 11 + 1
     // the statement to evaluate
     char      stmt[INPUT_MAX_SIZE];
-    int       bytecode_index, counter = 0;
+    size_t    bytecode_index, counter = 0;
     pVMFrame  current_frame;
     pVMClass  runClass;
     pVMObject it = nil_object; // last evaluation result.
@@ -128,7 +128,7 @@ void Shell_start() {
         inp[in_len] = '\0';
         
         // Generate a temporary class with a run method
-        sprintf(stmt, "%s%d%s", SHELL_PREFIX, counter++, SHELL_PART_1);
+        sprintf(stmt, "%s%zd%s", SHELL_PREFIX, counter++, SHELL_PART_1);
         statement = (char*)internal_allocate(
                 strlen(stmt) +
                 strlen(inp) +

@@ -52,7 +52,7 @@ pVMBlock VMBlock_new(pVMMethod method, pVMFrame context) {
 }
 
 
-pVMPrimitive VMBlock_get_evaluation_primitive(int number_of_arguments) {
+pVMPrimitive VMBlock_get_evaluation_primitive(int64_t number_of_arguments) {
     return (pVMPrimitive)VMEvaluationPrimitive_new(number_of_arguments);
 }
 

@@ -35,9 +35,9 @@ VTABLE(VMArray) {
 #define VMARRAY_VTABLE_FORMAT \
     VMOBJECT_VTABLE_FORMAT; \
     size_t    (*_get_offset)(void*); \
-    pVMObject (*get_indexable_field)(void*, int); \
-    void      (*set_indexable_field)(void*, int, pVMObject); \
-    int       (*get_number_of_indexable_fields)(void*); \
+    pVMObject (*get_indexable_field)(void*, int64_t); \
+    void      (*set_indexable_field)(void*, int64_t, pVMObject); \
+    int64_t   (*get_number_of_indexable_fields)(void*); \
     pVMArray  (*copy_and_extend_with)(void*, pVMObject); \
     void      (*copy_indexable_fields_to)(void*, pVMArray)
     

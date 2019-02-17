@@ -58,11 +58,11 @@ THE SOFTWARE.
  * A String hashing inline function
  * Java-like; see http://mindprod.com/jgloss/hashcode.html
  */
-static inline int32_t string_hash(const char* restrict string) {
-    int32_t result = 0;
+static inline int64_t string_hash(const char* restrict string) {
+    int64_t result = 0;
     char* ptr = (char*)string;
     while(ptr[0])
-        result = (31 * result + *ptr++) % INT32_MAX;
+        result = (31 * result + *ptr++) % INT64_MAX;
     return result;
 }
 

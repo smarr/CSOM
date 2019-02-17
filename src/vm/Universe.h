@@ -81,10 +81,10 @@ void          Universe_assert(bool);
 
 pVMSymbol     Universe_symbol_for(const char* restrict);
 
-pVMArray      Universe_new_array(int);
+pVMArray      Universe_new_array(int64_t);
 pVMArray      Universe_new_array_list(pList list);
 pVMArray      Universe_new_array_from_argv(int, const char**);
-pVMBlock      Universe_new_block(pVMMethod, pVMFrame, int);
+pVMBlock      Universe_new_block(pVMMethod, pVMFrame, int64_t);
 pVMClass      Universe_new_class(pVMClass);
 pVMFrame      Universe_new_frame(pVMFrame, pVMMethod, pVMFrame);
 pVMMethod     Universe_new_method(pVMSymbol, size_t, size_t, size_t, size_t);
@@ -104,7 +104,7 @@ void          Universe_set_global(pVMSymbol, pVMObject);
 bool          Universe_has_global(pVMSymbol);
 
 pVMClass      Universe_get_block_class(void);
-pVMClass      Universe_get_block_class_with_args(int);
+pVMClass      Universe_get_block_class_with_args(int64_t);
 
 pVMClass      Universe_load_class(pVMSymbol);
 void          Universe_load_system_class(pVMClass);
@@ -113,7 +113,10 @@ pVMClass      Universe_load_shell_class(const char*);
 
 const char**  Universe_handle_arguments(int* vm_argc, int argc,
                                         const char** argv);
-void          Universe_initialize(int argc, const char** argv);
+
+void          Universe_set_classpath(const char* classpath);
+void          Universe_start(int argc, const char** argv);
+pVMObject     Universe_interpret(const char* class_name, const char* method_name);
 void          Universe_destruct(void);
 
 #endif // UNIVERSE_H_

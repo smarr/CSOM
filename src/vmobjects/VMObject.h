@@ -43,13 +43,13 @@ VTABLE(VMObject) {
     OOOBJECT_VTABLE_FORMAT; \
     pVMClass  (*get_class)(void*); \
     void      (*set_class)(void*, pVMClass); \
-    pVMSymbol (*get_field_name)(void*, int); \
-    int       (*get_field_index)(void*, pVMSymbol); \
-    int       (*get_number_of_fields)(void*); \
-    int       (*get_default_number_of_fields)(void*); \
-    void      (*send)(void*, pVMSymbol, pVMObject*, int); \
-    pVMObject (*get_field)(void*, int); \
-    void      (*set_field)(void*, int, pVMObject); \
+    pVMSymbol (*get_field_name)(void*, int64_t); \
+    int64_t   (*get_field_index)(void*, pVMSymbol); \
+    int64_t   (*get_number_of_fields)(void*); \
+    int64_t   (*get_default_number_of_fields)(void*); \
+    void      (*send)(void*, pVMSymbol, pVMObject*, size_t); \
+    pVMObject (*get_field)(void*, int64_t); \
+    void      (*set_field)(void*, int64_t, pVMObject); \
     void      (*mark_references)(void*)
     
     VMOBJECT_VTABLE_FORMAT;
@@ -81,7 +81,7 @@ struct _VMObject {
 #pragma mark class methods
 
 pVMObject VMObject_new(void);
-pVMObject VMObject_new_num_fields(int);
+pVMObject VMObject_new_num_fields(size_t);
 void      VMObject_assert(bool);
 
 #pragma mark vtable initialization

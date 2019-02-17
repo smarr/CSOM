@@ -187,7 +187,7 @@ pString _String_concatChar(void* _self, char other) {
 }
 
 
-int _String_indexOf(void* _self, pString pattern) {
+intptr_t _String_indexOf(void* _self, pString pattern) {
     pString self = (pString)_self;
     char* pos = strstr(self->chars, pattern->chars);
     if(pos >= self->chars)
@@ -198,7 +198,7 @@ int _String_indexOf(void* _self, pString pattern) {
 }
 
 
-int _String_indexOfChar(void* _self, char pattern) {
+intptr_t _String_indexOfChar(void* _self, char pattern) {
     pString self = (pString)_self;
     char* pos = strchr(self->chars, pattern);
     if(pos >= self->chars)
@@ -209,7 +209,7 @@ int _String_indexOfChar(void* _self, char pattern) {
 }
 
 
-int _String_lastIndexOfChar(void* _self, char pattern) {
+intptr_t _String_lastIndexOfChar(void* _self, char pattern) {
     pString self = (pString)_self;
     char* pos = strrchr(self->chars, pattern);
     if(pos >= self->chars)

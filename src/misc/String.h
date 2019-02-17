@@ -48,9 +48,9 @@ VTABLE(String) {
     pString       (*concat)(void*, pString other); \
     pString       (*concatChars)(void*, const char* restrict other); \
     pString       (*concatChar)(void*, char other); \
-    int           (*indexOf)(void*, pString pattern); \
-    int           (*indexOfChar)(void*, char pattern); \
-    int           (*lastIndexOfChar)(void*, char pattern); \
+    intptr_t      (*indexOf)(void*, pString pattern); \
+    intptr_t      (*indexOfChar)(void*, char pattern); \
+    intptr_t      (*lastIndexOfChar)(void*, char pattern); \
     int           (*charAt)(void*, size_t position); \
     pString       (*substring)(void*, size_t start, size_t end); \
     pVMInteger    (*toInteger)(void*); \

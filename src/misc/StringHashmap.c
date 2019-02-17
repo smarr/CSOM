@@ -34,7 +34,7 @@ THE SOFTWARE.
 
 extern void*  primitiveGet(pHashmap self, void* key, size_t start);
 extern bool   primitivePut(pHashmap self, pHashmapElem elem, size_t start);
-extern size_t hashf(pHashmap self, int32_t hashv);
+extern size_t hashf(pHashmap self, size_t hashv);
 
 void* _StringHashmap_get(void* _self, void* key);
 void  _StringHashmap_put(void* _self, void* key, void* value);
@@ -50,7 +50,7 @@ bool _StringHashmapElem_key_equal_to(void* _self, void* other) {
 }
 
 
-int32_t _StringHashmapElem_key_hash(void* _self) {
+int64_t _StringHashmapElem_key_hash(void* _self) {
     pStringHashmapElem self = (pStringHashmapElem)_self;
     return string_hash((char*)self->key);
 }
@@ -134,7 +134,7 @@ void _StringHashmap_free(void* self) {
  */
 void* _StringHashmap_get(void* _self, void* key) {
     pStringHashmap self = (pStringHashmap)_self;
-    int32_t hash = string_hash((const char*)key);
+    size_t hash = string_hash((const char*)key);
     return primitiveGet((pHashmap)self, key, hashf((pHashmap)self, hash));
 }
 

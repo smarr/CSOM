@@ -58,7 +58,7 @@ THE SOFTWARE.
 #endif
 
 // private
-int number_of_super_instance_fields(void* _self);
+int64_t number_of_super_instance_fields(void* _self);
 
 //
 //  Class Methods (Starting with VMClass_) 
@@ -76,7 +76,7 @@ pVMClass VMClass_new(void) {
 /**
  * Create a new VMClass with a specific number of fields
  */
-pVMClass VMClass_new_num_fields(int number_of_fields) {
+pVMClass VMClass_new_num_fields(int64_t number_of_fields) {
     // calculate Class size without fields
     size_t class_stub_size = sizeof(VMClass) - 
                              sizeof(pVMObject) * 
@@ -244,7 +244,7 @@ void _VMClass_set_instance_invokables(void* _self, pVMArray value) {
 }
 
 
-int _VMClass_get_number_of_instance_invokables(void* _self) {
+int64_t _VMClass_get_number_of_instance_invokables(void* _self) {
     pVMClass self = (pVMClass)_self;
     // return the number of instance invokables in this class
     pVMArray arr = SEND(self, get_instance_invokables);
@@ -252,7 +252,7 @@ int _VMClass_get_number_of_instance_invokables(void* _self) {
 }
 
 
-pVMObject _VMClass_get_instance_invokable(void* _self, int index) {
+pVMObject _VMClass_get_instance_invokable(void* _self, int64_t index) {
     pVMClass self = (pVMClass)_self;
     // get the instance invokable with the given index
     pVMArray arr = SEND(self, get_instance_invokables);
@@ -260,7 +260,7 @@ pVMObject _VMClass_get_instance_invokable(void* _self, int index) {
 }
 
 
-void _VMClass_set_instance_invokable(void* _self, int idx, pVMObject value) {
+void _VMClass_set_instance_invokable(void* _self, int64_t idx, pVMObject value) {
     pVMClass self = (pVMClass)_self;
     // set this class as the holder of the given invokable
     TSEND(VMInvokable, value,  set_holder, self);
@@ -292,10 +292,10 @@ pVMObject _VMClass_lookup_invokable(void* _self, pVMSymbol signature) {
 }
 
 
-int _VMClass_lookup_field_index(void* _self, pVMSymbol field_name) {
+int64_t _VMClass_lookup_field_index(void* _self, pVMSymbol field_name) {
     pVMClass self = (pVMClass)_self;
     // lookup field with given name in array of instance fields
-    for(int i = SEND(self, get_number_of_instance_fields) - 1; i >= 0; i--) {
+    for(int64_t i = SEND(self, get_number_of_instance_fields) - 1; i >= 0; i--) {
       // return the current index if the name matches
       if(field_name == SEND(self, get_instance_field_name, i))
         return i;
@@ -336,7 +336,7 @@ void _VMClass_add_instance_primitive(void* _self, pVMPrimitive value) {
 }
 
 
-pVMSymbol _VMClass_get_instance_field_name(void* _self, int index) {
+pVMSymbol _VMClass_get_instance_field_name(void* _self, int64_t index) {
     pVMClass self = (pVMClass)_self;
     // get the name of the instance field with the given index
     if(index >= number_of_super_instance_fields(self)) {
@@ -352,7 +352,7 @@ pVMSymbol _VMClass_get_instance_field_name(void* _self, int index) {
 }
 
 
-int _VMClass_get_number_of_instance_fields(void* _self) {
+int64_t _VMClass_get_number_of_instance_fields(void* _self) {
     pVMClass self = (pVMClass)_self;
     // get the total number of instance fields in this class
     return
@@ -374,7 +374,7 @@ bool _VMClass_has_primitives(void* _self) {
 }
 
 
-int number_of_super_instance_fields(void* _self) {
+int64_t number_of_super_instance_fields(void* _self) {
     pVMClass self = (pVMClass)_self;
     /*
      * get the total number of instance fields defined in super classes
@@ -525,7 +525,7 @@ void set_primitives(pVMClass class, void* handle, const char* cname,
 /**
  * Load all primitives for the class given _and_ its metaclass
  */
-void _VMClass_load_primitives(void* _self, const pString* cp, int cp_count) {
+void _VMClass_load_primitives(void* _self, const pString* cp, size_t cp_count) {
     pVMClass self = (pVMClass)_self;
     // the library handle
     void* dlhandle=NULL;
@@ -533,7 +533,7 @@ void _VMClass_load_primitives(void* _self, const pString* cp, int cp_count) {
     const char* cname = SEND(self->name, get_chars);
 
     // iterate the classpathes
-    for(int i = 0; (i < cp_count) && !dlhandle; i++) {
+    for(size_t i = 0; (i < cp_count) && !dlhandle; i++) {
 
         // check the core library
         pString loadstring = gen_core_loadstring(cp[i]);

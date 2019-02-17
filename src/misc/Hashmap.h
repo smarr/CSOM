@@ -42,7 +42,7 @@ THE SOFTWARE.
 VTABLE(HashmapElem) {
 #define HASHMAPELEM_VTABLE_FORMAT \
     OOOBJECT_VTABLE_FORMAT; \
-    int32_t (*key_hash)(void*); \
+    int64_t  (*key_hash)(void*); \
     bool     (*key_equal_to)(void*,void*)
         
     HASHMAPELEM_VTABLE_FORMAT;

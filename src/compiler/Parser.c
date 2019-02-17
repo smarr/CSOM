@@ -267,12 +267,12 @@ static void keywordMessage(method_generation_context* mgenc, bool super);
 static void formula(method_generation_context* mgenc);
 static void nestedTerm(method_generation_context* mgenc);
 static void literal(method_generation_context* mgenc);
-static void literalNumber(method_generation_context* mgenc);
-static uint64_t literalDecimal(void);
-static int64_t negativeDecimal(void);
-static uint64_t literalInteger(void);
-static void literalSymbol(method_generation_context* mgenc);
-static void literalString(method_generation_context* mgenc);
+static pVMObject literalNumber(void);
+static pVMObject literalDecimal(bool);
+static pVMObject negativeDecimal(void);
+static pVMObject literalInteger(bool negateValue);
+static pVMObject literalSymbol(void);
+static pVMObject literalString(void);
 static pVMSymbol selector(void);
 static pVMSymbol keywordSelector(void);
 static char* string(void);
@@ -1151,56 +1151,61 @@ void nestedTerm(method_generation_context* mgenc) {
     expect(EndTerm);
 }
 
-
-void literal(method_generation_context* mgenc) {
+static pVMObject get_object_for_current_literal() {
+    pVMObject literal_obj;
     switch(sym) {
-        case Pound: 
-            literalSymbol(mgenc);
+        case Pound:
+                literal_obj = literalSymbol();
             break;
-        case STString: 
-            literalString(mgenc);
+        case STString:
+            literal_obj = literalString();
             break;
-        default: 
-            literalNumber(mgenc);
+        default:
+            literal_obj = literalNumber();
             break;
     }
+    return literal_obj;
+}
+
+void literal(method_generation_context* mgenc) {
+    pVMObject literal_obj = get_object_for_current_literal();
+
+    SEND(mgenc->literals, addIfAbsent, literal_obj);
+    emit_PUSH_CONSTANT(mgenc, literal_obj);
 }
 
 
-void literalNumber(method_generation_context* mgenc) {
-    int64_t val;
-    if(sym == Minus)
-        val = negativeDecimal();
+pVMObject literalNumber() {
+    if (sym == Minus)
+        return negativeDecimal();
     else
-        val = literalDecimal();
-    
-    pVMObject literal = (pVMObject) Universe_new_integer(val);
-    
-    SEND(mgenc->literals, addIfAbsent, literal);
-    
-    emit_PUSH_CONSTANT(mgenc, (pVMObject)literal);
+        return literalDecimal(false);
 }
 
 
-uint64_t literalDecimal(void) {
-    return literalInteger();
+pVMObject literalDecimal(bool negateValue) {
+            return literalInteger(negateValue);
 }
 
 
-int64_t negativeDecimal(void) {
+pVMObject negativeDecimal(void) {
     expect(Minus);
-    return -literalInteger();
+    return literalDecimal(true);
 }
 
 
-uint64_t literalInteger(void) {
-    uint64_t i = strtoull(text, NULL, 10);
+pVMObject literalInteger(bool negateValue) {
+    int64_t i = strtoll(text, NULL, 10);
     expect(Integer);
-    return i;
+
+    if (negateValue) {
+        i = 0 - i;
+    }
+    return (pVMObject)Universe_new_integer(i);
 }
 
 
-void literalSymbol(method_generation_context* mgenc) {
+pVMObject literalSymbol() {
     pVMSymbol symb;
     expect(Pound);
     if(sym == STString) {
@@ -1210,19 +1215,16 @@ void literalSymbol(method_generation_context* mgenc) {
     } else
         symb = selector();
     
-    SEND(mgenc->literals, addIfAbsent, symb);
-    
-    emit_PUSH_CONSTANT(mgenc, (pVMObject)symb);
+    return (pVMObject)symb;
 }
 
 
-void literalString(method_generation_context* mgenc) {
+pVMObject literalString() {
     char* s = string();
     pVMString str = Universe_new_string(s);
     internal_free(s);
     
-    SEND(mgenc->literals, addIfAbsent, str);
-    emit_PUSH_CONSTANT(mgenc, (pVMObject)str);
+    return (pVMObject)str;
 }
 
 

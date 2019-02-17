@@ -292,7 +292,9 @@ static void blockArguments(method_generation_context* mgenc);
 
 
 static FILE* infile;
+static const char* file_name;
 
+static int line_num;
 static Symbol sym;
 static char symc;
 static char text[BUFSIZ];
@@ -315,7 +317,9 @@ static int bufp;
 #pragma mark Stream handling
 
 
-void Parser_init(const FILE* fp) {
+void Parser_init(const FILE* fp, const char* fname) {
+    file_name = fname;
+    line_num = 0;
     infile = (FILE*)fp;
     sym = NONE;
     peekDone = false;
@@ -327,6 +331,8 @@ void Parser_init(const FILE* fp) {
 
 
 void Parser_init_string(const char* stream) {
+    file_name = "<string>";
+    line_num = 1;
     infile = NULL;
     sym = NONE;
     peekDone = false;
@@ -353,6 +359,7 @@ int fillbuffer(void) {
     } while(buf[p++] != '\n');
     buf[p - 1] = 0;
     bufp = 0;
+    line_num += 1;
     return p;
 }
 
@@ -367,6 +374,10 @@ int fillbuffer(void) {
 
 void skipWhiteSpace(void) {
     while(isblank(_BC)) {
+        if (_BC == '\n') {
+            line_num += 1;
+        }
+
         bufp++;
         while (EOB) {
             if (fillbuffer() == -1) {
@@ -380,6 +391,9 @@ void skipWhiteSpace(void) {
 void skipComment(void) {
     if(_BC == '"') {
         do {
+            if (_BC == '\n') {
+                line_num += 1;
+            }
             bufp++;
             while (EOB) {
                 if (fillbuffer() == -1) {
@@ -457,7 +471,10 @@ void lexString() {
     symc = 0;
     char* t = text;
     do {
-      lexStringChar(&t);
+        if (_BC == '\n') {
+            line_num += 1;
+        }
+        lexStringChar(&t);
         while (EOB) {
             if (fillbuffer() == -1) {
                 return;
@@ -646,8 +663,8 @@ bool acceptOneOf(Symbol* ss) {
 bool expect(Symbol s) {
     if(accept(s))
         return true;
-    fprintf(stderr, "Error: unexpected symbol. Expected %s, but found %s", 
-            symnames[s], symnames[sym]);
+    fprintf(stderr, "Error parsing %s:%d: unexpected symbol. Expected %s, but found %s",
+            file_name, line_num, symnames[s], symnames[sym]);
     if(_PRINTABLE_SYM)
         fprintf(stderr, " (%s)", text);
     fprintf(stderr, ": %s\n", buf);
@@ -658,7 +675,7 @@ bool expect(Symbol s) {
 bool expectOneOf(Symbol* ss) {
     if(acceptOneOf(ss))
         return true;
-    fprintf(stderr, "Error: unexpected symbol. Expected one of ");
+    fprintf(stderr, "Error parsing %s:%d: unexpected symbol. Expected one of ", file_name, line_num);
     while(*ss)
         fprintf(stderr, "%s, ", symnames[*ss++]);
     fprintf(stderr, "but found %s", symnames[sym]);

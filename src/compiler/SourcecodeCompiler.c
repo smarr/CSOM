@@ -129,7 +129,7 @@ pVMClass SourcecodeCompiler_compile_class(const char* path,
     internal_free(fname);
 
     // start compiling
-    Parser_init(stream);
+    Parser_init(stream, filename);
     result = compile(system_class);
     
     // Make sure the filename matches the class name

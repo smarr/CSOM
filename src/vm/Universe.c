@@ -322,11 +322,11 @@ void Universe_initialize(int argc, const char** argv) {
     Universe_initialize_system_class(nil_class, object_class, "Nil");
     Universe_initialize_system_class(array_class, object_class, "Array");
     Universe_initialize_system_class(method_class, array_class, "Method");
-    Universe_initialize_system_class(symbol_class, object_class, "Symbol");
     Universe_initialize_system_class(integer_class, object_class, "Integer");
     Universe_initialize_system_class(primitive_class, object_class,
                                      "Primitive");
     Universe_initialize_system_class(string_class, object_class, "String");
+    Universe_initialize_system_class(symbol_class, string_class, "Symbol");
     Universe_initialize_system_class(double_class, object_class, "Double");
     
     // load methods and fields into the system classes

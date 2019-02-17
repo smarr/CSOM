@@ -47,7 +47,7 @@ typedef struct _OOObject OOObject, *pOOObject;
             typedef struct _VMEvaluationPrimitive VMEvaluationPrimitive,
                 *pVMEvaluationPrimitive;
         typedef struct _VMString VMString, *pVMString;
-        typedef struct _VMSymbol VMSymbol, *pVMSymbol;
+            typedef struct _VMSymbol VMSymbol, *pVMSymbol;
         
         typedef struct _VMInvokable VMInvokable, *pVMInvokable;
 

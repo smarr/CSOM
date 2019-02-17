@@ -55,14 +55,13 @@ pVMSymbol VMSymbol_new(const char* restrict string) {
  * Initialize a VMSymbol
  */
 void _VMSymbol_init(void* _self, ...) {
-    pVMSymbol self = (pVMSymbol)_self;    
-    SUPER(VMObject, self, init, 0);
-    
+    pVMSymbol self = (pVMSymbol)_self;
     va_list args;
     va_start(args, _self);
-    const char* embed = va_arg(args, char*);
+
+    SUPER(VMString, _self, init, va_arg(args, char*));
+
     va_end(args);
-    strcpy(self->chars, embed);
 }
 
 
@@ -141,11 +140,6 @@ const char* _VMSymbol_get_plain_string(void* _self) {
 }
 
 
-const char* _VMSymbol_get_chars(void* _self) {
-    return (const char*)(((pVMSymbol)_self)->chars);
-}
-
-
 //
 // The VTABLE-function
 //
@@ -157,10 +151,9 @@ bool VMSymbol_vtable_inited = false;
 
 VTABLE(VMSymbol)* VMSymbol_vtable(void) {
     if(! VMSymbol_vtable_inited) {
-        *((VTABLE(VMObject)*)&_VMSymbol_vtable) = *VMObject_vtable();
+        *((VTABLE(VMString)*)&_VMSymbol_vtable) = *VMString_vtable();
         _VMSymbol_vtable.init             = METHOD(VMSymbol, init);        
         _VMSymbol_vtable.get_plain_string = METHOD(VMSymbol, get_plain_string);
-        _VMSymbol_vtable.get_chars        = METHOD(VMSymbol, get_chars);
 
         VMSymbol_vtable_inited = true;
     }

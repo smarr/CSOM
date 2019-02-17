@@ -98,7 +98,7 @@ pVMClass      Universe_new_system_class(void);
 
 void          Universe_initialize_system_class(pVMClass, pVMClass, const char*);
 
-pHashmap      Universe_get_globals_dictionary();
+pHashmap      Universe_get_globals_dictionary(void);
 pVMObject     Universe_get_global(pVMSymbol);
 void          Universe_set_global(pVMSymbol, pVMObject);
 bool          Universe_has_global(pVMSymbol);

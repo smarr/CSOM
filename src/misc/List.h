@@ -86,7 +86,7 @@ pList List_new(void);
 #pragma mark vtable initialization
 
 
-VTABLE(List)* List_vtable();
+VTABLE(List)* List_vtable(void);
 
 
 #endif // LIST_H_

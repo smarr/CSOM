@@ -91,7 +91,7 @@ pString String_new_from(pString restrict string);
 #pragma mark vtable initialization
 
 
-VTABLE(String)* String_vtable();
+VTABLE(String)* String_vtable(void);
 
 
 #endif // STRING_H_

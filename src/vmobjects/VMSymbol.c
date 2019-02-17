@@ -127,7 +127,7 @@ const char* _VMSymbol_get_plain_string(void* _self) {
                 strcat(plain_string, "_");
                 break;
             default: {
-                int l = strlen(plain_string);
+                int64_t l = strlen(plain_string);
                 plain_string[l] = self->chars[i];
                 plain_string[l + 1] = '\0';
                 break;

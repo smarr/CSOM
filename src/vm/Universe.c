@@ -215,6 +215,11 @@ void Universe_error_exit(const char* restrict err) {
 }
 
 
+void Universe_set_classpath(const char* classpath) {
+    setup_class_path(String_new(classpath));
+}
+
+
 const char** Universe_handle_arguments(
     int* vm_argc, int argc, const char** argv
 ) {
@@ -233,7 +238,7 @@ const char** Universe_handle_arguments(
                 print_usage_and_exit(argv[0]);
             
             // setup & skip class path
-            setup_class_path(String_new(argv[++i]));
+            Universe_set_classpath(argv[++i]);
 
         } else if(strcmp(argv[i], "-d") == 0) { // Dump  bytecode
             dump_bytecodes++;
@@ -283,9 +288,8 @@ const char** Universe_handle_arguments(
 }
 
 
-void Universe_initialize(int argc, const char** argv) {
+static pVMObject initialize_object_system() {
     /*
-     * affected globals:
      * affected file globals: globals_dictionary
      */
 
@@ -299,7 +303,7 @@ void Universe_initialize(int argc, const char** argv) {
     nil_object = VMObject_new();
 
     // allocate the Metaclass classes
-    metaclass_class = Universe_new_metaclass_class(); 
+    metaclass_class = Universe_new_metaclass_class();
     // allocate the rest of the system classes
     object_class    = Universe_new_system_class();
     nil_class       = Universe_new_system_class();
@@ -323,8 +327,7 @@ void Universe_initialize(int argc, const char** argv) {
     Universe_initialize_system_class(array_class, object_class, "Array");
     Universe_initialize_system_class(method_class, array_class, "Method");
     Universe_initialize_system_class(integer_class, object_class, "Integer");
-    Universe_initialize_system_class(primitive_class, object_class,
-                                     "Primitive");
+    Universe_initialize_system_class(primitive_class, object_class, "Primitive");
     Universe_initialize_system_class(string_class, object_class, "String");
     Universe_initialize_system_class(symbol_class, string_class, "Symbol");
     Universe_initialize_system_class(double_class, object_class, "Double");
@@ -376,14 +379,53 @@ void Universe_initialize(int argc, const char** argv) {
     unknownGlobal_sym = Universe_symbol_for("unknownGlobal:");
     escapedBlock_sym = Universe_symbol_for("escapedBlock:");
     run_sym = Universe_symbol_for("run:");
-    
-    // create a fake bootstrap method to simplify later frame traversal
+
+    return system_object;
+}
+
+
+// create a fake bootstrap method to simplify later frame traversal
+static pVMMethod create_bootstrap_method() {
     pVMMethod bootstrap_method =
         Universe_new_method(Universe_symbol_for("bootstrap"), 1, 0, 0, 2);
     SEND(bootstrap_method, set_bytecode, 0, BC_HALT);
     TSEND(VMInvokable, bootstrap_method, set_holder, system_class);
-    
-     
+    return bootstrap_method;
+}
+
+
+pVMObject Universe_interpret(const char* class_name, const char* method_name) {
+    gc_initialize();
+    initialize_object_system();
+    pVMMethod bootstrap_method = create_bootstrap_method();
+
+    // lookup the class and method
+    pVMClass class = Universe_load_class(Universe_symbol_for(class_name));
+    pVMObject method = (pVMObject)SEND(SEND(class, get_class), lookup_invokable,
+                                       Universe_symbol_for(method_name));
+
+    Universe_assert(method != NULL);
+
+    // create a fake bootstrap frame with the system object on the stack
+    Interpreter_initialize(nil_object);
+    pVMFrame bootstrap_frame = Interpreter_push_new_frame(bootstrap_method, (pVMFrame) nil_object);
+    SEND(bootstrap_frame, push, (pVMObject)class);
+
+    // invoke the method on the class object
+    TSEND(VMInvokable, method, invoke, bootstrap_frame);
+
+    // start the interpreter
+    Interpreter_start();
+
+    return SEND(bootstrap_frame, pop);
+}
+
+
+void Universe_start(int argc, const char** argv) {
+    gc_initialize();
+    pVMObject system_object = initialize_object_system();
+    pVMMethod bootstrap_method = create_bootstrap_method();
+
     // start the shell if no filename is given
     if(argc == 0) {
       Shell_set_bootstrap_method(bootstrap_method);
@@ -780,7 +822,7 @@ void Universe_load_system_class(pVMClass system_class) {
 
 
 pVMClass Universe_load_class_basic(pVMSymbol name, pVMClass system_class) {
-    debug_log("%s\n", SEND(name, get_chars));
+    debug_log("Universe_load_class_basic %s cp_count %zd\n", SEND(name, get_chars), cp_count);
 
     pVMClass result;
     // Try loading the class from all different paths

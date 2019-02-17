@@ -117,8 +117,8 @@ uint32_t spc_alloc;       // allocated space (since last collection)
 //
 
 
-void gc_merge_free_spaces();
-void gc_initialize();
+void gc_merge_free_spaces(void);
+void gc_initialize(void);
 
 
 void init_stat(void);
@@ -335,11 +335,6 @@ void* gc_allocate(size_t size) {
         return internal_allocate(size);
     }
     
-    // first allocate-request => initialize heap
-    if (object_space == NULL) {
-        gc_initialize();
-    }
-    
     // start garbage collection if the free heap has less
     // than BUFFERSIZE_FOR_UNINTERRUPTABLE Bytes and this
     // allocation is interruptable
@@ -528,6 +523,7 @@ void gc_initialize() {
 
 void gc_finalize() {
     free(object_space);
+    object_space = NULL;
 }
 
 

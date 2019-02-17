@@ -62,6 +62,7 @@ void   gc_free(void* ptr);
 
 void gc_stat(void);
 
+void gc_initialize(void);
 void gc_finalize(void);
 
 

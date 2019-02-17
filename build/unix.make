@@ -62,7 +62,6 @@ TEST_DIR	?= $(ROOT_DIR)/TestSuite
 
 ############# "component" directories
 
-
 COMPILER_DIR 	= $(SRC_DIR)/compiler
 INTERPRETER_DIR = $(SRC_DIR)/interpreter
 MEMORY_DIR 		= $(SRC_DIR)/memory
@@ -89,6 +88,12 @@ PRIMITIVES_DIR	= $(SRC_DIR)/primitives
 PRIMITIVES_SRC	= $(wildcard $(PRIMITIVES_DIR)/*.c)
 PRIMITIVES_OBJ	= $(PRIMITIVES_SRC:.c=.pic.o)
 
+############# unit tests
+
+UNITTEST_DIR	= $(ROOT_DIR)/tests
+UNITTEST_SRC	= $(wildcard $(UNITTEST_DIR)/*.c)
+UNITTEST_OBJ	= $(UNITTEST_SRC:.c=.o)
+
 ############# include path
 
 INCLUDES		=-I$(SRC_DIR)
@@ -107,7 +112,7 @@ SOURCES			=  $(COMPILER_SRC) $(INTERPRETER_SRC) $(MEMORY_SRC) \
 
 ############# Things to clean
 
-CLEAN			= $(OBJECTS) CORE
+CLEAN			= $(OBJECTS) CORE $(SRC_DIR)/unittest
 
 ############# Tools
 
@@ -209,8 +214,15 @@ uninstall:
 #
 # test: run the standard test suite
 #
-test: all
+test: all $(SRC_DIR)/unittest
+	$(SRC_DIR)/unittest
 	@(./CSOM -cp Smalltalk TestSuite/TestHarness.som;)
+
+$(SRC_DIR)/unittest: all $(UNITTEST_OBJ)
+	echo $(UNITTEST_DIR)
+	echo $(UNITTEST_OBJ)
+	$(CC) $(DBG_FLAGS) $(LDFLAGS) `$(OSTOOL) l` \
+	  -o $(SRC_DIR)/unittest $(filter-out $(SRC_DIR)/main.o,$(CSOM_OBJ)) $(CSOM_LIBS) $(UNITTEST_OBJ)
 
 #
 # bench: run the benchmarks

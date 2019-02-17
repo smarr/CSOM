@@ -286,3 +286,87 @@ void  _Integer_atRandom(pVMObject object, pVMFrame frame) {
     int32_t result = (SEND(self, get_embedded_integer) * rand())%INT32_MAX;
     SEND(frame, push, (pVMObject)Universe_new_integer(result));
 }
+
+
+void  _Integer_rem_(pVMObject object, pVMFrame frame) {
+  pVMObject rightObj = SEND(frame, pop);
+  pVMInteger left = (pVMInteger)SEND(frame, pop);
+
+  CHECK_COERCION(rightObj, left, "rem:");
+
+  pVMInteger right = (pVMInteger)rightObj;
+
+  int32_t r = SEND((pVMInteger)right, get_embedded_integer);
+  int32_t l = SEND(left, get_embedded_integer);
+
+  int32_t result = l - (l / r) * r;
+
+  _Integer__pushResult(object, frame, result);
+}
+
+
+void  _Integer_lessthanlessthan(pVMObject object, pVMFrame frame) {
+  pVMObject rightObj = SEND(frame, pop);
+  pVMInteger left = (pVMInteger)SEND(frame, pop);
+
+  CHECK_COERCION(rightObj, left, "<<");
+
+  pVMInteger right = (pVMInteger)rightObj;
+
+  int32_t r = SEND((pVMInteger)right, get_embedded_integer);
+  int32_t l = SEND(left, get_embedded_integer);
+
+  int32_t result = l << r;
+
+  _Integer__pushResult(object, frame, result);
+}
+
+
+void  _Integer_greaterthangreaterthangreaterthan(pVMObject object, pVMFrame frame) {
+  pVMObject rightObj = SEND(frame, pop);
+  pVMInteger left = (pVMInteger)SEND(frame, pop);
+
+  CHECK_COERCION(rightObj, left, ">>>");
+
+  pVMInteger right = (pVMInteger)rightObj;
+
+  int32_t r = SEND((pVMInteger)right, get_embedded_integer);
+  int32_t l = SEND(left, get_embedded_integer);
+
+  int32_t result = l >> r;
+
+  _Integer__pushResult(object, frame, result);
+}
+
+
+void  _Integer_bitXor_(pVMObject object, pVMFrame frame) {
+  pVMObject rightObj = SEND(frame, pop);
+  pVMInteger left = (pVMInteger)SEND(frame, pop);
+
+  CHECK_COERCION(rightObj, left, "bitXor:");
+
+  pVMInteger right = (pVMInteger)rightObj;
+
+  int32_t r = SEND((pVMInteger)right, get_embedded_integer);
+  int32_t l = SEND(left, get_embedded_integer);
+
+  int32_t result = l ^ r;
+
+  _Integer__pushResult(object, frame, result);
+}
+
+
+void  _Integer_as32BitSignedValue(pVMObject object, pVMFrame frame) {
+  // NO-OP, unoptimized version:
+  //  pVMInteger self = (pVMInteger)SEND(frame, pop);
+  //  int32_t result = (int32_t) (SEND(self, get_embedded_integer));
+  //  SEND(frame, push, (pVMObject)Universe_new_integer(result));
+}
+
+
+void  _Integer_as32BitUnsignedValue(pVMObject object, pVMFrame frame) {
+  pVMInteger self = (pVMInteger)SEND(frame, pop);
+  uint32_t result = (uint32_t) (SEND(self, get_embedded_integer));
+  _Integer__pushResult(object, frame, result);
+}
+

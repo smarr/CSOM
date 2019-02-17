@@ -421,6 +421,41 @@ void lexNumber() {
     *t = 0;
 }
 
+void lexEscapeChar(char** t) {
+    char current = buf[++bufp];
+
+    switch (current) {
+        case 't': *(*t)++ = current; break;
+        case 'b': *(*t)++ = current; break;
+        case 'n': *(*t)++ = current; break;
+        case 'r': *(*t)++ = current; break;
+        case 'f': *(*t)++ = current; break;
+        case '\'': *(*t)++ = current; break;
+        case '\\': *(*t)++ = current; break;
+    }
+}
+
+void lexStringChar(char** t) {
+    char current = buf[++bufp];
+
+    if (current == '\\') {
+        lexEscapeChar(t);
+    } else {
+        *(*t)++ = current;
+    }
+}
+
+void lexString() {
+    sym = STString;
+    symc = 0;
+    char* t = text;
+    do {
+      lexStringChar(&t);
+    } while(_BC != '\'');
+    bufp++;
+    *--t = 0;
+}
+
 void getsym(void) {
     if(peekDone) {
         peekDone = false;
@@ -438,14 +473,7 @@ void getsym(void) {
     } while((EOB || isblank(_BC) || _BC == '"') && infile);
     
     if(_BC == '\'') {
-        sym = STString;
-        symc = 0;
-        char* t = text;
-        do {
-            *t++ = buf[++bufp];
-        } while(_BC != '\'');
-        bufp++;
-        *--t = 0;
+        lexString();
     }
     else _MATCH('[', NewBlock)
     else _MATCH(']', EndBlock)

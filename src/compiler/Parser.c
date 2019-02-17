@@ -221,7 +221,7 @@ static char* symnames[] = {
 #pragma mark intern Prototypes
 
 
-static void fillbuffer(void);
+static int fillbuffer(void);
 static bool eob(void);
 static void skipWhiteSpace(void);
 static void skipComment(void);
@@ -341,9 +341,9 @@ void Parser_init_string(const char* stream) {
 #define EOB (buf[bufp]==0)
 
 
-void fillbuffer(void) {
+int fillbuffer(void) {
     if(!infile) // string stream
-        return;
+        return -1;
     int p = 0;
     do {
         if(!feof(infile))
@@ -353,6 +353,7 @@ void fillbuffer(void) {
     } while(buf[p++] != '\n');
     buf[p - 1] = 0;
     bufp = 0;
+    return p;
 }
 
 
@@ -367,8 +368,11 @@ void fillbuffer(void) {
 void skipWhiteSpace(void) {
     while(isblank(_BC)) {
         bufp++;
-        if(EOB)
-            fillbuffer();
+        while (EOB) {
+            if (fillbuffer() == -1) {
+                return;
+            }
+        }
     }
 }
 
@@ -377,8 +381,11 @@ void skipComment(void) {
     if(_BC == '"') {
         do {
             bufp++;
-            if(EOB)
-                fillbuffer();
+            while (EOB) {
+                if (fillbuffer() == -1) {
+                    return;
+                }
+            }
         } while(_BC != '"');
         bufp++;
     }
@@ -451,6 +458,11 @@ void lexString() {
     char* t = text;
     do {
       lexStringChar(&t);
+        while (EOB) {
+            if (fillbuffer() == -1) {
+                return;
+            }
+        }
     } while(_BC != '\'');
     bufp++;
     *--t = 0;

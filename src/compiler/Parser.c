@@ -201,7 +201,7 @@ blockArguments =
 
 
 typedef enum {
-    NONE, Integer, Not, And, Or, Star, Div, Mod, Plus,
+    NONE, Integer, Double, Not, And, Or, Star, Div, Mod, Plus,
     Minus, Equal, More, Less, Comma, At, Per, NewBlock,
     EndBlock, Colon, Period, Exit, Assign, NewTerm, EndTerm, Pound,
     Primitive, Separator, STString, Identifier, Keyword, KeywordSequence,
@@ -210,7 +210,7 @@ typedef enum {
 
 
 static char* symnames[] = {
-    "NONE", "Integer", "Not", "And", "Or", "Star", "Div", "Mod", "Plus",
+    "NONE", "Integer", "Double", "Not", "And", "Or", "Star", "Div", "Mod", "Plus",
     "Minus", "Equal", "More", "Less", "Comma", "At", "Per", "NewBlock",
     "EndBlock", "Colon", "Period", "Exit", "Assign", "NewTerm", "EndTerm",
     "Pound", "Primitive", "Separator", "STString", "Identifier", "Keyword",
@@ -272,6 +272,7 @@ static pVMObject literalNumber(void);
 static pVMObject literalDecimal(bool);
 static pVMObject negativeDecimal(void);
 static pVMObject literalInteger(bool negateValue);
+static pVMObject literalDouble(bool negateValue);
 static pVMObject literalSymbol(void);
 static pVMObject literalString(void);
 static pVMSymbol selector(void);
@@ -394,6 +395,32 @@ void skipComment(void) {
 #define PRIMITIVE "primitive"
 
 
+void lexNumber() {
+    sym = Integer;
+    symc = 0;
+    char* t = text;
+
+    bool saw_decimal_mark = false;
+
+    do {
+        *t++ = buf[bufp++];
+        char char_arr[3];
+        char_arr[0] = buf[bufp + 0];
+        char_arr[1] = buf[bufp + 1];
+        char_arr[2] = buf[bufp + 2];
+
+        if (!saw_decimal_mark &&
+            '.' == _BC &&
+            buf[bufp + 1] != 0 &&
+            isdigit(buf[bufp + 1])) {
+            sym = Double;
+            saw_decimal_mark = true;
+            *t++ = buf[bufp++];
+        }
+    } while(isdigit(_BC));
+    *t = 0;
+}
+
 void getsym(void) {
     if(peekDone) {
         peekDone = false;
@@ -502,13 +529,7 @@ void getsym(void) {
         *t = 0;
     }
     else if(isdigit(_BC)) {
-        sym = Integer;
-        symc = 0;
-        char* t = text;
-        do {
-            *t++ = buf[bufp++];
-        } while(isdigit(_BC));
-        *t = 0;
+        lexNumber();
     }
     else {
         sym = NONE;
@@ -1197,7 +1218,12 @@ pVMObject literalNumber() {
 
 
 pVMObject literalDecimal(bool negateValue) {
+    if (sym == Integer) {
             return literalInteger(negateValue);
+    } else {
+        Universe_assert(sym == Double);
+        return literalDouble(negateValue);
+    }
 }
 
 
@@ -1217,6 +1243,15 @@ pVMObject literalInteger(bool negateValue) {
     return (pVMObject)Universe_new_integer(i);
 }
 
+
+pVMObject literalDouble(bool negateValue) {
+    double d = strtod(text, NULL);
+    if (negateValue) {
+        d = 0 - d;
+    }
+    expect(Double);
+    return (pVMObject) Universe_new_double(d);
+}
 
 pVMObject literalSymbol() {
     pVMSymbol symb;

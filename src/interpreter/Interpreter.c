@@ -341,17 +341,31 @@ static void do_return_non_local() {
         // acutally sent the 'value' message.
         pVMBlock block = (pVMBlock)SEND(_FRAME, get_argument, 0, 0);
         pVMFrame prev_frame = SEND(_FRAME, get_previous_frame);
-        pVMFrame outer_context =SEND(prev_frame, get_outer_context);
+        pVMFrame outer_context = SEND(prev_frame, get_outer_context);
         pVMObject sender = SEND(outer_context, get_argument, 0, 0);
         pVMObject arguments[] = { (pVMObject)block };
 
         // pop the frame of the currently executing block...
         pop_frame();
 
-        // ... and execute the escapedBlock message instead
-       SEND(sender, send, escapedBlock_sym, arguments, 1);
+        // pop old arguments from stack
+        pVMMethod method = SEND(frame, get_method);
+        int64_t num_args = SEND(method, get_number_of_arguments);
+        for (size_t i = 0; i < num_args; i++) {
+            SEND(frame, pop);
+        }
 
-       return;
+        // check if current frame is big enough for this unplanned send
+        // #escapeBlock: needs 2 slots, one for self, and one for the block
+        int64_t max_slots = SEND(frame, get_number_of_indexable_fields);
+        int64_t remaining_slots = max_slots - frame->stack_pointer;
+        if (remaining_slots < 2) {
+            Universe_error_exit("Tried to trigger #escapeBlock:, but don't have sufficient stack space");
+        }
+
+        // ... and execute the escapedBlock message instead
+        SEND(sender, send, escapedBlock_sym, arguments, 1);
+        return;
     }
 
     // Unwind the frames

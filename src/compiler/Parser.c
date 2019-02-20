@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
   */
 
+#include "Lexer.h"
 #include "Parser.h"
 
 #include "GenerationContexts.h"
@@ -38,6 +39,7 @@ THE SOFTWARE.
 
 #include <memory/gc.h>
 
+#include <vmobjects/VMClass.h>
 #include <vmobjects/VMString.h>
 
 
@@ -197,493 +199,133 @@ blockArguments =
 //
 
 
-#pragma mark Enums
-
-
-typedef enum {
-    NONE, Integer, Double, Not, And, Or, Star, Div, Mod, Plus,
-    Minus, Equal, More, Less, Comma, At, Per, NewBlock,
-    EndBlock, Colon, Period, Exit, Assign, NewTerm, EndTerm, Pound,
-    Primitive, Separator, STString, Identifier, Keyword, KeywordSequence,
-    OperatorSequence
-} Symbol;
-
-
-static char* symnames[] = {
-    "NONE", "Integer", "Double", "Not", "And", "Or", "Star", "Div", "Mod", "Plus",
-    "Minus", "Equal", "More", "Less", "Comma", "At", "Per", "NewBlock",
-    "EndBlock", "Colon", "Period", "Exit", "Assign", "NewTerm", "EndTerm",
-    "Pound", "Primitive", "Separator", "STString", "Identifier", "Keyword",
-    "KeywordSequence", "OperatorSequence"
-};
-
-
 #pragma mark intern Prototypes
 
 
-static int fillbuffer(void);
-static bool eob(void);
-static void skipWhiteSpace(void);
-static void skipComment(void);
-static void getsym(void);
-static void peek(void);
-static bool symIn(Symbol* ss);
-static bool accept(Symbol s);
-static bool acceptOneOf(Symbol* ss);
-static bool expect(Symbol s);
-static bool expectOneOf(Symbol* ss);
-static void SingleOperator(void);
-static void classdef(void);
-static void instanceFields(class_generation_context* cgenc);
-static void classFields(class_generation_context* cgenc);
-static void method(method_generation_context* mgenc);
-static void primitiveBlock(void);
-static void pattern(method_generation_context* mgenc);
-static void unaryPattern(method_generation_context* mgenc);
-static void binaryPattern(method_generation_context* mgenc);
-static void keywordPattern(method_generation_context* mgenc);
-static void methodBlock(method_generation_context* mgenc);
-static pVMSymbol unarySelector(void);
-static pVMSymbol binarySelector(void);
-static char* identifier(void);
-static pString keyword(void);
-static char* argument(void);
-static void blockContents(method_generation_context* mgenc);
-static void locals(method_generation_context* mgenc);
-static void blockBody(method_generation_context* mgenc, bool seen_period);
-static void result(method_generation_context* mgenc);
-static void expression(method_generation_context* mgenc);
-static void assignation(method_generation_context* mgenc);
-static void assignments(method_generation_context* mgenc, pList l);
-static pString assignment(method_generation_context* mgenc);
-static void evaluation(method_generation_context* mgenc);
-static void primary(method_generation_context* mgenc, bool* super);
-static char* variable(void);
-static void messages(method_generation_context* mgenc, bool super);
-static void unaryMessage(method_generation_context* mgenc, bool super);
-static void binaryMessage(method_generation_context* mgenc, bool super);
-static void binaryOperand(method_generation_context* mgenc, bool* super);
-static void keywordMessage(method_generation_context* mgenc, bool super);
-static void formula(method_generation_context* mgenc);
-static void nestedTerm(method_generation_context* mgenc);
-static void literal(method_generation_context* mgenc);
-static pVMObject literalArray(void);
-static pVMObject literalNumber(void);
-static pVMObject literalDecimal(bool);
-static pVMObject negativeDecimal(void);
-static pVMObject literalInteger(bool negateValue);
-static pVMObject literalDouble(bool negateValue);
-static pVMObject literalSymbol(void);
-static pVMObject literalString(void);
-static pVMSymbol selector(void);
-static pVMSymbol keywordSelector(void);
-static char* string(void);
-static void nestedBlock(method_generation_context* mgenc);
-static void blockPattern(method_generation_context* mgenc);
-static void blockArguments(method_generation_context* mgenc);
+static bool symIn(Lexer* l, Symbol* ss);
+static bool accept(Lexer* l, Symbol s);
+static bool acceptOneOf(Lexer* l, Symbol* ss);
+static bool expect(Lexer* l, Symbol s);
+static bool expectOneOf(Lexer* l, Symbol* ss);
+static void superclass(Lexer* l, class_generation_context* cgenc);
+static void instanceFields(Lexer* l, class_generation_context* cgenc);
+static void classFields(Lexer* l, class_generation_context* cgenc);
+static void method(Lexer* l, method_generation_context* mgenc);
+static void primitiveBlock(Lexer* l);
+static void pattern(Lexer* l, method_generation_context* mgenc);
+static void unaryPattern(Lexer* l, method_generation_context* mgenc);
+static void binaryPattern(Lexer* l, method_generation_context* mgenc);
+static void keywordPattern(Lexer* l, method_generation_context* mgenc);
+static void methodBlock(Lexer* l, method_generation_context* mgenc);
+static pVMSymbol unarySelector(Lexer* l);
+static pVMSymbol binarySelector(Lexer* l);
+static char* identifier(Lexer* l);
+static pString keyword(Lexer* l);
+static char* argument(Lexer* l);
+static void blockContents(Lexer* l, method_generation_context* mgenc);
+static void locals(Lexer* l, method_generation_context* mgenc);
+static void blockBody(Lexer* l, method_generation_context* mgenc, bool seen_period);
+static void result(Lexer* l, method_generation_context* mgenc);
+static void expression(Lexer* l, method_generation_context* mgenc);
+static void assignation(Lexer* lexer, method_generation_context* mgenc);
+static void assignments(Lexer* lexer, method_generation_context* mgenc, pList l);
+static pString assignment(Lexer* l, method_generation_context* mgenc);
+static void evaluation(Lexer* l, method_generation_context* mgenc);
+static void primary(Lexer* l, method_generation_context* mgenc, bool* super);
+static char* variable(Lexer* l);
+static void messages(Lexer* l, method_generation_context* mgenc, bool super);
+static void unaryMessage(Lexer* l, method_generation_context* mgenc, bool super);
+static void binaryMessage(Lexer* l, method_generation_context* mgenc, bool super);
+static void binaryOperand(Lexer* l, method_generation_context* mgenc, bool* super);
+static void keywordMessage(Lexer* l, method_generation_context* mgenc, bool super);
+static void formula(Lexer* l, method_generation_context* mgenc);
+static void nestedTerm(Lexer* l, method_generation_context* mgenc);
+static void literal(Lexer* l, method_generation_context* mgenc);
+static pVMObject literalArray(Lexer* l);
+static pVMObject literalNumber(Lexer* l);
+static pVMObject literalDecimal(Lexer* l, bool negateValue);
+static pVMObject negativeDecimal(Lexer* l);
+static pVMObject literalInteger(Lexer* l, bool negateValue);
+static pVMObject literalDouble(Lexer* l, bool negateValue);
+static pVMObject literalSymbol(Lexer* l);
+static pVMObject literalString(Lexer* l);
+static pVMSymbol selector(Lexer* l);
+static pVMSymbol keywordSelector(Lexer* l);
+static char* string(Lexer* l);
+static void nestedBlock(Lexer* l, method_generation_context* mgenc);
+static void blockPattern(Lexer* l, method_generation_context* mgenc);
+static void blockArguments(Lexer* l, method_generation_context* mgenc);
 
 
-//
-// internal data
-//
-
-
-#pragma mark File local variables
-
-
-static FILE* infile;
-static const char* file_name;
-
-static int line_num;
-static Symbol sym;
-static char symc;
-static char text[BUFSIZ];
-
-static bool peekDone;
-static Symbol nextSym;
-static char nextSymc;
-static char nextText[BUFSIZ];
-
-
-//
-// input buffer
-//
-
-
-static char buf[BUFSIZ];
-static int bufp;
-
-
-#pragma mark Stream handling
-
-
-void Parser_init(const FILE* fp, const char* fname) {
-    file_name = fname;
-    line_num = 0;
-    infile = (FILE*)fp;
-    sym = NONE;
-    peekDone = false;
-    nextSym = NONE;
-    *buf = 0;
-    bufp = 0;
-    getsym();
+Lexer* Parser_init(const FILE* fp, const char* fname) {
+    Lexer* l = Lexer_create(fp, fname);
+    Lexer_get_sym(l);
+    return l;
 }
 
 
-void Parser_init_string(const char* stream) {
-    file_name = "<string>";
-    line_num = 1;
-    infile = NULL;
-    sym = NONE;
-    peekDone = false;
-    nextSym = NONE;
-    strncpy(buf, stream, BUFSIZ);
-    bufp = 0;
-    getsym();
+Lexer* Parser_init_string(const char* stream) {
+    Lexer* l = Lexer_from_string(stream);
+    Lexer_get_sym(l);
+    return l;
 }
-
-
-#define _BC (buf[bufp])
-#define EOB (buf[bufp]==0)
-
-
-int fillbuffer(void) {
-    if(!infile) // string stream
-        return -1;
-    int p = 0;
-    do {
-        if(!feof(infile))
-            buf[p] = fgetc(infile);
-        else
-            buf[p] = '\n';
-    } while(buf[p++] != '\n');
-    buf[p - 1] = 0;
-    bufp = 0;
-    line_num += 1;
-    return p;
-}
-
-
-//
-// basic lexing
-//
-
-
-#pragma mark Lexer functions
-
-
-void skipWhiteSpace(void) {
-    while(isblank(_BC)) {
-        if (_BC == '\n') {
-            line_num += 1;
-        }
-
-        bufp++;
-        while (EOB) {
-            if (fillbuffer() == -1) {
-                return;
-            }
-        }
-    }
-}
-
-
-void skipComment(void) {
-    if(_BC == '"') {
-        do {
-            if (_BC == '\n') {
-                line_num += 1;
-            }
-            bufp++;
-            while (EOB) {
-                if (fillbuffer() == -1) {
-                    return;
-                }
-            }
-        } while(_BC != '"');
-        bufp++;
-    }
-}
-
-
-#define _ISOP(C) \
-    ((C) == '~' || (C) == '&' || (C) == '|' || (C) == '*' || (C) == '/' || \
-     (C) == '\\' || (C) == '+' || (C) == '=' || (C) == '>' || (C) == '<' || \
-     (C) == ',' || (C) == '@' || (C) == '%' || (C) == '-')
-#define _MATCH(C, S) \
-    if(_BC == (C)) { sym = (S); symc = _BC; sprintf(text, "%c", _BC); bufp++;}
-#define SEPARATOR "----"
-#define PRIMITIVE "primitive"
-
-
-void lexNumber() {
-    sym = Integer;
-    symc = 0;
-    char* t = text;
-
-    bool saw_decimal_mark = false;
-
-    do {
-        *t++ = buf[bufp++];
-        char char_arr[3];
-        char_arr[0] = buf[bufp + 0];
-        char_arr[1] = buf[bufp + 1];
-        char_arr[2] = buf[bufp + 2];
-
-        if (!saw_decimal_mark &&
-            '.' == _BC &&
-            buf[bufp + 1] != 0 &&
-            isdigit(buf[bufp + 1])) {
-            sym = Double;
-            saw_decimal_mark = true;
-            *t++ = buf[bufp++];
-        }
-    } while(isdigit(_BC));
-    *t = 0;
-}
-
-void lexEscapeChar(char** t) {
-    char current = buf[++bufp];
-
-    switch (current) {
-        case 't': *(*t)++ = current; break;
-        case 'b': *(*t)++ = current; break;
-        case 'n': *(*t)++ = current; break;
-        case 'r': *(*t)++ = current; break;
-        case 'f': *(*t)++ = current; break;
-        case '\'': *(*t)++ = current; break;
-        case '\\': *(*t)++ = current; break;
-    }
-
-    bufp++;
-}
-
-void lexStringChar(char** t) {
-    char current = buf[++bufp];
-
-    if (current == '\\') {
-        lexEscapeChar(t);
-    } else {
-        *(*t)++ = current;
-    }
-}
-
-void lexString() {
-    sym = STString;
-    symc = 0;
-    char* t = text;
-    do {
-        if (_BC == '\n') {
-            line_num += 1;
-        }
-        lexStringChar(&t);
-        while (EOB) {
-            if (fillbuffer() == -1) {
-                return;
-            }
-        }
-    } while(_BC != '\'');
-    bufp++;
-    *--t = 0;
-}
-
-void lexOperator() {
-    if(_ISOP(buf[bufp + 1])) {
-        sym = OperatorSequence;
-        symc = 0;
-        char* t = text;
-        while(_ISOP(_BC))
-            *t++ = buf[bufp++];
-        *t = 0;
-    }
-    else _MATCH('~', Not)
-    else _MATCH('&', And)
-    else _MATCH('|', Or)
-    else _MATCH('*', Star)
-    else _MATCH('/', Div)
-    else _MATCH('\\', Mod)
-    else _MATCH('+', Plus)
-    else _MATCH('=', Equal)
-    else _MATCH('>', More)
-    else _MATCH('<', Less)
-    else _MATCH(',', Comma)
-    else _MATCH('@', At)
-    else _MATCH('%', Per)
-    else _MATCH('-', Minus)
-}
-
-void getsym(void) {
-    if(peekDone) {
-        peekDone = false;
-        sym = nextSym;
-        symc = nextSymc;
-        strcpy(text, nextText);
-        return;
-    }
-
-    do {
-        if(EOB)
-            fillbuffer();
-        skipWhiteSpace();
-        skipComment();
-    } while((EOB || isblank(_BC) || _BC == '"') && infile);
-    
-    if(_BC == '\'') {
-        lexString();
-    }
-    else _MATCH('[', NewBlock)
-    else _MATCH(']', EndBlock)
-    else if(_BC == ':') {
-        if(buf[bufp+1] == '=') {
-            bufp += 2;
-            sym = Assign;
-            symc = 0;
-            sprintf(text, ":=");
-        } else {
-            bufp++;
-            sym = Colon;
-            symc = ':';
-            sprintf(text, ":");
-        }
-    }
-    else _MATCH('(', NewTerm)
-    else _MATCH(')', EndTerm)
-    else _MATCH('#', Pound)
-    else _MATCH('^', Exit)
-    else _MATCH('.', Period)
-    else if(_BC == '-') {
-        if(!strncmp(buf + bufp, SEPARATOR, strlen(SEPARATOR))) {
-            char* t = text;
-            while(_BC == '-')
-                *t++ = buf[bufp++];
-            *t = 0;
-            sym = Separator;
-        } else {
-            lexOperator();
-        }
-    }
-    else if(_ISOP(_BC)) {
-        lexOperator();
-    }
-    else if(!strncmp(buf + bufp, PRIMITIVE, strlen(PRIMITIVE))) {
-        bufp += strlen(PRIMITIVE);
-        sym = Primitive;
-        symc = 0;
-        sprintf(text, PRIMITIVE);
-    }
-    else if(isalpha(_BC)) {
-        char* t = text;
-        symc = 0;
-        while(isalpha(_BC) || isdigit(_BC) || _BC == '_')
-            *t++ = buf[bufp++];
-        sym = Identifier;
-        if(buf[bufp] == ':') {
-            sym = Keyword;
-            bufp++;
-            *t++ = ':';
-            if(isalpha(_BC)) {
-                sym = KeywordSequence;
-                while(isalpha(_BC) || _BC == ':')
-                    *t++ = buf[bufp++];
-            }
-        }
-        *t = 0;
-    }
-    else if(isdigit(_BC)) {
-        lexNumber();
-    }
-    else {
-        sym = NONE;
-        symc = _BC;
-        sprintf(text, "%c", _BC);
-    }
-}
-
-
-void peek(void) {
-    Symbol saveSym = sym;
-    char saveSymc = symc;
-    char saveText[256];
-    strcpy(saveText, text);
-    if(peekDone)
-        fprintf(stderr, "Cannot peek twice!\n");
-    getsym();
-    nextSym = sym;
-    nextSymc = symc;
-    strcpy(nextText, text);
-    sym = saveSym;
-    symc = saveSymc;
-    strcpy(text, saveText);
-    peekDone = true;
-}
-
-
-void peekIfNecessary() {
-    if (!peekDone) {
-        peek();
-    }
-}
-
-
-//
-// parsing
-//
 
 
 #pragma mark Parser helpers
 
 
-bool symIn(Symbol* ss) {
+bool symIn(Lexer* l, Symbol* ss) {
     while(*ss)
-        if(*ss++ == sym)
+        if(*ss++ == l->sym)
             return true;
     return false;
 }
 
 
-bool accept(Symbol s) {
-    if(sym == s) {
-        getsym();
+bool accept(Lexer* l, Symbol s) {
+    if (l->sym == s) {
+        Lexer_get_sym(l);
         return true;
     }
     return false;
 }
 
 
-bool acceptOneOf(Symbol* ss) {
-    if(symIn(ss)) {
-        getsym();
+bool acceptOneOf(Lexer* l, Symbol* ss) {
+    if(symIn(l, ss)) {
+        Lexer_get_sym(l);
         return true;
     }
     return false;
 }
 
 
-#define _PRINTABLE_SYM (sym == Integer || sym >= STString)
+#define _PRINTABLE_SYM (l->sym == Integer || l->sym >= STString)
 
 
-bool expect(Symbol s) {
-    if(accept(s))
+bool expect(Lexer* l, Symbol s) {
+    if(accept(l, s))
         return true;
     fprintf(stderr, "Error parsing %s:%d: unexpected symbol. Expected %s, but found %s",
-            file_name, line_num, symnames[s], symnames[sym]);
+            l->file_name, l->line_num, symnames[s], symnames[l->sym]);
     if(_PRINTABLE_SYM)
-        fprintf(stderr, " (%s)", text);
-    fprintf(stderr, ": %s\n", buf);
+        fprintf(stderr, " (%s)", l->text);
+    fprintf(stderr, ": %s\n", l->buf);
     return false;
 }
 
 
-bool expectOneOf(Symbol* ss) {
-    if(acceptOneOf(ss))
+bool expectOneOf(Lexer* l, Symbol* ss) {
+    if(acceptOneOf(l, ss))
         return true;
-    fprintf(stderr, "Error parsing %s:%d: unexpected symbol. Expected one of ", file_name, line_num);
+    fprintf(stderr, "Error parsing %s:%d: unexpected symbol. Expected one of ",
+            l->file_name, l->line_num);
     while(*ss)
         fprintf(stderr, "%s, ", symnames[*ss++]);
-    fprintf(stderr, "but found %s", symnames[sym]);
+    fprintf(stderr, "but found %s", symnames[l->sym]);
     if(_PRINTABLE_SYM)
-        fprintf(stderr, " (%s)", text);
-    fprintf(stderr, ": %s\n", buf);
+        fprintf(stderr, " (%s)", l->text);
+    fprintf(stderr, ": %s\n", l->buf);
     return false;
 }
 
@@ -758,22 +400,21 @@ static Symbol keywordSelectorSyms[] = { Keyword, KeywordSequence };
 #pragma mark Parser grammar
 
 
-void Parser_classdef(class_generation_context* cgenc) {
-    cgenc->name = Universe_symbol_for(text);
-    expect(Identifier);
-    
-    expect(Equal);
     
     if(sym == Identifier) {
         cgenc->super_name = Universe_symbol_for(text);
         accept(Identifier);
     } else
         cgenc->super_name = Universe_symbol_for("Object");
+void Parser_classdef(Lexer* l, class_generation_context* cgenc) {
+    cgenc->name = Universe_symbol_for(l->text);
+    expect(l, Identifier);
     
-    expect(NewTerm);
-    instanceFields(cgenc);
-    while(sym == Identifier || sym == Keyword || sym == OperatorSequence ||
-        symIn(binaryOpSyms)
+    expect(l, Equal);
+    expect(l, NewTerm);
+    instanceFields(l, cgenc);
+    while(l->sym == Identifier || l->sym == Keyword || l->sym == OperatorSequence ||
+        symIn(l, binaryOpSyms)
     ) {
         method_generation_context mgenc;
         method_genc_init(&mgenc);
@@ -782,7 +423,7 @@ void Parser_classdef(class_generation_context* cgenc) {
         // each method has a self variable
         SEND(mgenc.arguments, addCString, "self");
         
-        method(&mgenc);
+        method(l, &mgenc);
         
         if(mgenc.primitive)
             SEND(cgenc->instance_methods, add, VMPrimitive_assemble(&mgenc));
@@ -792,11 +433,11 @@ void Parser_classdef(class_generation_context* cgenc) {
         method_genc_release(&mgenc);
     }
     
-    if(accept(Separator)) {
+    if(accept(l, Separator)) {
         cgenc->class_side = true;
-        classFields(cgenc);
-        while(sym == Identifier || sym == Keyword || sym == OperatorSequence ||
-            symIn(binaryOpSyms)
+        classFields(l, cgenc);
+        while(l->sym == Identifier || l->sym == Keyword || l->sym == OperatorSequence ||
+            symIn(l, binaryOpSyms)
         ) {
             method_generation_context mgenc;
             method_genc_init(&mgenc);
@@ -805,7 +446,7 @@ void Parser_classdef(class_generation_context* cgenc) {
             // each method has a self variable
             SEND(mgenc.arguments, addCString, "self");
             
-            method(&mgenc);
+            method(l, &mgenc);
             
             if(mgenc.primitive)
                 SEND(cgenc->class_methods, add, VMPrimitive_assemble(&mgenc));
@@ -815,98 +456,98 @@ void Parser_classdef(class_generation_context* cgenc) {
             method_genc_release(&mgenc);
         }    
     }
-    expect(EndTerm);
+    expect(l, EndTerm);
 }
 
 
-void instanceFields(class_generation_context* cgenc) {
-    if(accept(Or)) {
-        while(sym == Identifier) {
-            char* var = variable();
+void instanceFields(Lexer* l, class_generation_context* cgenc) {
+    if(accept(l, Or)) {
+        while(l->sym == Identifier) {
+            char* var = variable(l);
             SEND(cgenc->instance_fields, add, Universe_symbol_for(var));
             internal_free(var);
         }
-        expect(Or);
+        expect(l, Or);
     }
 }
 
 
-void classFields(class_generation_context* cgenc) {
-    if(accept(Or)) {
-        while(sym == Identifier) {
-            char* var = variable();
+void classFields(Lexer* l, class_generation_context* cgenc) {
+    if(accept(l, Or)) {
+        while(l->sym == Identifier) {
+            char* var = variable(l);
             SEND(cgenc->class_fields, add, Universe_symbol_for(var));
             internal_free(var);
         }
-        expect(Or);
+        expect(l, Or);
     }
 }
 
 
-void method(method_generation_context* mgenc) {
-    pattern(mgenc);
+void method(Lexer* l, method_generation_context* mgenc) {
+    pattern(l, mgenc);
     
-    expect(Equal);
-    if(sym == Primitive) {
+    expect(l, Equal);
+    if(l->sym == Primitive) {
         mgenc->primitive = true;
-        primitiveBlock();
+        primitiveBlock(l);
     } else
-        methodBlock(mgenc);
+        methodBlock(l, mgenc);
 }
 
 
-void primitiveBlock(void) {
-    expect(Primitive);
+void primitiveBlock(Lexer* l) {
+    expect(l, Primitive);
 }
 
 
-void pattern(method_generation_context* mgenc) {
-    switch(sym) {
+void pattern(Lexer* l, method_generation_context* mgenc) {
+    switch(l->sym) {
         case Identifier: 
-            unaryPattern(mgenc);
+            unaryPattern(l, mgenc);
             break;
         case Keyword: 
-            keywordPattern(mgenc);
+            keywordPattern(l, mgenc);
             break;
         default: 
-            binaryPattern(mgenc);
+            binaryPattern(l, mgenc);
             break;
     }
 }
 
 
-void unaryPattern(method_generation_context* mgenc) {
-    mgenc->signature = unarySelector();
+void unaryPattern(Lexer* l, method_generation_context* mgenc) {
+    mgenc->signature = unarySelector(l);
 }
 
 
-void binaryPattern(method_generation_context* mgenc) {
-    mgenc->signature = binarySelector();
-    char* arg = argument();
+void binaryPattern(Lexer* l, method_generation_context* mgenc) {
+    mgenc->signature = binarySelector(l);
+    char* arg = argument(l);
     SEND(mgenc->arguments, addCStringIfAbsent, arg);
     internal_free(arg);
 }
 
 
-void keywordPattern(method_generation_context* mgenc) {
+void keywordPattern(Lexer* l, method_generation_context* mgenc) {
     pString kw = String_new("");
     do {
-        pString key = keyword();
+        pString key = keyword(l);
         kw = SEND(kw, concat, key);
         SEND(key, free);
-        char* arg = argument();
+        char* arg = argument(l);
         SEND(mgenc->arguments, addCStringIfAbsent, arg);
         internal_free(arg);
-    } while(sym == Keyword);
+    } while(l->sym == Keyword);
     
     mgenc->signature = Universe_symbol_for(SEND(kw, chars));
     SEND(kw, free);
 }
 
 
-void methodBlock(method_generation_context* mgenc) {
-    expect(NewTerm);
-    blockContents(mgenc);
+void methodBlock(Lexer* l, method_generation_context* mgenc) {
+    expect(l, NewTerm);
+    blockContents(l, mgenc);
     
     // if no return has been generated so far, we can be sure there was no .
     // terminating the last expression, so the last expression's value must be
@@ -918,86 +559,86 @@ void methodBlock(method_generation_context* mgenc) {
         mgenc->finished = true;
     }
     
-    expect(EndTerm);
+    expect(l, EndTerm);
 }
 
 
-pVMSymbol unarySelector(void) {
-    const char* id = identifier();
+pVMSymbol unarySelector(Lexer* l) {
+    const char* id = identifier(l);
     pVMSymbol result = Universe_symbol_for(id);
     internal_free((void*) id);
     return result;
 }
 
 
-pVMSymbol binarySelector(void) {
-    pVMSymbol symb = Universe_symbol_for(text);
+pVMSymbol binarySelector(Lexer* l) {
+    pVMSymbol symb = Universe_symbol_for(l->text);
     
-    if(accept(Or))
+    if(accept(l, Or))
         ;
-    else if(accept(Comma))
+    else if(accept(l, Comma))
         ;
-    else if(accept(Minus))
+    else if(accept(l, Minus))
         ;
-    else if(accept(Equal))
+    else if(accept(l, Equal))
         ;
-    else if(acceptOneOf(singleOpSyms))
+    else if(acceptOneOf(l, singleOpSyms))
         ;
-    else if(accept(OperatorSequence))
+    else if(accept(l, OperatorSequence))
         ;
     else
-        expect(NONE);
+        expect(l, NONE);
     
     return symb;
 }
 
 
-char* identifier(void) {
-    char* s = internal_allocate_string(text);
-    if(accept(Primitive))
+char* identifier(Lexer* l) {
+    char* s = internal_allocate_string(l->text);
+    if(accept(l, Primitive))
         ; // text is set
     else
-        expect(Identifier);
+        expect(l, Identifier);
     
     return s;
 }
 
 
-pString keyword(void) {
-    pString s = String_new(text);
-    expect(Keyword);
+pString keyword(Lexer* l) {
+    pString s = String_new(l->text);
+    expect(l, Keyword);
     
     return s;
 }
 
 
-char* argument(void) {
-    return variable();
+char* argument(Lexer* l) {
+    return variable(l);
 }
 
 
-void blockContents(method_generation_context* mgenc) {
-    if(accept(Or)) {
-        locals(mgenc);
-        expect(Or);
+void blockContents(Lexer* l, method_generation_context* mgenc) {
+    if(accept(l, Or)) {
+        locals(l, mgenc);
+        expect(l, Or);
     }
-    blockBody(mgenc, false);
+    blockBody(l, mgenc, false);
 }
 
 
-void locals(method_generation_context* mgenc) {
-    while(sym == Identifier) {
-        char* var = variable();
+void locals(Lexer* l, method_generation_context* mgenc) {
+    while(l->sym == Identifier) {
+        char* var = variable(l);
         SEND(mgenc->locals, addCStringIfAbsent, var);
         internal_free(var);
     }
 }
 
 
-void blockBody(method_generation_context* mgenc, bool seen_period) {
-    if(accept(Exit))
-        result(mgenc);
-    else if(sym == EndBlock) {
+void blockBody(Lexer* l, method_generation_context* mgenc, bool seen_period) {
+    if(accept(l, Exit))
+        result(l, mgenc);
+    else if(l->sym == EndBlock) {
         if(seen_period)
             // a POP has been generated which must be elided (blocks always
             // return the value of the last expression, regardless of whether it
@@ -1005,7 +646,7 @@ void blockBody(method_generation_context* mgenc, bool seen_period) {
             mgenc->bp--;
         emit_RETURN_LOCAL(mgenc);
         mgenc->finished = true;
-    } else if(sym == EndTerm) {
+    } else if(l->sym == EndTerm) {
         // it does not matter whether a period has been seen, as the end of
         // the method has been found (EndTerm) - so it is safe to emit a
         // "return self"
@@ -1013,40 +654,40 @@ void blockBody(method_generation_context* mgenc, bool seen_period) {
         emit_RETURN_LOCAL(mgenc);
         mgenc->finished = true;
     } else {
-        expression(mgenc);
-        if(accept(Period)) {
+        expression(l, mgenc);
+        if(accept(l, Period)) {
             emit_POP(mgenc);
-            blockBody(mgenc, true);
+            blockBody(l, mgenc, true);
         }
     }
 }
 
 
-void result(method_generation_context* mgenc) {
-    expression(mgenc);
+void result(Lexer* l, method_generation_context* mgenc) {
+    expression(l, mgenc);
     if(mgenc->block_method)
         emit_RETURN_NON_LOCAL(mgenc);
     else
         emit_RETURN_LOCAL(mgenc);
     mgenc->finished = true;
-    accept(Period);
+    accept(l, Period);
 }
 
 
-void expression(method_generation_context* mgenc) {
-    peek();
-    if(nextSym == Assign)
-        assignation(mgenc);
+void expression(Lexer* l, method_generation_context* mgenc) {
+    Lexer_peek(l);
+    if(l->nextSym == Assign)
+        assignation(l, mgenc);
     else
-        evaluation(mgenc);
+        evaluation(l, mgenc);
 }
 
 
-void assignation(method_generation_context* mgenc) {
+void assignation(Lexer* lexer, method_generation_context* mgenc) {
     pList l = List_new();
     
-    assignments(mgenc, l);
-    evaluation(mgenc);
+    assignments(lexer, mgenc, l);
+    evaluation(lexer, mgenc);
     
     int i;
     for(i = 0; i < SEND(l, size); i++)
@@ -1060,22 +701,22 @@ void assignation(method_generation_context* mgenc) {
 }
 
 
-void assignments(method_generation_context* mgenc, pList l) {
-    if(sym == Identifier) {
-        SEND(l, add, assignment(mgenc));
-        peek();
-        if(nextSym == Assign)
-            assignments(mgenc, l);
+void assignments(Lexer* lexer, method_generation_context* mgenc, pList l) {
+    if(lexer->sym == Identifier) {
+        SEND(l, add, assignment(lexer, mgenc));
+        Lexer_peek(lexer);
+        if(lexer->nextSym == Assign)
+            assignments(lexer, mgenc, l);
     }
 }
 
 
-pString assignment(method_generation_context* mgenc) {
-    char* v = variable();
+pString assignment(Lexer* l, method_generation_context* mgenc) {
+    char* v = variable(l);
     pVMSymbol var = Universe_symbol_for(v);
     SEND(mgenc->literals, addIfAbsent, var);
     
-    expect(Assign);
+    expect(l, Assign);
     
     pString vString = String_new(v);
     internal_free(v);
@@ -1083,22 +724,22 @@ pString assignment(method_generation_context* mgenc) {
 }
 
 
-void evaluation(method_generation_context* mgenc) {
+void evaluation(Lexer* l, method_generation_context* mgenc) {
     bool super;
-    primary(mgenc, &super);
-    if(sym == Identifier || sym == Keyword || sym == OperatorSequence ||
-        symIn(binaryOpSyms)
+    primary(l, mgenc, &super);
+    if(l->sym == Identifier || l->sym == Keyword || l->sym == OperatorSequence ||
+        symIn(l, binaryOpSyms)
     ) {       
-        messages(mgenc, super);
+        messages(l, mgenc, super);
     }
 }
 
 
-void primary(method_generation_context* mgenc, bool* super) {
+void primary(Lexer* l, method_generation_context* mgenc, bool* super) {
     *super = false;
-    switch(sym) {
+    switch(l->sym) {
         case Identifier: {
-            char* var = variable();
+            char* var = variable(l);
             if(strcmp(var, "super") == 0) {
                 *super = true;
                 // sends to super push self as the receiver
@@ -1111,7 +752,7 @@ void primary(method_generation_context* mgenc, bool* super) {
             break;
         }
         case NewTerm:
-            nestedTerm(mgenc);
+            nestedTerm(l, mgenc);
             break;
         case NewBlock: {
             method_generation_context bgenc;
@@ -1120,7 +761,7 @@ void primary(method_generation_context* mgenc, bool* super) {
             bgenc.holder_genc = mgenc->holder_genc;
             bgenc.outer_genc = mgenc;
             
-            nestedBlock(&bgenc);
+            nestedBlock(l, &bgenc);
             
             pVMMethod block_method = VMMethod_assemble(&bgenc);
             SEND(mgenc->literals, add, block_method);
@@ -1130,49 +771,49 @@ void primary(method_generation_context* mgenc, bool* super) {
             break;
         }
         default:
-            literal(mgenc);
+            literal(l, mgenc);
             break;
     }
 }
 
 
-char* variable(void) {
-    return identifier();
+char* variable(Lexer* l) {
+    return identifier(l);
 }
 
 
-void messages(method_generation_context* mgenc, bool super) {
-    if(sym == Identifier) {
+void messages(Lexer* l, method_generation_context* mgenc, bool super) {
+    if(l->sym == Identifier) {
         do {
             // only the first message in a sequence can be a super send
-            unaryMessage(mgenc, super);
+            unaryMessage(l, mgenc, super);
             super = false;
-        } while(sym == Identifier);
+        } while(l->sym == Identifier);
         
-        while(sym == OperatorSequence || symIn(binaryOpSyms)) {
-            binaryMessage(mgenc, false);
+        while(l->sym == OperatorSequence || symIn(l, binaryOpSyms)) {
+            binaryMessage(l, mgenc, false);
         }
         
-        if(sym == Keyword) {
-            keywordMessage(mgenc, false);
+        if(l->sym == Keyword) {
+            keywordMessage(l, mgenc, false);
         }
-    } else if(sym == OperatorSequence || symIn(binaryOpSyms)) {
+    } else if(l->sym == OperatorSequence || symIn(l, binaryOpSyms)) {
         do {
             // only the first message in a sequence can be a super send
-            binaryMessage(mgenc, super);
+            binaryMessage(l, mgenc, super);
             super = false;
-        } while(sym == OperatorSequence || symIn(binaryOpSyms));
+        } while(l->sym == OperatorSequence || symIn(l, binaryOpSyms));
         
-        if(sym == Keyword) {
-            keywordMessage(mgenc, false);
+        if(l->sym == Keyword) {
+            keywordMessage(l, mgenc, false);
         }
     } else
-        keywordMessage(mgenc, super);
+        keywordMessage(l, mgenc, super);
 }
 
 
-void unaryMessage(method_generation_context* mgenc, bool super) {
-    pVMSymbol msg = unarySelector();
+void unaryMessage(Lexer* l, method_generation_context* mgenc, bool super) {
+    pVMSymbol msg = unarySelector(l);
     SEND(mgenc->literals, addIfAbsent, msg);
     if(super)
         emit_SUPER_SEND(mgenc, msg);
@@ -1181,12 +822,12 @@ void unaryMessage(method_generation_context* mgenc, bool super) {
 }
 
 
-void binaryMessage(method_generation_context* mgenc, bool super) {
-    pVMSymbol msg = binarySelector();
+void binaryMessage(Lexer* l, method_generation_context* mgenc, bool super) {
+    pVMSymbol msg = binarySelector(l);
     SEND(mgenc->literals, addIfAbsent, msg);
     
     bool tmp_bool = false;
-    binaryOperand(mgenc, &tmp_bool);
+    binaryOperand(l, mgenc, &tmp_bool);
     
     if(super)
         emit_SUPER_SEND(mgenc, msg);
@@ -1195,22 +836,22 @@ void binaryMessage(method_generation_context* mgenc, bool super) {
 }
 
 
-void binaryOperand(method_generation_context* mgenc, bool* super) {
-    primary(mgenc, super);
+void binaryOperand(Lexer* l, method_generation_context* mgenc, bool* super) {
+    primary(l, mgenc, super);
     
-    while(sym == Identifier)
-        unaryMessage(mgenc, *super);
+    while(l->sym == Identifier)
+        unaryMessage(l, mgenc, *super);
 }
 
 
-void keywordMessage(method_generation_context* mgenc, bool super) {
+void keywordMessage(Lexer* l, method_generation_context* mgenc, bool super) {
     pString kw = String_new("");
     do {
-        pString key = keyword();
+        pString key = keyword(l);
         kw = SEND(kw, concat, key);
         SEND(key, free);
-        formula(mgenc);
-    } while(sym == Keyword);
+        formula(l, mgenc);
+    } while(l->sym == Keyword);
     
     pVMSymbol msg = Universe_symbol_for(SEND(kw, chars));
     SEND(kw, free);
@@ -1223,80 +864,80 @@ void keywordMessage(method_generation_context* mgenc, bool super) {
 }
 
 
-void formula(method_generation_context* mgenc) {
+void formula(Lexer* l, method_generation_context* mgenc) {
     bool super;
-    binaryOperand(mgenc, &super);
+    binaryOperand(l, mgenc, &super);
     
     // only the first message in a sequence can be a super send
-    if(sym == OperatorSequence || symIn(binaryOpSyms))
-        binaryMessage(mgenc, super);
-    while(sym == OperatorSequence || symIn(binaryOpSyms))
-        binaryMessage(mgenc, false);
+    if(l->sym == OperatorSequence || symIn(l, binaryOpSyms))
+        binaryMessage(l, mgenc, super);
+    while(l->sym == OperatorSequence || symIn(l, binaryOpSyms))
+        binaryMessage(l, mgenc, false);
 }
 
 
-void nestedTerm(method_generation_context* mgenc) {
-    expect(NewTerm);
-    expression(mgenc);
-    expect(EndTerm);
+void nestedTerm(Lexer* l, method_generation_context* mgenc) {
+    expect(l, NewTerm);
+    expression(l, mgenc);
+    expect(l, EndTerm);
 }
 
-static pVMObject get_object_for_current_literal() {
+static pVMObject get_object_for_current_literal(Lexer* l) {
     pVMObject literal_obj;
-    switch(sym) {
+    switch(l->sym) {
         case Pound:
-            peekIfNecessary();
-            if (nextSym == NewTerm) {
-                literal_obj = literalArray();
+            Lexer_peek_if_necessary(l);
+            if (l->nextSym == NewTerm) {
+                literal_obj = literalArray(l);
             } else {
-                literal_obj = literalSymbol();
+                literal_obj = literalSymbol(l);
             }
             break;
         case STString:
-            literal_obj = literalString();
+            literal_obj = literalString(l);
             break;
         default:
-            literal_obj = literalNumber();
+            literal_obj = literalNumber(l);
             break;
     }
     return literal_obj;
 }
 
-void literal(method_generation_context* mgenc) {
-    pVMObject literal_obj = get_object_for_current_literal();
+void literal(Lexer* l, method_generation_context* mgenc) {
+    pVMObject literal_obj = get_object_for_current_literal(l);
 
     SEND(mgenc->literals, addIfAbsent, literal_obj);
     emit_PUSH_CONSTANT(mgenc, literal_obj);
 }
 
 
-pVMObject literalNumber() {
-    if (sym == Minus)
-        return negativeDecimal();
+pVMObject literalNumber(Lexer* l) {
+    if (l->sym == Minus)
+        return negativeDecimal(l);
     else
-        return literalDecimal(false);
+        return literalDecimal(l, false);
 }
 
 
-pVMObject literalDecimal(bool negateValue) {
-    if (sym == Integer) {
-            return literalInteger(negateValue);
+pVMObject literalDecimal(Lexer* l, bool negateValue) {
+    if (l->sym == Integer) {
+            return literalInteger(l, negateValue);
     } else {
-        Universe_assert(sym == Double);
-        return literalDouble(negateValue);
+        Universe_assert(l->sym == Double);
+        return literalDouble(l, negateValue);
     }
 }
 
 
-pVMObject negativeDecimal(void) {
-    expect(Minus);
-    return literalDecimal(true);
+pVMObject negativeDecimal(Lexer* l) {
+    expect(l, Minus);
+    return literalDecimal(l, true);
 }
 
 
-pVMObject literalInteger(bool negateValue) {
-    int64_t i = strtoll(text, NULL, 10);
-    expect(Integer);
+pVMObject literalInteger(Lexer* l, bool negateValue) {
+    int64_t i = strtoll(l->text, NULL, 10);
+    expect(l, Integer);
 
     if (negateValue) {
         i = 0 - i;
@@ -1305,31 +946,31 @@ pVMObject literalInteger(bool negateValue) {
 }
 
 
-pVMObject literalDouble(bool negateValue) {
-    double d = strtod(text, NULL);
+pVMObject literalDouble(Lexer* l, bool negateValue) {
+    double d = strtod(l->text, NULL);
     if (negateValue) {
         d = 0 - d;
     }
-    expect(Double);
+    expect(l, Double);
     return (pVMObject) Universe_new_double(d);
 }
 
-pVMObject literalSymbol() {
+pVMObject literalSymbol(Lexer* l) {
     pVMSymbol symb;
-    expect(Pound);
-    if(sym == STString) {
-        char* s = string();
+    expect(l, Pound);
+    if(l->sym == STString) {
+        char* s = string(l);
         symb = Universe_symbol_for(s);
         internal_free(s);
     } else
-        symb = selector();
+        symb = selector(l);
     
     return (pVMObject)symb;
 }
 
 
-pVMObject literalString() {
-    char* s = string();
+pVMObject literalString(Lexer* l) {
+    char* s = string(l);
     pVMString str = Universe_new_string(s);
     internal_free(s);
     
@@ -1337,17 +978,17 @@ pVMObject literalString() {
 }
 
 
-pVMObject literalArray() {
+pVMObject literalArray(Lexer* l) {
     pList literal_values = List_new();
 
-    expect(Pound);
-    expect(NewTerm);
+    expect(l, Pound);
+    expect(l, NewTerm);
 
-    while (sym != EndTerm) {
-        SEND(literal_values, add, get_object_for_current_literal());
+    while (l->sym != EndTerm) {
+        SEND(literal_values, add, get_object_for_current_literal(l));
     }
 
-    expect(EndTerm);
+    expect(l, EndTerm);
 
     pVMArray arr = Universe_new_array_list(literal_values);
 
@@ -1357,40 +998,40 @@ pVMObject literalArray() {
 }
 
 
-pVMSymbol selector(void) {
-    if(sym == OperatorSequence || symIn(singleOpSyms))
-        return binarySelector();
-    else if(sym == Keyword || sym == KeywordSequence)
-        return keywordSelector();
+pVMSymbol selector(Lexer* l) {
+    if(l->sym == OperatorSequence || symIn(l, singleOpSyms))
+        return binarySelector(l);
+    else if(l->sym == Keyword || l->sym == KeywordSequence)
+        return keywordSelector(l);
     else
-        return unarySelector();
+        return unarySelector(l);
 }
 
 
-pVMSymbol keywordSelector(void) {
-    char* s = internal_allocate_string(text);
-    expectOneOf(keywordSelectorSyms);
+pVMSymbol keywordSelector(Lexer* l) {
+    char* s = internal_allocate_string(l->text);
+    expectOneOf(l, keywordSelectorSyms);
     pVMSymbol symb = Universe_symbol_for(s);
     internal_free(s);
     return symb;
 }
 
 
-char* string(void) {
-    char* s = internal_allocate_string(text);
-    expect(STString);
+char* string(Lexer* l) {
+    char* s = internal_allocate_string(l->text);
+    expect(l, STString);
     return s; // literal strings are at most BUFSIZ long
 }
 
 
-void nestedBlock(method_generation_context* mgenc) {
+void nestedBlock(Lexer* l, method_generation_context* mgenc) {
 #define BLOCK_METHOD   "$block method"
 #define BLOCK_METHOD_L (13)
     SEND(mgenc->arguments, addCStringIfAbsent, "$block self");
     
-    expect(NewBlock);
-    if(sym == Colon)
-        blockPattern(mgenc);
+    expect(l, NewBlock);
+    if(l->sym == Colon)
+        blockPattern(l, mgenc);
     
     // generate Block signature
     size_t arg_size = SEND(mgenc->arguments, size);
@@ -1401,7 +1042,7 @@ void nestedBlock(method_generation_context* mgenc) {
     mgenc->signature = Universe_symbol_for(block_sig);
     internal_free(block_sig);
     
-    blockContents(mgenc);
+    blockContents(l, mgenc);
     
     // if no return has been generated, we can be sure that the last expression
     // in the block was not terminated by ., and can generate a return
@@ -1410,23 +1051,23 @@ void nestedBlock(method_generation_context* mgenc) {
         mgenc->finished = true;
     }
     
-    expect(EndBlock);
+    expect(l, EndBlock);
 }
 
 
-void blockPattern(method_generation_context* mgenc) {
-    blockArguments(mgenc);
-    expect(Or);
+void blockPattern(Lexer* l, method_generation_context* mgenc) {
+    blockArguments(l, mgenc);
+    expect(l, Or);
 }
 
 
-void blockArguments(method_generation_context* mgenc) {
+void blockArguments(Lexer* l, method_generation_context* mgenc) {
     do {
-        expect(Colon);
-        char* arg = argument();
+        expect(l, Colon);
+        char* arg = argument(l);
         SEND(mgenc->arguments, addCStringIfAbsent, arg);
         internal_free(arg);
-    } while(sym == Colon);
+    } while(l->sym == Colon);
 }
 
 

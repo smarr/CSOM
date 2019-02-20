@@ -47,7 +47,7 @@ static void show_compilation_error(const char* filename,
 
 
 // precondition: Parser is inited!
-static pVMClass compile(pVMClass system_class) {
+static pVMClass compile(Lexer* l, pVMClass system_class) {
     // context for class generation
     class_generation_context cgc;
     class_genc_init(&cgc);
@@ -59,7 +59,7 @@ static pVMClass compile(pVMClass system_class) {
     pVMClass result = system_class;   
 
     // parse class into 
-    Parser_classdef(&cgc);
+    Parser_classdef(l, &cgc);
     
     // compile the class
     if(system_class == NULL)
@@ -84,8 +84,10 @@ static pVMClass compile(pVMClass system_class) {
 
 pVMClass SourcecodeCompiler_compile_class_string(const char* stream,     
                                                  pVMClass system_class) {
-    Parser_init_string(stream);
-    return compile(system_class);
+    Lexer* l = Parser_init_string(stream);
+    pVMClass class = compile(l, system_class);
+    internal_free(l);
+    return class;
 }
 
 
@@ -129,8 +131,9 @@ pVMClass SourcecodeCompiler_compile_class(const char* path,
     internal_free(fname);
 
     // start compiling
-    Parser_init(stream, filename);
-    result = compile(system_class);
+    Lexer* l = Parser_init(stream, filename);
+    result = compile(l, system_class);
+    internal_free(l);
     
     // Make sure the filename matches the class name
     pVMSymbol cname = SEND(result, get_name);

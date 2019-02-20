@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		0A775BBA221859D800CB6FA5 /* Method.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A775BB9221859D800CB6FA5 /* Method.c */; };
 		0A775BBD2218CE4C00CB6FA5 /* Primitive.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A775BBC2218CE4C00CB6FA5 /* Primitive.c */; };
+		0AADABE1221CACDC00CB801F /* Lexer.c in Sources */ = {isa = PBXBuildFile; fileRef = 0AADABE0221CACDC00CB801F /* Lexer.c */; };
+		0AADABE2221CACDC00CB801F /* Lexer.c in Sources */ = {isa = PBXBuildFile; fileRef = 0AADABE0221CACDC00CB801F /* Lexer.c */; };
 		0AF36C002219806A00985926 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 0AF36BFF2219806A00985926 /* main.c */; };
 		0AF36C05221980A700985926 /* BasicInterpreterTests.c in Sources */ = {isa = PBXBuildFile; fileRef = 0AF36C04221980A700985926 /* BasicInterpreterTests.c */; };
 		0AF36C062219BA6E00985926 /* Universe.c in Sources */ = {isa = PBXBuildFile; fileRef = F6F204150C7DA4310074678D /* Universe.c */; };
@@ -132,6 +134,8 @@
 		0A775BB9221859D800CB6FA5 /* Method.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Method.c; sourceTree = "<group>"; };
 		0A775BBB2218CE4C00CB6FA5 /* Primitive.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Primitive.h; sourceTree = "<group>"; };
 		0A775BBC2218CE4C00CB6FA5 /* Primitive.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Primitive.c; sourceTree = "<group>"; };
+		0AADABDF221CACDC00CB801F /* Lexer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Lexer.h; sourceTree = "<group>"; };
+		0AADABE0221CACDC00CB801F /* Lexer.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Lexer.c; sourceTree = "<group>"; };
 		0AF36BFD2219806A00985926 /* tests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = tests; sourceTree = BUILT_PRODUCTS_DIR; };
 		0AF36BFF2219806A00985926 /* main.c */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; tabWidth = 4; };
 		0AF36C04221980A700985926 /* BasicInterpreterTests.c */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.c; path = BasicInterpreterTests.c; sourceTree = "<group>"; tabWidth = 4; };
@@ -150,7 +154,7 @@
 		F616D4530C8FFF4900BE276B /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = doc/Primitives/Makefile; sourceTree = SOURCE_ROOT; };
 		F616D4540C8FFF4900BE276B /* README.de */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = README.de; path = doc/Primitives/README.de; sourceTree = SOURCE_ROOT; };
 		F616D4550C8FFF4900BE276B /* README.en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = README.en; path = doc/Primitives/README.en; sourceTree = SOURCE_ROOT; };
-		F61FF4070C8439F100178340 /* Interpreter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Interpreter.c; path = src/interpreter/Interpreter.c; sourceTree = SOURCE_ROOT; };
+		F61FF4070C8439F100178340 /* Interpreter.c */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.c; name = Interpreter.c; path = src/interpreter/Interpreter.c; sourceTree = SOURCE_ROOT; tabWidth = 4; };
 		F61FF8A30C856E9600178340 /* StringHashmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringHashmap.h; sourceTree = "<group>"; };
 		F61FF8A40C856E9600178340 /* StringHashmap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = StringHashmap.c; sourceTree = "<group>"; };
 		F62EE5E50DB0B45B00330696 /* Darwin.make */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Darwin.make; path = build/Darwin.make; sourceTree = SOURCE_ROOT; };
@@ -204,7 +208,7 @@
 		F6F204280C7DA4320074678D /* VMDouble.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VMDouble.h; path = src/vmobjects/VMDouble.h; sourceTree = SOURCE_ROOT; };
 		F6F204290C7DA4320074678D /* VMEvaluationPrimitive.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = VMEvaluationPrimitive.c; path = src/vmobjects/VMEvaluationPrimitive.c; sourceTree = SOURCE_ROOT; };
 		F6F2042A0C7DA4320074678D /* VMEvaluationPrimitive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VMEvaluationPrimitive.h; path = src/vmobjects/VMEvaluationPrimitive.h; sourceTree = SOURCE_ROOT; };
-		F6F2042B0C7DA4320074678D /* VMFrame.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = VMFrame.c; path = src/vmobjects/VMFrame.c; sourceTree = SOURCE_ROOT; };
+		F6F2042B0C7DA4320074678D /* VMFrame.c */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.c; name = VMFrame.c; path = src/vmobjects/VMFrame.c; sourceTree = SOURCE_ROOT; tabWidth = 4; };
 		F6F2042C0C7DA4320074678D /* VMFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VMFrame.h; path = src/vmobjects/VMFrame.h; sourceTree = SOURCE_ROOT; };
 		F6F2042D0C7DA4320074678D /* VMInteger.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = VMInteger.c; path = src/vmobjects/VMInteger.c; sourceTree = SOURCE_ROOT; };
 		F6F2042E0C7DA4320074678D /* VMInteger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VMInteger.h; path = src/vmobjects/VMInteger.h; sourceTree = SOURCE_ROOT; };
@@ -377,6 +381,8 @@
 				E1F124AF0CE48964000F5179 /* GenerationContexts.c */,
 				E1F125800CE4A7E1000F5179 /* BytecodeGeneration.h */,
 				E1F125870CE4AAC8000F5179 /* BytecodeGeneration.c */,
+				0AADABDF221CACDC00CB801F /* Lexer.h */,
+				0AADABE0221CACDC00CB801F /* Lexer.c */,
 			);
 			name = compiler;
 			path = src/compiler;
@@ -638,6 +644,7 @@
 				0AF36C112219BB8A00985926 /* VMInteger.c in Sources */,
 				0AF36C122219BB8A00985926 /* VMMethod.c in Sources */,
 				0AF36C132219BB8A00985926 /* SourcecodeCompiler.c in Sources */,
+				0AADABE2221CACDC00CB801F /* Lexer.c in Sources */,
 				0AF36C0A2219BB5500985926 /* Shell.c in Sources */,
 				0AF36C092219BB4E00985926 /* Interpreter.c in Sources */,
 				0AF36C082219BB4500985926 /* Hashmap.c in Sources */,
@@ -658,6 +665,7 @@
 				F6F204790C7DA4320074678D /* gc.c in Sources */,
 				F6F2047D0C7DA4320074678D /* Hashmap.c in Sources */,
 				F6F2047F0C7DA4320074678D /* List.c in Sources */,
+				0AADABE1221CACDC00CB801F /* Lexer.c in Sources */,
 				F6F204820C7DA4320074678D /* Shell.c in Sources */,
 				F6F204840C7DA4320074678D /* Universe.c in Sources */,
 				F6F204870C7DA4320074678D /* OOObject.c in Sources */,

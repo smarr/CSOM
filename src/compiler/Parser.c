@@ -49,10 +49,13 @@ and white space are not dealt with in the grammar. Names of non-terminals begin
 with a lower-case letter; terminals, with an upper-case one.
 
 classdef =
-    Identifier Equal Identifier? NewTerm
+    Identifier Equal superclass
     instanceFields method*
     ( Separator classFields method* )?
     EndTerm
+
+superclass =
+    Identifier? NewTerm
 
 instanceFields =
     ( Or Identifier* Or )?
@@ -400,17 +403,14 @@ static Symbol keywordSelectorSyms[] = { Keyword, KeywordSequence };
 #pragma mark Parser grammar
 
 
-    
-    if(sym == Identifier) {
-        cgenc->super_name = Universe_symbol_for(text);
-        accept(Identifier);
-    } else
-        cgenc->super_name = Universe_symbol_for("Object");
 void Parser_classdef(Lexer* l, class_generation_context* cgenc) {
     cgenc->name = Universe_symbol_for(l->text);
     expect(l, Identifier);
     
     expect(l, Equal);
+
+    superclass(l, cgenc);
+
     expect(l, NewTerm);
     instanceFields(l, cgenc);
     while(l->sym == Identifier || l->sym == Keyword || l->sym == OperatorSequence ||
@@ -457,6 +457,28 @@ void Parser_classdef(Lexer* l, class_generation_context* cgenc) {
         }    
     }
     expect(l, EndTerm);
+}
+
+
+void superclass(Lexer* l, class_generation_context* cgenc) {
+    if(l->sym == Identifier) {
+        cgenc->super_name = Universe_symbol_for(l->text);
+        accept(l, Identifier);
+    } else
+        cgenc->super_name = Universe_symbol_for("Object");
+
+    // Load the super class, if it is not nil (break the dependency cycle)
+    if (cgenc->super_name != Universe_symbol_for("nil")) {
+        pVMClass super_class = Universe_load_class(cgenc->super_name);
+        class_genc_set_instance_fields_of_super(cgenc, SEND(super_class, get_instance_fields));
+        class_genc_set_class_fields_of_super(cgenc, SEND(SEND(super_class, get_class), get_instance_fields));
+    } else {
+        // we hardcode here the field names for Class
+        // since Object class superclass = Class
+        // We avoid here any kind of dynamic solution to avoid further complexity.
+        // However, that makes it static, it is going to make it harder to
+        // change the definition of Class and Object
+    }
 }
 
 

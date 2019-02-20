@@ -141,7 +141,7 @@ void lexNumber(Lexer* l) {
 }
 
 void lexEscapeChar(Lexer* l, char** t) {
-  char current = l->buf[++l->bufp];
+  char current = _BC;
 
   switch (current) {
     case 't': *(*t)++ = '\t'; break;
@@ -152,17 +152,18 @@ void lexEscapeChar(Lexer* l, char** t) {
     case '\'': *(*t)++ = '\''; break;
     case '\\': *(*t)++ = '\\'; break;
   }
-
   l->bufp++;
 }
 
 void lexStringChar(Lexer* l, char** t) {
-  char current = l->buf[++l->bufp];
+  char current = _BC;
 
   if (current == '\\') {
+    l->bufp++;
     lexEscapeChar(l, t);
   } else {
     *(*t)++ = current;
+    l->bufp++;
   }
 }
 
@@ -170,7 +171,9 @@ void lexString(Lexer* l) {
   l->sym = STString;
   l->symc = 0;
   char* t = l->text;
-  do {
+  l->bufp++;
+
+  while(_BC != '\'') {
     if (_BC == '\n') {
       l->line_num += 1;
     }
@@ -180,9 +183,10 @@ void lexString(Lexer* l) {
         return;
       }
     }
-  } while(_BC != '\'');
+  }
+
+  *t = 0;
   l->bufp++;
-  *--t = 0;
 }
 
 void lexOperator(Lexer* l) {

@@ -144,13 +144,13 @@ void lexEscapeChar(Lexer* l, char** t) {
   char current = l->buf[++l->bufp];
 
   switch (current) {
-    case 't': *(*t)++ = current; break;
-    case 'b': *(*t)++ = current; break;
-    case 'n': *(*t)++ = current; break;
-    case 'r': *(*t)++ = current; break;
-    case 'f': *(*t)++ = current; break;
-    case '\'': *(*t)++ = current; break;
-    case '\\': *(*t)++ = current; break;
+    case 't': *(*t)++ = '\t'; break;
+    case 'b': *(*t)++ = '\b'; break;
+    case 'n': *(*t)++ = '\n'; break;
+    case 'r': *(*t)++ = '\r'; break;
+    case 'f': *(*t)++ = '\f'; break;
+    case '\'': *(*t)++ = '\''; break;
+    case '\\': *(*t)++ = '\\'; break;
   }
 
   l->bufp++;

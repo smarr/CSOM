@@ -62,6 +62,7 @@ void _VMString_init(void* _self, ...) {
     va_end(args);
     
     strcpy(self->chars, embed);
+    self->hash = 0;
 }
 
 

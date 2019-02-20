@@ -67,6 +67,10 @@ void  _String_asSymbol(pVMObject object, pVMFrame frame) {
 
 void  _String_hashcode(pVMObject object, pVMFrame frame) {
     pVMString self = (pVMString)SEND(frame, pop);
+    if (self->hash == 0) {
+        self->hash = string_hash(self->chars);
+    }
+
     SEND(frame, push, (pVMObject)Universe_new_integer(self->hash));    
 }
 

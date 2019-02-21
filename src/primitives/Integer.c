@@ -174,7 +174,7 @@ void  _Integer_percent(pVMObject object, pVMFrame frame) {
 
     int64_t result = l % r;
     
-    if (l > 0 && r < 0) {
+    if ((result != 0) && ((result < 0) != (r < 0))) {
         result += r;
     }
     

@@ -202,8 +202,8 @@
 		F6F204200C7DA4320074678D /* VMArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VMArray.h; path = src/vmobjects/VMArray.h; sourceTree = SOURCE_ROOT; };
 		F6F204230C7DA4320074678D /* VMBlock.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = VMBlock.c; path = src/vmobjects/VMBlock.c; sourceTree = SOURCE_ROOT; };
 		F6F204240C7DA4320074678D /* VMBlock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VMBlock.h; path = src/vmobjects/VMBlock.h; sourceTree = SOURCE_ROOT; };
-		F6F204250C7DA4320074678D /* VMClass.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = VMClass.c; path = src/vmobjects/VMClass.c; sourceTree = SOURCE_ROOT; };
-		F6F204260C7DA4320074678D /* VMClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VMClass.h; path = src/vmobjects/VMClass.h; sourceTree = SOURCE_ROOT; };
+		F6F204250C7DA4320074678D /* VMClass.c */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.c; name = VMClass.c; path = src/vmobjects/VMClass.c; sourceTree = SOURCE_ROOT; tabWidth = 4; };
+		F6F204260C7DA4320074678D /* VMClass.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; name = VMClass.h; path = src/vmobjects/VMClass.h; sourceTree = SOURCE_ROOT; tabWidth = 4; };
 		F6F204270C7DA4320074678D /* VMDouble.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = VMDouble.c; path = src/vmobjects/VMDouble.c; sourceTree = SOURCE_ROOT; };
 		F6F204280C7DA4320074678D /* VMDouble.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VMDouble.h; path = src/vmobjects/VMDouble.h; sourceTree = SOURCE_ROOT; };
 		F6F204290C7DA4320074678D /* VMEvaluationPrimitive.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = VMEvaluationPrimitive.c; path = src/vmobjects/VMEvaluationPrimitive.c; sourceTree = SOURCE_ROOT; };
@@ -212,8 +212,8 @@
 		F6F2042C0C7DA4320074678D /* VMFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VMFrame.h; path = src/vmobjects/VMFrame.h; sourceTree = SOURCE_ROOT; };
 		F6F2042D0C7DA4320074678D /* VMInteger.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = VMInteger.c; path = src/vmobjects/VMInteger.c; sourceTree = SOURCE_ROOT; };
 		F6F2042E0C7DA4320074678D /* VMInteger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VMInteger.h; path = src/vmobjects/VMInteger.h; sourceTree = SOURCE_ROOT; };
-		F6F2042F0C7DA4320074678D /* VMInvokable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = VMInvokable.c; path = src/vmobjects/VMInvokable.c; sourceTree = SOURCE_ROOT; };
-		F6F204300C7DA4320074678D /* VMInvokable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VMInvokable.h; path = src/vmobjects/VMInvokable.h; sourceTree = SOURCE_ROOT; };
+		F6F2042F0C7DA4320074678D /* VMInvokable.c */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.c; name = VMInvokable.c; path = src/vmobjects/VMInvokable.c; sourceTree = SOURCE_ROOT; tabWidth = 4; };
+		F6F204300C7DA4320074678D /* VMInvokable.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; name = VMInvokable.h; path = src/vmobjects/VMInvokable.h; sourceTree = SOURCE_ROOT; tabWidth = 4; };
 		F6F204310C7DA4320074678D /* VMMethod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = VMMethod.c; path = src/vmobjects/VMMethod.c; sourceTree = SOURCE_ROOT; };
 		F6F204320C7DA4320074678D /* VMMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VMMethod.h; path = src/vmobjects/VMMethod.h; sourceTree = SOURCE_ROOT; };
 		F6F204330C7DA4320074678D /* VMObject.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = VMObject.c; path = src/vmobjects/VMObject.c; sourceTree = SOURCE_ROOT; };
@@ -233,8 +233,8 @@
 		F6F2056B0C7DB2B40074678D /* Core.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Core.c; path = src/primitives/Core.c; sourceTree = SOURCE_ROOT; };
 		F6F2056C0C7DB2B40074678D /* Double.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Double.c; path = src/primitives/Double.c; sourceTree = SOURCE_ROOT; };
 		F6F2056D0C7DB2B40074678D /* Double.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Double.h; path = src/primitives/Double.h; sourceTree = SOURCE_ROOT; };
-		F6F205700C7DB2B40074678D /* Integer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Integer.c; path = src/primitives/Integer.c; sourceTree = SOURCE_ROOT; };
-		F6F205710C7DB2B40074678D /* Integer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Integer.h; path = src/primitives/Integer.h; sourceTree = SOURCE_ROOT; };
+		F6F205700C7DB2B40074678D /* Integer.c */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.c; name = Integer.c; path = src/primitives/Integer.c; sourceTree = SOURCE_ROOT; tabWidth = 4; };
+		F6F205710C7DB2B40074678D /* Integer.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; name = Integer.h; path = src/primitives/Integer.h; sourceTree = SOURCE_ROOT; tabWidth = 4; };
 		F6F205740C7DB2B40074678D /* Object.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Object.c; path = src/primitives/Object.c; sourceTree = SOURCE_ROOT; };
 		F6F205750C7DB2B40074678D /* Object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Object.h; path = src/primitives/Object.h; sourceTree = SOURCE_ROOT; };
 		F6F205790C7DB2B40074678D /* String.c */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.c; name = String.c; path = src/primitives/String.c; sourceTree = SOURCE_ROOT; tabWidth = 4; };

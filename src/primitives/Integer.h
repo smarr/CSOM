@@ -47,6 +47,7 @@ void  _Integer_greaterthangreaterthangreaterthan(pVMObject object, pVMFrame fram
 void  _Integer_bitXor_(pVMObject object, pVMFrame frame);
 void  _Integer_as32BitSignedValue(pVMObject object, pVMFrame frame);
 void  _Integer_as32BitUnsignedValue(pVMObject object, pVMFrame frame);
+void  _Integer_equalequal(pVMObject object, pVMFrame frame);
 
 void Integer_fromString_(pVMObject object, pVMFrame frame);
 

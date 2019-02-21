@@ -370,3 +370,17 @@ void  _Integer_as32BitUnsignedValue(pVMObject object, pVMFrame frame) {
   _Integer__pushResult(object, frame, result);
 }
 
+
+void  _Integer_equalequal(pVMObject object, pVMFrame frame) {
+    pVMObject rightObj = SEND(frame, pop);
+    pVMInteger left = (pVMInteger)SEND(frame, pop);
+
+    if (IS_A(rightObj, VMInteger)) {
+        int64_t l = SEND(left, get_embedded_integer);
+        pVMInteger right = (pVMInteger) rightObj;
+        int64_t r = SEND(right, get_embedded_integer);
+        SEND(frame, push, l == r ? true_object : false_object);
+    } else {
+        SEND(frame, push, false_object);
+    }
+}

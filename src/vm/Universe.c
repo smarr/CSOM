@@ -292,6 +292,7 @@ static pVMObject initialize_object_system() {
     /*
      * affected file globals: globals_dictionary
      */
+    VMClass_init_primitive_map();
 
     // setup the Hashmap for all globals
     globals_dictionary = Hashmap_new();
@@ -773,7 +774,7 @@ pVMClass Universe_get_block_class_with_args(int64_t number_of_arguments) {
     
     // Add the appropriate value primitive to the block class
     SEND(result, add_instance_primitive,
-         VMBlock_get_evaluation_primitive(number_of_arguments));
+         VMBlock_get_evaluation_primitive(number_of_arguments), true);
     
     // Insert the block class into the dictionary of globals
     Universe_set_global(name, (pVMObject)result);

@@ -35,6 +35,7 @@ THE SOFTWARE.
 
 #include <misc/debug.h>
 #include <misc/Hashmap.h>
+#include <misc/StringHashmap.h>
 
 #include <vm/Universe.h>
 
@@ -325,9 +326,9 @@ bool _VMClass_add_instance_invokable(void* _self, pVMObject value) {
 }
 
 
-void _VMClass_add_instance_primitive(void* _self, pVMPrimitive value) {
+void _VMClass_add_instance_primitive(void* _self, pVMPrimitive value, bool warn) {
     pVMClass self = (pVMClass)_self;
-    if(SEND(self, add_instance_invokable, (pVMObject)value)) {
+    if(SEND(self, add_instance_invokable, (pVMObject)value) && warn) {
         pVMSymbol sym = TSEND(VMInvokable, value, get_signature);
         debug_warn("Primitive %s is not in class definition for class %s.\n",
                    sym->chars,
@@ -475,13 +476,17 @@ bool is_responsible(void* handle, const char* class) {
 #define INSTANCE_METHOD_FORMAT_S "_%s_%s"
 // as in _AClass_anInstanceMethod
 
+static pStringHashmap primitive_map = NULL;
+
+void VMClass_init_primitive_map() {
+    primitive_map = StringHashmap_new();
+}
 
 /**
  * set the routines for primitive marked invokables of the given class
  */
 void set_primitives(pVMClass class, void* handle, const char* cname,
-    const char* restrict format
-) {    
+    const char* restrict format, pVMClass target) {
     pVMPrimitive the_primitive;
     routine_fn   routine=NULL;
     
@@ -495,27 +500,44 @@ void set_primitives(pVMClass class, void* handle, const char* cname,
             // get it's selector
             pVMSymbol sig = TSEND(VMInvokable, the_primitive, get_signature);
             const char* selector = SEND(sig, get_plain_string);
-            
-            { //string block                
+
+            { //string block
                 char symbol[strlen(cname) + strlen(selector) + 2 + 1];
                                                                 //2 for 2x '_'
                 sprintf(symbol, format, cname, selector);
-                 
+
+                bool loaded = (bool) SEND(primitive_map, get, (void*)symbol);
+
+                if (loaded) {
+                    // we already loaded this symbol
+                    continue;
+                }
+
                 // try loading the primitive
                 routine = (routine_fn)dlsym(handle, symbol);
+                SEND(primitive_map, put, (void*)symbol, (void*)true);
             }
             
-            if(!routine) {
+            if(!routine && class == target) {
                 debug_error("could not load primitive '%s' for class %s\n"
                             "ERR: routine not in library\n",
                             selector,
                             cname);
                 Universe_exit(ERR_FAIL);
             }
-            
-            // set routine
-            SEND(the_primitive, set_routine, routine);
-            the_primitive->empty = false;
+
+            if (routine && class != target) {
+                // need new invokable in the target class, because we are loading
+                // the primitive for a method defined in a superclass
+                the_primitive = VMPrimitive_get_empty_primitive(sig);
+                SEND(target, add_instance_primitive, the_primitive, false);
+            }
+
+            if (routine) {
+                SEND(the_primitive, set_routine, routine);
+                the_primitive->empty = false;
+            }
+
             internal_free((void*) selector);
         }
     }
@@ -579,8 +601,16 @@ void _VMClass_load_primitives(void* _self, const pString* cp, size_t cp_count) {
         Universe_exit(ERR_FAIL);
     }
     // do the actual loading for both class and metaclass
-    set_primitives(self, dlhandle, cname, INSTANCE_METHOD_FORMAT_S);
-    set_primitives(self->class, dlhandle, cname, CLASS_METHOD_FORMAT_S);
+    set_primitives(self, dlhandle, cname, INSTANCE_METHOD_FORMAT_S, self);
+    set_primitives(self->class, dlhandle, cname, CLASS_METHOD_FORMAT_S, self->class);
+
+    // do load
+    pVMClass clazz = self;
+    while (SEND(clazz, has_super_class)) {
+        clazz = SEND(clazz, get_super_class);
+        set_primitives(clazz, dlhandle, cname, INSTANCE_METHOD_FORMAT_S, self);
+    }
+
 }
 
 

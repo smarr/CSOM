@@ -57,7 +57,7 @@ VTABLE(VMClass) {
     pVMObject (*lookup_invokable)(void*, pVMSymbol); \
     int64_t   (*lookup_field_index)(void*, pVMSymbol); \
     bool      (*add_instance_invokable)(void*, pVMObject); \
-    void      (*add_instance_primitive)(void*, pVMPrimitive); \
+    void      (*add_instance_primitive)(void*, pVMPrimitive, bool); \
     pVMSymbol (*get_instance_field_name)(void*, int64_t); \
     int64_t   (*get_number_of_instance_fields)(void*); \
     bool      (*has_primitives)(void*); \
@@ -93,6 +93,7 @@ pVMClass VMClass_new_num_fields(int64_t);
 pVMClass VMClass_assemble(class_generation_context*);
 void     VMClass_assemble_system_class(class_generation_context*, pVMClass);
 
+void     VMClass_init_primitive_map(void);
 
 #pragma mark vtable initialization
 

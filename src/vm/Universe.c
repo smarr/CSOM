@@ -573,9 +573,10 @@ pVMFrame Universe_new_frame(pVMFrame previous_frame, pVMMethod method, pVMFrame 
     // Compute the maximum number of stack locations (including arguments,
     // locals and extra buffer to support doesNotUnderstand) and set the number
     // of indexable fields accordingly
+    // + 3 for the use by #doesNotUnderstand and #escapedBlock
     int64_t length = SEND(method, get_number_of_arguments) +
                      SEND(method, get_number_of_locals) +
-                     SEND(method, get_maximum_number_of_stack_elements) + 2;
+                     SEND(method, get_maximum_number_of_stack_elements) + 3;
     
     // Allocate a new frame and set its class to be the frame class
     pVMFrame result = VMFrame_new(length, method, context, previous_frame);

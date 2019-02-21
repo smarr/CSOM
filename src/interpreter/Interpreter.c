@@ -100,11 +100,12 @@ static void send(pVMSymbol signature, pVMClass receiver_class) {
         pVMObject receiver = 
             SEND(_FRAME, get_stack_element, number_of_arguments - 1);
         
-        // Allocate an array with enough room to hold all arguments
-        pVMArray arguments_array = Universe_new_array(number_of_arguments);
+        // Allocate an array with enough room to hold all arguments, without receiver
+        pVMArray arguments_array = Universe_new_array(number_of_arguments - 1);
       
         // Remove all arguments and put them in the freshly allocated array
-        for(int i = number_of_arguments - 1; i >= 0; i--) {
+        // (except for the receiver, thus, -2)
+        for(int i = number_of_arguments - 2; i >= 0; i--) {
             pVMObject o = SEND(_FRAME, pop);
             SEND(arguments_array, set_indexable_field, i, o);
         }
@@ -112,6 +113,10 @@ static void send(pVMSymbol signature, pVMClass receiver_class) {
         // Send 'doesNotUnderstand:arguments:' to the receiver object
         pVMObject arguments[] =
             { (pVMObject)signature, (pVMObject)arguments_array };
+
+        // Pop the receiver
+        SEND(_FRAME, pop);
+
         SEND(receiver, send, doesNotUnderstand_sym, arguments, 2);
     }
 } 

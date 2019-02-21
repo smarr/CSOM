@@ -48,7 +48,6 @@ void _Symbol_equal(pVMObject object, pVMFrame frame) {
 
   pVMClass op1_class = SEND(op1, get_class);
 
-  pVMObject result;
   if (op1_class == symbol_class) {
     if ((pVMSymbol) op1 == op2) {
       SEND(frame, push, true_object);

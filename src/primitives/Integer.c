@@ -63,12 +63,6 @@ THE SOFTWARE.
 //
 
 
-static inline void _Integer__pushResult(pVMObject object, pVMFrame frame, 
-                              int64_t result) {
-    SEND(frame, push, (pVMObject)Universe_new_integer(result));
-}
-
-
 void _Integer__resendAsDouble(pVMObject object, const char* restrict operator,
     pVMInteger left, pVMDouble right
 ) {
@@ -102,7 +96,7 @@ void  _Integer_plus(pVMObject object, pVMFrame frame) {
     
     int64_t result = (int64_t)SEND(left, get_embedded_integer) + 
         (int64_t)SEND(right, get_embedded_integer);
-    _Integer__pushResult(object, frame, result);
+    SEND(frame, push, (pVMObject)Universe_new_integer(result));
 }
 
 
@@ -117,7 +111,7 @@ void  _Integer_minus(pVMObject object, pVMFrame frame) {
     
     int64_t result = (int64_t)SEND(left, get_embedded_integer) - 
                      (int64_t)SEND(right, get_embedded_integer);
-    _Integer__pushResult(object, frame, result);
+    SEND(frame, push, (pVMObject)Universe_new_integer(result));
 }
 
 
@@ -132,7 +126,7 @@ void  _Integer_star(pVMObject object, pVMFrame frame) {
     
     int64_t result = (int64_t)SEND(left, get_embedded_integer) * 
                      (int64_t)SEND(right, get_embedded_integer);
-    _Integer__pushResult(object, frame, result);   
+    SEND(frame, push, (pVMObject)Universe_new_integer(result));
 }
 
 
@@ -162,7 +156,7 @@ void  _Integer_slash(pVMObject object, pVMFrame frame) {
     
     int64_t result = (int64_t)SEND(left, get_embedded_integer) / 
                      (int64_t)SEND(right, get_embedded_integer);
-    _Integer__pushResult(object, frame, result);
+    SEND(frame, push, (pVMObject)Universe_new_integer(result));
 }
 
 
@@ -184,7 +178,7 @@ void  _Integer_percent(pVMObject object, pVMFrame frame) {
         result += r;
     }
     
-    _Integer__pushResult(object, frame, result);
+    SEND(frame, push, (pVMObject)Universe_new_integer(result));
 }
 
 
@@ -199,7 +193,7 @@ void  _Integer_and(pVMObject object, pVMFrame frame) {
     
     int64_t result = (int64_t)SEND(left, get_embedded_integer) & 
                     (int64_t)SEND(right, get_embedded_integer);
-    _Integer__pushResult(object, frame, result);
+    SEND(frame, push, (pVMObject)Universe_new_integer(result));
 }   
 
 
@@ -275,7 +269,7 @@ void  _Integer_sqrt(pVMObject object, pVMFrame frame) {
     double result = sqrt((double)SEND(self, get_embedded_integer));
     
     if (result == rint(result))
-        _Integer__pushResult(object, frame, result);
+        SEND(frame, push, (pVMObject)Universe_new_integer(result));
     else
         SEND(frame, push, (pVMObject) Universe_new_double(result));
 }
@@ -296,12 +290,12 @@ void  _Integer_rem_(pVMObject object, pVMFrame frame) {
 
   pVMInteger right = (pVMInteger)rightObj;
 
-  int32_t r = SEND((pVMInteger)right, get_embedded_integer);
-  int32_t l = SEND(left, get_embedded_integer);
+  int64_t r = SEND((pVMInteger)right, get_embedded_integer);
+  int64_t l = SEND(left, get_embedded_integer);
 
-  int32_t result = l - (l / r) * r;
+  int64_t result = l - (l / r) * r;
 
-  _Integer__pushResult(object, frame, result);
+  SEND(frame, push, (pVMObject)Universe_new_integer(result));
 }
 
 
@@ -313,12 +307,12 @@ void  _Integer_lessthanlessthan(pVMObject object, pVMFrame frame) {
 
   pVMInteger right = (pVMInteger)rightObj;
 
-  int32_t r = SEND((pVMInteger)right, get_embedded_integer);
-  int32_t l = SEND(left, get_embedded_integer);
+  int64_t r = SEND((pVMInteger)right, get_embedded_integer);
+  int64_t l = SEND(left, get_embedded_integer);
 
-  int32_t result = l << r;
+  int64_t result = l << r;
 
-  _Integer__pushResult(object, frame, result);
+  SEND(frame, push, (pVMObject)Universe_new_integer(result));
 }
 
 
@@ -330,12 +324,12 @@ void  _Integer_greaterthangreaterthangreaterthan(pVMObject object, pVMFrame fram
 
   pVMInteger right = (pVMInteger)rightObj;
 
-  int32_t r = SEND((pVMInteger)right, get_embedded_integer);
-  int32_t l = SEND(left, get_embedded_integer);
+  int64_t r = SEND((pVMInteger)right, get_embedded_integer);
+  int64_t l = SEND(left, get_embedded_integer);
 
-  int32_t result = l >> r;
+  int64_t result = l >> r;
 
-  _Integer__pushResult(object, frame, result);
+  SEND(frame, push, (pVMObject)Universe_new_integer(result));
 }
 
 
@@ -347,27 +341,26 @@ void  _Integer_bitXor_(pVMObject object, pVMFrame frame) {
 
   pVMInteger right = (pVMInteger)rightObj;
 
-  int32_t r = SEND((pVMInteger)right, get_embedded_integer);
-  int32_t l = SEND(left, get_embedded_integer);
+  int64_t r = SEND((pVMInteger)right, get_embedded_integer);
+  int64_t l = SEND(left, get_embedded_integer);
 
-  int32_t result = l ^ r;
+  int64_t result = l ^ r;
 
-  _Integer__pushResult(object, frame, result);
+  SEND(frame, push, (pVMObject)Universe_new_integer(result));
 }
 
 
 void  _Integer_as32BitSignedValue(pVMObject object, pVMFrame frame) {
-  // NO-OP, unoptimized version:
-  //  pVMInteger self = (pVMInteger)SEND(frame, pop);
-  //  int32_t result = (int32_t) (SEND(self, get_embedded_integer));
-  //  SEND(frame, push, (pVMObject)Universe_new_integer(result));
+    pVMInteger self = (pVMInteger)SEND(frame, pop);
+    int32_t result = (int32_t) (SEND(self, get_embedded_integer));
+    SEND(frame, push, (pVMObject)Universe_new_integer(result));
 }
 
 
 void  _Integer_as32BitUnsignedValue(pVMObject object, pVMFrame frame) {
-  pVMInteger self = (pVMInteger)SEND(frame, pop);
-  uint32_t result = (uint32_t) (SEND(self, get_embedded_integer));
-  _Integer__pushResult(object, frame, result);
+    pVMInteger self = (pVMInteger)SEND(frame, pop);
+    uint32_t result = (uint32_t) (SEND(self, get_embedded_integer));
+    SEND(frame, push, (pVMObject)Universe_new_integer(result));
 }
 
 

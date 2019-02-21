@@ -104,9 +104,9 @@ void  _String_primSubstringFrom_to_(pVMObject object, pVMFrame frame) {
     pVMString self = (pVMString)SEND(frame, pop);
     
     const char* string = SEND(self, get_chars);
-    int s = SEND(start, get_embedded_integer);
-    int e = SEND(end, get_embedded_integer);
-    int l = e - s + 1;
+    int64_t s = SEND(start, get_embedded_integer);
+    int64_t e = SEND(end, get_embedded_integer);
+    int64_t l = e - s + 1;
     
     char* result = (char*)internal_allocate(l + 1);
     strncpy(result, string + s - 1, l);

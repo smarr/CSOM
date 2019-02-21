@@ -83,11 +83,11 @@ void  _System_load_(pVMObject object, pVMFrame frame) {
 
 void  _System_exit_(pVMObject object, pVMFrame frame) {
     pVMInteger err = (pVMInteger)SEND(frame, pop);
-    int32_t err_no = SEND(err, get_embedded_integer);
+    int64_t err_no = SEND(err, get_embedded_integer);
 
-    if(err_no != ERR_SUCCESS)
+    if (err_no != ERR_SUCCESS)
         SEND(frame, print_stack_trace);    
-    Universe_exit(err_no);
+    Universe_exit((int32_t)err_no);
 }
 
 

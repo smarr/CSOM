@@ -166,7 +166,14 @@ void _Double_round(pVMObject object, pVMFrame frame) {
 void _Double_asInteger(pVMObject object, pVMFrame frame) {
   pVMDouble self = (pVMDouble)SEND(frame, pop);
   double dbl = SEND(self, get_embedded_double);
+#ifdef  __EMSCRIPTEN__
+  // TODO: remove this hack, seems like an emscripten limitation
+  //       the normal version bails out with an error about values
+  //       not being representable
+  SEND(frame, push, (pVMObject)Universe_new_integer((int32_t)dbl));
+#else
   SEND(frame, push, (pVMObject)Universe_new_integer((int64_t)dbl));
+#endif
 }
 
 

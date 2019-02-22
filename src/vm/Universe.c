@@ -554,7 +554,7 @@ pVMBlock Universe_new_block(pVMMethod method, pVMFrame context, int64_t argument
 
 pVMClass Universe_new_class(pVMClass class_of_class) {
     // Allocate a new class and set its class to be the given class class
-    int64_t num_fields = SEND(class_of_class, get_number_of_instance_fields);
+    intptr_t num_fields = SEND(class_of_class, get_number_of_instance_fields);
     pVMClass result;
     
     if(num_fields) //this is a normal class as class class

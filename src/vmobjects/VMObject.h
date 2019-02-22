@@ -45,7 +45,7 @@ VTABLE(VMObject) {
     void      (*set_class)(void*, pVMClass); \
     pVMSymbol (*get_field_name)(void*, int64_t); \
     int64_t   (*get_field_index)(void*, pVMSymbol); \
-    int64_t   (*get_number_of_fields)(void*); \
+    intptr_t  (*get_number_of_fields)(void*); \
     int64_t   (*get_default_number_of_fields)(void*); \
     void      (*send)(void*, pVMSymbol, pVMObject*, size_t); \
     pVMObject (*get_field)(void*, int64_t); \
@@ -81,7 +81,7 @@ struct _VMObject {
 #pragma mark class methods
 
 pVMObject VMObject_new(void);
-pVMObject VMObject_new_num_fields(size_t);
+pVMObject VMObject_new_num_fields(intptr_t);
 void      VMObject_assert(bool);
 
 #pragma mark vtable initialization

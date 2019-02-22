@@ -42,7 +42,7 @@ pVMInteger VMInteger_new(void) {
     if(result) {
         result->_vtable = VMInteger_vtable();
         gc_start_uninterruptable_allocation();
-        INIT(result, 0);
+        INIT(result, (int64_t) 0);
         gc_end_uninterruptable_allocation();
     }
     return result;
@@ -68,7 +68,7 @@ pVMInteger VMInteger_new_with(const int64_t integer) {
  */
 void _VMInteger_init(void* _self, ...) {
     pVMInteger self = (pVMInteger)_self;
-    SUPER(VMObject, self, init, 0);
+    SUPER(VMObject, self, init, (intptr_t) 0);
     
     va_list args; va_start(args, _self);
     self->embedded_integer = va_arg(args, int64_t);

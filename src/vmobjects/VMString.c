@@ -54,7 +54,7 @@ pVMString VMString_new(const char* restrict chars) {
  */
 void _VMString_init(void* _self, ...) {
     pVMString self = (pVMString)_self;
-    SUPER(VMObject, self, init, 0);
+    SUPER(VMObject, self, init, (intptr_t) 0);
     
     va_list args; 
     va_start(args, _self);

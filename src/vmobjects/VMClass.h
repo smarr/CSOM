@@ -88,7 +88,7 @@ struct _VMClass {
 
 
 pVMClass VMClass_new(void);
-pVMClass VMClass_new_num_fields(int64_t);
+pVMClass VMClass_new_num_fields(intptr_t);
 
 pVMClass VMClass_assemble(class_generation_context*);
 void     VMClass_assemble_system_class(class_generation_context*, pVMClass);

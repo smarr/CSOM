@@ -41,7 +41,7 @@ THE SOFTWARE.
 
 //forward decl
 void routine(pVMObject object, pVMFrame frame);
-pVMSymbol compute_signature_string(int argc);
+pVMSymbol compute_signature_string(int32_t argc);
 
 //
 //  Class Primitives (Starting with VMEvaluationPrimitive_) 
@@ -72,11 +72,11 @@ void _VMEvaluationPrimitive_init(void* _self, ...) {
 
     // Set the signature of this primitive
     va_list args; va_start(args, _self);
-        int fieldc = va_arg(args, int);
-        int argc = va_arg(args, int);
+        size_t fieldc = va_arg(args, size_t);
+        int64_t argc = va_arg(args, int64_t);
     va_end(args);
     
-    SUPER(VMPrimitive, self, init, fieldc, compute_signature_string(argc));
+    SUPER(VMPrimitive, self, init, fieldc, compute_signature_string((int32_t) argc));
 
     // set routine to the Evaluation routine
     SEND((pVMPrimitive)_self, set_routine, routine);
@@ -93,7 +93,7 @@ void _VMEvaluationPrimitive_free(void* _self) {
 }
 
 
-pVMSymbol compute_signature_string(int argc) {
+pVMSymbol compute_signature_string(int32_t argc) {
 #define VALUE_S "value"
 #define VALUE_LEN 5
 #define WITH_S    "with:"

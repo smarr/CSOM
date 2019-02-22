@@ -41,7 +41,7 @@ THE SOFTWARE.
 
 
 // number of fields helper
-static void set_number_of_fields(void* _self, int value);
+static void set_number_of_fields(void* _self, intptr_t value);
 
 
 //
@@ -60,7 +60,7 @@ pVMObject VMObject_new(void) {
 /**
  * Create a new VMObject with a specific number of fields
  */
-pVMObject VMObject_new_num_fields(size_t number_of_fields) {
+pVMObject VMObject_new_num_fields(intptr_t number_of_fields) {
     size_t object_stub_size = 
         sizeof(VMObject) - 
         sizeof(pVMObject) * NUMBER_OF_OBJECT_FIELDS;
@@ -85,7 +85,7 @@ void _VMObject_init(void* _self, ...) {
     
     va_list args;
     va_start(args, _self);
-    set_number_of_fields(self, va_arg(args, int));
+    set_number_of_fields(self, va_arg(args, intptr_t));
     va_end(args);
 }
 
@@ -143,7 +143,7 @@ int64_t _VMObject_get_field_index(void* _self, pVMSymbol name) {
 }
 
 
-int64_t _VMObject_get_number_of_fields(void* _self) {
+intptr_t _VMObject_get_number_of_fields(void* _self) {
     pVMObject self = (pVMObject)_self;
     // get the number of fields in this object
     return self->num_of_fields;
@@ -151,7 +151,7 @@ int64_t _VMObject_get_number_of_fields(void* _self) {
 
 
 // number of fields helper
-static void set_number_of_fields(void* _self, int value) {
+static void set_number_of_fields(void* _self, intptr_t value) {
     pVMObject self = (pVMObject)_self;
     self->num_of_fields = value;
     

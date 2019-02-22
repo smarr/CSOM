@@ -77,7 +77,7 @@ pVMClass VMClass_new(void) {
 /**
  * Create a new VMClass with a specific number of fields
  */
-pVMClass VMClass_new_num_fields(int64_t number_of_fields) {
+pVMClass VMClass_new_num_fields(intptr_t number_of_fields) {
     // calculate Class size without fields
     size_t class_stub_size = sizeof(VMClass) - 
                              sizeof(pVMObject) * 
@@ -163,7 +163,7 @@ void _VMClass_init(void* _self, ...) {
     pVMClass self = (pVMClass)_self;    
     va_list args;
     va_start(args, _self);
-    SUPER(VMObject, self, init, va_arg(args, int));
+    SUPER(VMObject, self, init, va_arg(args, intptr_t));
     va_end(args);
 }
 

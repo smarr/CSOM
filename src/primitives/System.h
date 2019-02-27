@@ -32,6 +32,7 @@ THE SOFTWARE.
 
 void _System_global_(pVMObject object, pVMFrame frame);
 void _System_global_put_(pVMObject object, pVMFrame frame);
+void _System_hasGlobal_(pVMObject object, pVMFrame frame);
 void _System_load_(pVMObject object, pVMFrame frame);
 void _System_exit_(pVMObject object, pVMFrame frame);
 void _System_printString_(pVMObject object, pVMFrame frame);

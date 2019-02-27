@@ -53,7 +53,7 @@ struct _VMEvaluationPrimitive {
 
 #pragma mark class methods
 
-pVMEvaluationPrimitive VMEvaluationPrimitive_new(int argc);
+pVMEvaluationPrimitive VMEvaluationPrimitive_new(int64_t argc);
 
 #pragma mark vtable initialization
 

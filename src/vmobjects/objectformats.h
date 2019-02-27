@@ -39,7 +39,6 @@ typedef struct _OOObject OOObject, *pOOObject;
         typedef struct _VMArray VMArray, *pVMArray;
             typedef struct _VMMethod VMMethod, *pVMMethod;
             typedef struct _VMFrame VMFrame, *pVMFrame;
-        typedef struct _VMBigInteger VMBigInteger, *pVMBigInteger;
         typedef struct _VMBlock VMBlock,  *pVMBlock;
         typedef struct _VMClass VMClass, *pVMClass;
         typedef struct _VMDouble VMDouble, *pVMDouble;
@@ -48,7 +47,7 @@ typedef struct _OOObject OOObject, *pOOObject;
             typedef struct _VMEvaluationPrimitive VMEvaluationPrimitive,
                 *pVMEvaluationPrimitive;
         typedef struct _VMString VMString, *pVMString;
-        typedef struct _VMSymbol VMSymbol, *pVMSymbol;
+            typedef struct _VMSymbol VMSymbol, *pVMSymbol;
         
         typedef struct _VMInvokable VMInvokable, *pVMInvokable;
 

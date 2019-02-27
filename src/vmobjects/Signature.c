@@ -41,7 +41,7 @@ int Signature_get_number_of_arguments(pVMSymbol sig) {
         int num_colons = 0;
         
         // search the str
-        for(int i = 0 ; i <= strlen(str); i++) 
+        for(int i = 0 ; i < strlen(str); i++) 
             if(str[i] == ':')
                 // additional colon found
                 num_colons++;

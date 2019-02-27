@@ -29,29 +29,27 @@ THE SOFTWARE.
 
 #include <misc/String.h>
 
-#include <vmobjects/VMObject.h>
+#include <vmobjects/VMString.h>
 
 #pragma mark VTable definition
 
 VTABLE(VMSymbol) {
 #define VMSYMBOL_VTABLE_FORMAT \
-    VMOBJECT_VTABLE_FORMAT; \
-    const char* (*get_plain_string)(void*); \
-    const char* (*get_chars)(void*)
+    VMSTRING_VTABLE_FORMAT; \
+    const char* (*get_plain_string)(void*)
     
     VMSYMBOL_VTABLE_FORMAT;
 };
 
 #pragma mark class definition
 
-#define SYMBOL_FORMAT \
-   VMOBJECT_FORMAT; \
-   char chars[0]
+#define VMSYMBOL_FORMAT \
+   VMSTRING_FORMAT
 
 
 struct _VMSymbol {
     VTABLE(VMSymbol)* _vtable;    
-    SYMBOL_FORMAT;
+    VMSYMBOL_FORMAT;
 };
 
 #pragma mark class methods

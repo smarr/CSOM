@@ -26,7 +26,7 @@ THE SOFTWARE.
  
 #include "Hashmap.h"
 
-#include "debug.h"
+#include <misc/debug.h>
 
 #include <memory/gc.h>
 
@@ -42,7 +42,7 @@ bool _HashmapElem_key_equal_to(void* _self, void* other) {
 }
 
 
-int32_t _HashmapElem_key_hash(void* _self) {
+int64_t _HashmapElem_key_hash(void* _self) {
     pHashmapElem self = (pHashmapElem)_self;
     return ((pOOObject)self->key)->hash;
 }
@@ -134,8 +134,8 @@ void _Hashmap_free(void* _self) {
 /**
  * Slot computation from hash value.
  */
-size_t hashf(pHashmap self, int32_t hashv) {
-    return (size_t)hashv % self->size;
+size_t hashf(pHashmap self, size_t hashv) {
+    return hashv % self->size;
 }
 
 
@@ -169,10 +169,10 @@ void* _Hashmap_get(void* _self, void* key) {
 //
 
 
-int nprimes = 303;
+size_t nprimes = 303;
 
 
-static int primes[] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47,
+static size_t primes[] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47,
     53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131,
     137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211,
     223, 227, 229, 233, 239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293,
@@ -202,7 +202,7 @@ static int primes[] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47,
  * return the next prime larger than or equal to k, or k itself if the array is
  * exhausted
  */
-int nextPrimeOrNumber(int k) {
+size_t nextPrimeOrNumber(size_t k) {
     for(int i = 0; i < nprimes; i++)
         if(primes[i] >= k)
             return primes[i];

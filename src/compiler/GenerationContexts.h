@@ -27,6 +27,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
 
+#include <vmobjects/VMArray.h>
 #include <vmobjects/VMSymbol.h>
 
 #include <misc/List.h>
@@ -68,7 +69,8 @@ struct _method_generation_context {
 
 void class_genc_init(class_generation_context* cgenc);
 void class_genc_release(class_generation_context* cgenc);
-
+void class_genc_set_instance_fields_of_super(class_generation_context* cgenc, pVMArray fields);
+void class_genc_set_class_fields_of_super(class_generation_context* cgenc, pVMArray fields);
 
 void    method_genc_init(method_generation_context* mgenc);
 void    method_genc_release(method_generation_context* mgenc);

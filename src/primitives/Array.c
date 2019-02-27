@@ -37,7 +37,7 @@ THE SOFTWARE.
 void _Array_at_(pVMObject object, pVMFrame frame) {
     pVMInteger index = (pVMInteger)SEND(frame, pop);
     pVMArray self = (pVMArray)SEND(frame, pop);
-    int i = SEND(index, get_embedded_integer);
+    int64_t i = SEND(index, get_embedded_integer);
     pVMObject elem = SEND((pVMArray)self, get_indexable_field, i - 1);
     SEND(frame, push, elem);
 }
@@ -47,7 +47,7 @@ void _Array_at_put_(pVMObject object, pVMFrame frame) {
     pVMObject value = SEND(frame, pop);
     pVMInteger index = (pVMInteger)SEND(frame, pop);
     pVMArray self = (pVMArray)SEND(frame, get_stack_element, 0);
-    int i = SEND(index, get_embedded_integer);
+    int64_t i = SEND(index, get_embedded_integer);
     SEND(self, set_indexable_field, i - 1,  value);
 }
 
@@ -63,6 +63,6 @@ void _Array_length(pVMObject object, pVMFrame frame) {
 void Array_new_(pVMObject object, pVMFrame frame) {
     pVMInteger length = (pVMInteger)SEND(frame, pop);
     pVMClass self __attribute__((unused)) = (pVMClass)SEND(frame, pop);        
-    int size = SEND(length, get_embedded_integer);
+    int64_t size = SEND(length, get_embedded_integer);
     SEND(frame, push, (pVMObject) Universe_new_array(size));
 }

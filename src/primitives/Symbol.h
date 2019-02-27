@@ -30,5 +30,6 @@ THE SOFTWARE.
 #include <vmobjects/OOObject.h>
 
 void  _Symbol_asString(pVMObject object, pVMFrame frame);
+void  _Symbol_equal(pVMObject object, pVMFrame frame);
 
 #endif // CORE_SYMBOL_H_

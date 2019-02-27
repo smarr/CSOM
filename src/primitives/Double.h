@@ -41,5 +41,10 @@ void  _Double_lessthan(pVMObject object, pVMFrame frame);
 void  _Double_asString(pVMObject object, pVMFrame frame);
 void  _Double_sqrt(pVMObject object, pVMFrame frame);
 void  _Double_rount(pVMObject object, pVMFrame frame);
+void  _Double_asInteger(pVMObject object, pVMFrame frame);
+void  _Double_cos(pVMObject object, pVMFrame frame);
+void  _Double_sin(pVMObject object, pVMFrame frame);
+
+void  Double_PositiveInfinity(pVMObject object, pVMFrame frame);
 
 #endif // CORE_DOUBLE_H_

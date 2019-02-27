@@ -122,7 +122,7 @@ void _Object_instVarAt_(pVMObject object, pVMFrame frame) {
     pVMInteger idx = (pVMInteger) SEND(frame, pop);
     pVMObject  self = SEND(frame, pop);
     
-    int32_t field_idx = SEND(idx, get_embedded_integer) - 1;
+    int64_t field_idx = SEND(idx, get_embedded_integer) - 1;
     pVMObject value   = SEND(self, get_field, field_idx);
     
     SEND(frame, push, value);
@@ -133,7 +133,7 @@ void _Object_instVarAt_put_(pVMObject object, pVMFrame frame) {
     pVMInteger idx   = (pVMInteger) SEND(frame, pop);
     pVMObject  self  = SEND(frame, get_stack_element, 0);
     
-    int32_t field_idx = SEND(idx, get_embedded_integer) - 1;
+    int64_t field_idx = SEND(idx, get_embedded_integer) - 1;
 
     
     SEND(self, set_field, field_idx, value);
@@ -143,7 +143,7 @@ void _Object_instVarNamed_(pVMObject object, pVMFrame frame) {
     pVMSymbol name = (pVMSymbol) SEND(frame, pop);
     pVMObject self = SEND(frame, pop);
     
-    int32_t field_idx = SEND(self, get_field_index, name);
+    int64_t field_idx = SEND(self, get_field_index, name);
     pVMObject value   = SEND(self, get_field, field_idx);
     
     SEND(frame, push, value);

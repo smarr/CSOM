@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
     int vm_argc = 0;    
     const char** vm_argv =
         Universe_handle_arguments(&vm_argc, argc, (const char**)argv);
-    Universe_initialize(vm_argc, (const char**)vm_argv);
+    Universe_start(vm_argc, (const char**)vm_argv);
     
     FREE_ARRAY_ELEMENTS((char**)vm_argv, vm_argc);  // the array itself is still part of argv, i.e., on the c-stack
     

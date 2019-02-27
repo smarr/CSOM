@@ -187,7 +187,7 @@ pString _String_concatChar(void* _self, char other) {
 }
 
 
-int _String_indexOf(void* _self, pString pattern) {
+intptr_t _String_indexOf(void* _self, pString pattern) {
     pString self = (pString)_self;
     char* pos = strstr(self->chars, pattern->chars);
     if(pos >= self->chars)
@@ -198,7 +198,7 @@ int _String_indexOf(void* _self, pString pattern) {
 }
 
 
-int _String_indexOfChar(void* _self, char pattern) {
+intptr_t _String_indexOfChar(void* _self, char pattern) {
     pString self = (pString)_self;
     char* pos = strchr(self->chars, pattern);
     if(pos >= self->chars)
@@ -209,7 +209,7 @@ int _String_indexOfChar(void* _self, char pattern) {
 }
 
 
-int _String_lastIndexOfChar(void* _self, char pattern) {
+intptr_t _String_lastIndexOfChar(void* _self, char pattern) {
     pString self = (pString)_self;
     char* pos = strrchr(self->chars, pattern);
     if(pos >= self->chars)
@@ -244,13 +244,7 @@ pString _String_substring(void* _self, size_t start, size_t end) {
 
 pVMInteger _String_toInteger(void* _self) {
     pString self = (pString)_self;
-    return Universe_new_integer((int32_t)strtol(self->chars, NULL, 10));
-}
-
-
-pVMBigInteger _String_toBigInteger(void* _self) {
-    pString self = (pString)_self;
-    return Universe_new_biginteger((int64_t)strtoll(self->chars, NULL, 10));
+    return Universe_new_integer((int64_t)strtoll(self->chars, NULL, 10));
 }
 
 
@@ -321,7 +315,6 @@ VTABLE(String)* String_vtable(void) {
         _String_vtable.charAt          = METHOD(String, charAt);
         _String_vtable.substring       = METHOD(String, substring);
         _String_vtable.toInteger       = METHOD(String, toInteger);
-        _String_vtable.toBigInteger    = METHOD(String, toBigInteger);
         _String_vtable.toDouble        = METHOD(String, toDouble);
         _String_vtable.tokenize        = METHOD(String, tokenize);
         

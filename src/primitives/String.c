@@ -67,6 +67,10 @@ void  _String_asSymbol(pVMObject object, pVMFrame frame) {
 
 void  _String_hashcode(pVMObject object, pVMFrame frame) {
     pVMString self = (pVMString)SEND(frame, pop);
+    if (self->hash == 0) {
+        self->hash = string_hash(self->chars);
+    }
+
     SEND(frame, push, (pVMObject)Universe_new_integer(self->hash));    
 }
 
@@ -81,8 +85,9 @@ void  _String_length(pVMObject object, pVMFrame frame) {
 void  _String_equal(pVMObject object, pVMFrame frame) {
     pVMObject op1 = SEND(frame, pop);
     pVMString op2 = (pVMString)SEND(frame, pop);
-    
-    if((SEND(op1, get_class) == string_class)) {
+
+    pVMClass op1_class = SEND(op1, get_class);
+    if((op1_class == string_class) || op1_class == symbol_class) {
         if(strcmp(SEND(op2, get_chars), SEND((pVMString)op1, get_chars)) == 0) {
             SEND(frame, push, true_object);
             return;
@@ -99,9 +104,9 @@ void  _String_primSubstringFrom_to_(pVMObject object, pVMFrame frame) {
     pVMString self = (pVMString)SEND(frame, pop);
     
     const char* string = SEND(self, get_chars);
-    int s = SEND(start, get_embedded_integer);
-    int e = SEND(end, get_embedded_integer);
-    int l = e - s + 1;
+    int64_t s = SEND(start, get_embedded_integer);
+    int64_t e = SEND(end, get_embedded_integer);
+    int64_t l = e - s + 1;
     
     char* result = (char*)internal_allocate(l + 1);
     strncpy(result, string + s - 1, l);

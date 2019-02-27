@@ -72,7 +72,7 @@ static void pop_frame_and_push_result(pVMObject result) {
     // of arguments
     pVMFrame prev_frame = pop_frame();
     pVMMethod method = SEND(prev_frame, get_method);
-    int number_of_arguments = SEND(method, get_number_of_arguments);
+    int64_t number_of_arguments = SEND(method, get_number_of_arguments);
         
     // Pop the arguments
     for(int i = 0; i < number_of_arguments; i++)
@@ -100,11 +100,12 @@ static void send(pVMSymbol signature, pVMClass receiver_class) {
         pVMObject receiver = 
             SEND(_FRAME, get_stack_element, number_of_arguments - 1);
         
-        // Allocate an array with enough room to hold all arguments
-        pVMArray arguments_array = Universe_new_array(number_of_arguments);
+        // Allocate an array with enough room to hold all arguments, without receiver
+        pVMArray arguments_array = Universe_new_array(number_of_arguments - 1);
       
         // Remove all arguments and put them in the freshly allocated array
-        for(int i = number_of_arguments - 1; i >= 0; i--) {
+        // (except for the receiver, thus, -2)
+        for(int i = number_of_arguments - 2; i >= 0; i--) {
             pVMObject o = SEND(_FRAME, pop);
             SEND(arguments_array, set_indexable_field, i, o);
         }
@@ -112,6 +113,10 @@ static void send(pVMSymbol signature, pVMClass receiver_class) {
         // Send 'doesNotUnderstand:arguments:' to the receiver object
         pVMObject arguments[] =
             { (pVMObject)signature, (pVMObject)arguments_array };
+
+        // Pop the receiver
+        SEND(_FRAME, pop);
+
         SEND(receiver, send, doesNotUnderstand_sym, arguments, 2);
     }
 } 
@@ -125,7 +130,7 @@ static void do_dup(void) {
 }
 
 
-static void do_push_local(int bytecode_index) {
+static void do_push_local(size_t bytecode_index) {
     // Handle the push local bytecode
     pVMMethod method = _METHOD;
     uint8_t bc1 = SEND(method, get_bytecode, bytecode_index + 1);
@@ -137,7 +142,7 @@ static void do_push_local(int bytecode_index) {
 }
 
 
-static void do_push_argument(int bytecode_index) {
+static void do_push_argument(size_t bytecode_index) {
     // Handle the push argument bytecode
     pVMMethod method = _METHOD;
     uint8_t bc1 = SEND(method, get_bytecode, bytecode_index + 1);
@@ -149,7 +154,7 @@ static void do_push_argument(int bytecode_index) {
 }
 
 
-static void do_push_field(int bytecode_index) {
+static void do_push_field(size_t bytecode_index) {
     pVMMethod method = _METHOD;
     // Handle the push field bytecode
     pVMSymbol field_name =
@@ -157,7 +162,7 @@ static void do_push_field(int bytecode_index) {
     
     // Get the field index from the field name
     pVMObject self = _SELF;
-    int field_index = SEND(self, get_field_index, field_name);
+    int64_t field_index = SEND(self, get_field_index, field_name);
     
     pVMObject o = SEND(self, get_field, field_index);
     // Push the field with the computed index onto the stack
@@ -165,13 +170,13 @@ static void do_push_field(int bytecode_index) {
 }
 
 
-static void do_push_block(int bytecode_index) {
+static void do_push_block(size_t bytecode_index) {
     pVMMethod method = _METHOD;
     // Handle the push block bytecode
     pVMMethod block_method = (pVMMethod)SEND(method, 
                                               get_constant, bytecode_index);
         
-    int number_of_arguments = SEND(block_method, get_number_of_arguments);
+    int64_t number_of_arguments = SEND(block_method, get_number_of_arguments);
     // Push a new block with the current get_frame() as context onto the stack
     SEND(_FRAME, push,
          (pVMObject) Universe_new_block(block_method,
@@ -180,7 +185,7 @@ static void do_push_block(int bytecode_index) {
 }
 
 
-static void do_push_constant(int bytecode_index) {
+static void do_push_constant(size_t bytecode_index) {
     pVMMethod method = _METHOD;
     
     // Handle the push constant bytecode
@@ -189,7 +194,7 @@ static void do_push_constant(int bytecode_index) {
 }
 
 
-static void do_push_global(int bytecode_index) {
+static void do_push_global(size_t bytecode_index) {
     pVMMethod method = _METHOD;
     // Handle the push global bytecode
     pVMSymbol global_name = (pVMSymbol)SEND(method,
@@ -216,7 +221,7 @@ static void do_pop(void) {
 }
 
 
-static void do_pop_local(int bytecode_index) {
+static void do_pop_local(size_t bytecode_index) {
     pVMMethod method = _METHOD;
     // Handle the pop local bytecode
     uint8_t bc1 = SEND(method, get_bytecode, bytecode_index + 1);
@@ -228,7 +233,7 @@ static void do_pop_local(int bytecode_index) {
 }
 
 
-static void do_pop_argument(int bytecode_index) {
+static void do_pop_argument(size_t bytecode_index) {
     pVMMethod method = _METHOD;
     // Handle the pop argument bytecode
     uint8_t bc1 = SEND(method, get_bytecode, bytecode_index + 1);
@@ -239,7 +244,7 @@ static void do_pop_argument(int bytecode_index) {
 }
 
 
-static void do_pop_field(int bytecode_index) {
+static void do_pop_field(size_t bytecode_index) {
     pVMMethod method = _METHOD;
     // Handle the pop field bytecode
     pVMSymbol field_name = (pVMSymbol)SEND(method, 
@@ -247,7 +252,7 @@ static void do_pop_field(int bytecode_index) {
                 
     // Get the field index from the field name
     pVMObject self = _SELF;
-    int field_index = SEND(self, get_field_index, field_name);
+    int64_t field_index = SEND(self, get_field_index, field_name);
     
     // Set the field with the computed index to the value popped from the stack
     pVMObject o = SEND(_FRAME, pop);
@@ -255,7 +260,7 @@ static void do_pop_field(int bytecode_index) {
 }
 
 
-static void do_send(int bytecode_index) {
+static void do_send(size_t bytecode_index) {
     pVMMethod method = _METHOD;
     // Handle the send bytecode
     pVMSymbol signature = (pVMSymbol)SEND(method, 
@@ -273,7 +278,7 @@ static void do_send(int bytecode_index) {
 }
 
 
-static void do_super_send(int bytecode_index) {
+static void do_super_send(size_t bytecode_index) {
     pVMMethod method = _METHOD;
     // Handle the super send bytecode
     pVMSymbol signature = (pVMSymbol)SEND(method, 
@@ -341,17 +346,31 @@ static void do_return_non_local() {
         // acutally sent the 'value' message.
         pVMBlock block = (pVMBlock)SEND(_FRAME, get_argument, 0, 0);
         pVMFrame prev_frame = SEND(_FRAME, get_previous_frame);
-        pVMFrame outer_context =SEND(prev_frame, get_outer_context);
+        pVMFrame outer_context = SEND(prev_frame, get_outer_context);
         pVMObject sender = SEND(outer_context, get_argument, 0, 0);
         pVMObject arguments[] = { (pVMObject)block };
 
         // pop the frame of the currently executing block...
         pop_frame();
 
-        // ... and execute the escapedBlock message instead
-       SEND(sender, send, escapedBlock_sym, arguments, 1);
+        // pop old arguments from stack
+        pVMMethod method = SEND(frame, get_method);
+        int64_t num_args = SEND(method, get_number_of_arguments);
+        for (size_t i = 0; i < num_args; i++) {
+            SEND(frame, pop);
+        }
 
-       return;
+        // check if current frame is big enough for this unplanned send
+        // #escapeBlock: needs 2 slots, one for self, and one for the block
+        int64_t max_slots = SEND(frame, get_number_of_indexable_fields);
+        int64_t remaining_slots = max_slots - frame->stack_pointer;
+        if (remaining_slots < 2) {
+            Universe_error_exit("Tried to trigger #escapeBlock:, but don't have sufficient stack space");
+        }
+
+        // ... and execute the escapedBlock message instead
+        SEND(sender, send, escapedBlock_sym, arguments, 1);
+        return;
     }
 
     // Unwind the frames
@@ -374,7 +393,7 @@ void Interpreter_start(void) {
     // iterate over the bytecodes
     while(true) {
         // get the current bytecode index
-        int bytecode_index = SEND(_FRAME, get_bytecode_index);
+        size_t bytecode_index = SEND(_FRAME, get_bytecode_index);
         // get the current bytecode
         pVMMethod method = Interpreter_get_method();
         uint8_t bytecode = SEND(method, get_bytecode, bytecode_index);
@@ -386,7 +405,7 @@ void Interpreter_start(void) {
             Disassembler_dump_bytecode(_FRAME, method, bytecode_index);
         
         // compute the next bytecode index
-        int next_bytecode_index = bytecode_index + bytecode_length;
+        size_t next_bytecode_index = bytecode_index + bytecode_length;
         // update the bytecode index of the frame
         SEND(_FRAME, set_bytecode_index, next_bytecode_index);
         

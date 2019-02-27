@@ -41,6 +41,13 @@ void  _Integer_lessthan(pVMObject object, pVMFrame frame);
 void  _Integer_asString(pVMObject object, pVMFrame frame);
 void  _Integer_sqrt(pVMObject object, pVMFrame frame);
 void  _Integer_atRandom(pVMObject object, pVMFrame frame);
+void  _Integer_rem_(pVMObject object, pVMFrame frame);
+void  _Integer_lessthanlessthan(pVMObject object, pVMFrame frame);
+void  _Integer_greaterthangreaterthangreaterthan(pVMObject object, pVMFrame frame);
+void  _Integer_bitXor_(pVMObject object, pVMFrame frame);
+void  _Integer_as32BitSignedValue(pVMObject object, pVMFrame frame);
+void  _Integer_as32BitUnsignedValue(pVMObject object, pVMFrame frame);
+void  _Integer_equalequal(pVMObject object, pVMFrame frame);
 
 void Integer_fromString_(pVMObject object, pVMFrame frame);
 

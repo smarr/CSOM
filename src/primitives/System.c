@@ -55,7 +55,19 @@ void  _System_global_(pVMObject object, pVMFrame frame) {
 void  _System_global_put_(pVMObject object, pVMFrame frame) {
     pVMObject value = SEND(frame, pop);
     pVMSymbol arg = (pVMSymbol)SEND(frame, pop);
-    Universe_set_global(arg, value);    
+    Universe_set_global(arg, value);
+}
+
+
+void _System_hasGlobal_(pVMObject object, pVMFrame frame) {
+    pVMSymbol arg = (pVMSymbol)SEND(frame, pop);
+    SEND(frame, pop);
+
+  if (Universe_has_global(arg)) {
+    SEND(frame, push, true_object);
+  } else {
+    SEND(frame, push, false_object);
+  }
 }
 
 
@@ -71,11 +83,11 @@ void  _System_load_(pVMObject object, pVMFrame frame) {
 
 void  _System_exit_(pVMObject object, pVMFrame frame) {
     pVMInteger err = (pVMInteger)SEND(frame, pop);
-    int32_t err_no = SEND(err, get_embedded_integer);
+    int64_t err_no = SEND(err, get_embedded_integer);
 
-    if(err_no != ERR_SUCCESS)
+    if (err_no != ERR_SUCCESS)
         SEND(frame, print_stack_trace);    
-    Universe_exit(err_no);
+    Universe_exit((int32_t)err_no);
 }
 
 
@@ -107,7 +119,7 @@ void  _System_ticks(pVMObject object, pVMFrame frame) {
     
     int64_t ticks = ((now.tv_sec - _System_start_time.tv_sec) * 1000 * 1000) + //seconds
                     ((now.tv_usec - _System_start_time.tv_usec)); //µseconds
-    SEND(frame, push, (pVMObject)Universe_new_biginteger(ticks));
+    SEND(frame, push, (pVMObject)Universe_new_integer(ticks));
 }
 
 

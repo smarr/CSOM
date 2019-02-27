@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include <vmobjects/VMObject.h>
 #include <vmobjects/VMFrame.h>
 #include <vmobjects/VMClass.h>
+#include <vmobjects/VMSymbol.h>
 
 #include <vm/Universe.h>
 
@@ -36,4 +37,28 @@ THE SOFTWARE.
 void  _Class_new(pVMObject object, pVMFrame frame) {
     pVMClass self = (pVMClass)SEND(frame, pop);
     SEND(frame, push, Universe_new_instance(self));
+}
+
+void  _Class_name(pVMObject object, pVMFrame frame) {
+  pVMClass self = (pVMClass)SEND(frame, pop);
+  pVMSymbol name = (pVMSymbol)SEND(self, get_name);
+  SEND(frame, push, (pVMObject)name);
+}
+
+void  _Class_superclass(pVMObject object, pVMFrame frame) {
+  pVMClass self = (pVMClass)SEND(frame, pop);
+  pVMClass super_class = (pVMClass)SEND(self, get_super_class);
+  SEND(frame, push, (pVMObject)super_class);
+}
+
+void  _Class_fields(pVMObject object, pVMFrame frame) {
+  pVMClass self = (pVMClass)SEND(frame, pop);
+  pVMArray fields = (pVMArray)SEND(self, get_instance_fields);
+  SEND(frame, push, (pVMObject)fields);
+}
+
+void  _Class_methods(pVMObject object, pVMFrame frame) {
+  pVMClass self = (pVMClass)SEND(frame, pop);
+  pVMArray methods = (pVMArray)SEND(self, get_instance_invokables);
+  SEND(frame, push, (pVMObject)methods);
 }

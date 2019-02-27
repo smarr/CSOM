@@ -51,17 +51,17 @@ VTABLE(VMClass) {
     void      (*set_instance_fields)(void*, pVMArray); \
     pVMArray  (*get_instance_invokables)(void*); \
     void      (*set_instance_invokables)(void*, pVMArray); \
-    int       (*get_number_of_instance_invokables)(void*); \
-    pVMObject (*get_instance_invokable)(void*, int); \
-    void      (*set_instance_invokable)(void*, int, pVMObject); \
+    int64_t   (*get_number_of_instance_invokables)(void*); \
+    pVMObject (*get_instance_invokable)(void*, int64_t); \
+    void      (*set_instance_invokable)(void*, int64_t, pVMObject); \
     pVMObject (*lookup_invokable)(void*, pVMSymbol); \
-    int       (*lookup_field_index)(void*, pVMSymbol); \
+    int64_t   (*lookup_field_index)(void*, pVMSymbol); \
     bool      (*add_instance_invokable)(void*, pVMObject); \
-    void      (*add_instance_primitive)(void*, pVMPrimitive); \
-    pVMSymbol (*get_instance_field_name)(void*, int); \
-    int       (*get_number_of_instance_fields)(void*); \
+    void      (*add_instance_primitive)(void*, pVMPrimitive, bool); \
+    pVMSymbol (*get_instance_field_name)(void*, int64_t); \
+    int64_t   (*get_number_of_instance_fields)(void*); \
     bool      (*has_primitives)(void*); \
-    void      (*load_primitives)(void*,const pString*,int)
+    void      (*load_primitives)(void*,const pString*, size_t)
   
     VMCLASS_VTABLE_FORMAT;
 };
@@ -88,11 +88,12 @@ struct _VMClass {
 
 
 pVMClass VMClass_new(void);
-pVMClass VMClass_new_num_fields(int);
+pVMClass VMClass_new_num_fields(intptr_t);
 
 pVMClass VMClass_assemble(class_generation_context*);
 void     VMClass_assemble_system_class(class_generation_context*, pVMClass);
 
+void     VMClass_init_primitive_map(void);
 
 #pragma mark vtable initialization
 

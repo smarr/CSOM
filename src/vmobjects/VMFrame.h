@@ -55,22 +55,22 @@ VTABLE(VMFrame) {
     bool      (*is_bootstrap_frame)(void*); \
     pVMFrame  (*get_context)(void*); \
     bool      (*has_context)(void*); \
-    pVMFrame  (*get_context_level)(void*, int); \
+    pVMFrame  (*get_context_level)(void*, int64_t); \
     pVMFrame  (*get_outer_context)(void*); \
     pVMMethod (*get_method)(void*); \
     pVMObject (*pop)(void*); \
     void      (*push)(void*, pVMObject); \
     void      (*reset_stack_pointer)(void*); \
-    int       (*get_bytecode_index)(void*); \
-    void      (*set_bytecode_index)(void*, int); \
-    pVMObject (*get_stack_element)(void*, int); \
-    void      (*set_stack_element)(void*, int, pVMObject); \
-    pVMObject (*get_local)(void*, int, int); \
-    void      (*set_local)(void*, int, int, pVMObject); \
-    pVMObject (*get_argument)(void*, int, int); \
-    void      (*set_argument)(void*, int, int, pVMObject); \
+    size_t    (*get_bytecode_index)(void*); \
+    void      (*set_bytecode_index)(void*, size_t); \
+    pVMObject (*get_stack_element)(void*, size_t); \
+    void      (*set_stack_element)(void*, size_t, pVMObject); \
+    pVMObject (*get_local)(void*, size_t, size_t); \
+    void      (*set_local)(void*, size_t, size_t, pVMObject); \
+    pVMObject (*get_argument)(void*, size_t, size_t); \
+    void      (*set_argument)(void*, size_t, size_t, pVMObject); \
     void      (*print_stack_trace)(void*); \
-    int       (*argument_stack_index)(void* frame, int index); \
+    size_t    (*argument_stack_index)(void* frame, size_t index); \
     void      (*copy_arguments_from)(void* self, pVMFrame frame)
     
     VMFRAME_VTABLE_FORMAT;

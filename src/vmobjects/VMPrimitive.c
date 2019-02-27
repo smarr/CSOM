@@ -88,7 +88,7 @@ void _VMPrimitive_init(void* _self, ...) {
     va_list args; va_start(args, _self);
    
     // call "super" constructor
-    SUPER(VMObject, self, init, va_arg(args, int));
+    SUPER(VMObject, self, init, va_arg(args, size_t));
     
     //
     // Set the class of this primitive to be the universal primitive class

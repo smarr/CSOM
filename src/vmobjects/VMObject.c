@@ -41,7 +41,7 @@ THE SOFTWARE.
 
 
 // number of fields helper
-static void set_number_of_fields(void* _self, int value);
+static void set_number_of_fields(void* _self, intptr_t value);
 
 
 //
@@ -60,7 +60,7 @@ pVMObject VMObject_new(void) {
 /**
  * Create a new VMObject with a specific number of fields
  */
-pVMObject VMObject_new_num_fields(int number_of_fields) {
+pVMObject VMObject_new_num_fields(intptr_t number_of_fields) {
     size_t object_stub_size = 
         sizeof(VMObject) - 
         sizeof(pVMObject) * NUMBER_OF_OBJECT_FIELDS;
@@ -85,7 +85,7 @@ void _VMObject_init(void* _self, ...) {
     
     va_list args;
     va_start(args, _self);
-    set_number_of_fields(self, va_arg(args, int));
+    set_number_of_fields(self, va_arg(args, intptr_t));
     va_end(args);
 }
 
@@ -100,14 +100,14 @@ void _VMObject_free(void* _self) {
 //
 
 
-pVMObject _VMObject_get_field(void* _self, int index) {
+pVMObject _VMObject_get_field(void* _self, int64_t index) {
     pVMObject self = (pVMObject)_self;
     // get the field with the given index
     return self->fields[index];
 }
 
 
-void _VMObject_set_field(void* _self, int index, pVMObject value) {
+void _VMObject_set_field(void* _self, int64_t index, pVMObject value) {
     pVMObject self = (pVMObject)_self;
     // set the field with the given index to the given value
     self->fields[index] = value;
@@ -129,21 +129,21 @@ void _VMObject_set_class(void* _self, pVMClass value) {
 }
 
 
-pVMSymbol _VMObject_get_field_name(void* _self, int index) {
+pVMSymbol _VMObject_get_field_name(void* _self, int64_t index) {
     pVMObject self = (pVMObject)_self;
     // get the name of the field with the given index
     return SEND(self->class, get_instance_field_name, index);
 }
 
 
-int _VMObject_get_field_index(void* _self, pVMSymbol name) {
+int64_t _VMObject_get_field_index(void* _self, pVMSymbol name) {
     pVMObject self = (pVMObject)_self;
     // get the index for the field with the given name
     return SEND(self->class, lookup_field_index, name);
 }
 
 
-int _VMObject_get_number_of_fields(void* _self) {
+intptr_t _VMObject_get_number_of_fields(void* _self) {
     pVMObject self = (pVMObject)_self;
     // get the number of fields in this object
     return self->num_of_fields;
@@ -151,7 +151,7 @@ int _VMObject_get_number_of_fields(void* _self) {
 
 
 // number of fields helper
-static void set_number_of_fields(void* _self, int value) {
+static void set_number_of_fields(void* _self, intptr_t value) {
     pVMObject self = (pVMObject)_self;
     self->num_of_fields = value;
     
@@ -163,7 +163,7 @@ static void set_number_of_fields(void* _self, int value) {
 
 
 void _VMObject_send(void* _self, pVMSymbol selector, 
-                    pVMObject* arguments, int argc) {
+                    pVMObject* arguments, size_t argc) {
     pVMObject self = (pVMObject)_self;
     // push the receiver onto the stack
     pVMFrame frame = Interpreter_get_frame();

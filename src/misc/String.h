@@ -48,13 +48,12 @@ VTABLE(String) {
     pString       (*concat)(void*, pString other); \
     pString       (*concatChars)(void*, const char* restrict other); \
     pString       (*concatChar)(void*, char other); \
-    int           (*indexOf)(void*, pString pattern); \
-    int           (*indexOfChar)(void*, char pattern); \
-    int           (*lastIndexOfChar)(void*, char pattern); \
+    intptr_t      (*indexOf)(void*, pString pattern); \
+    intptr_t      (*indexOfChar)(void*, char pattern); \
+    intptr_t      (*lastIndexOfChar)(void*, char pattern); \
     int           (*charAt)(void*, size_t position); \
     pString       (*substring)(void*, size_t start, size_t end); \
     pVMInteger    (*toInteger)(void*); \
-    pVMBigInteger (*toBigInteger)(void*); \
     pVMDouble     (*toDouble)(void*); \
     pString*      (*tokenize)(void*, size_t* length, \
                               const char* restrict delimiters);
@@ -92,7 +91,7 @@ pString String_new_from(pString restrict string);
 #pragma mark vtable initialization
 
 
-VTABLE(String)* String_vtable();
+VTABLE(String)* String_vtable(void);
 
 
 #endif // STRING_H_

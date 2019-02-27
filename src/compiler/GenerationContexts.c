@@ -29,6 +29,8 @@ THE SOFTWARE.
 #include <misc/debug.h>
 
 #include <vmobjects/Signature.h>
+#include <vmobjects/VMArray.h>
+#include <vmobjects/VMSymbol.h>
 
 #include <interpreter/bytecodes.h>
 
@@ -56,6 +58,24 @@ void class_genc_release(class_generation_context* cgenc) {
     SEND(cgenc->instance_methods, free);
     SEND(cgenc->class_fields, free);
     SEND(cgenc->class_methods, free);
+}
+
+
+void class_genc_set_instance_fields_of_super(class_generation_context* cgenc, pVMArray fields) {
+  int64_t num = SEND(fields, get_number_of_indexable_fields);
+  for (int64_t i = 0; i < num; i ++) {
+    pVMSymbol field_name = (pVMSymbol)SEND(fields, get_indexable_field, i);
+    SEND(cgenc->instance_fields, add, field_name);
+  }
+}
+
+
+void class_genc_set_class_fields_of_super(class_generation_context* cgenc, pVMArray fields) {
+  int64_t num = SEND(fields, get_number_of_indexable_fields);
+  for (int64_t i = 0; i < num; i ++) {
+    pVMSymbol field_name = (pVMSymbol)SEND(fields, get_indexable_field, i);
+    SEND(cgenc->class_fields, add, field_name);
+  }
 }
 
 

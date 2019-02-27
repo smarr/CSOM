@@ -36,10 +36,11 @@ THE SOFTWARE.
 #include <vm/Universe.h>
 
 #include "GenerationContexts.h"
+#include "Lexer.h"
 
 
-void Parser_init(const FILE* fp);
-void Parser_init_string(const char* stream);
-void Parser_classdef(class_generation_context* cgenc);
+Lexer* Parser_init(const FILE* fp, const char* fname);
+Lexer* Parser_init_string(const char* stream);
+void Parser_classdef(Lexer* l, class_generation_context* cgenc);
 
 #endif // PARSER_H_

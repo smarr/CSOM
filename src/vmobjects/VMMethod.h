@@ -41,14 +41,14 @@ THE SOFTWARE.
 VTABLE(VMMethod) {
 #define VMMETHOD_VTABLE_FORMAT \
     VMARRAY_VTABLE_FORMAT; \
-    int       (*get_number_of_locals)(void*); \
-    int       (*get_maximum_number_of_stack_elements)(void*); \
+    int64_t   (*get_number_of_locals)(void*); \
+    int64_t   (*get_maximum_number_of_stack_elements)(void*); \
     void      (*set_holder_all)(void*, pVMClass); \
-    pVMObject (*get_constant)(void*, int); \
-    int       (*get_number_of_arguments)(void*); \
-    int       (*get_number_of_bytecodes)(void*); \
-    uint8_t   (*get_bytecode)(void*, int); \
-    void      (*set_bytecode)(void*, int, uint8_t); \
+    pVMObject (*get_constant)(void*, size_t); \
+    int64_t   (*get_number_of_arguments)(void*); \
+    int64_t   (*get_number_of_bytecodes)(void*); \
+    uint8_t   (*get_bytecode)(void*, size_t); \
+    void      (*set_bytecode)(void*, size_t, uint8_t); \
     void      (*invoke_method)(void*, pVMFrame)
 
     VMMETHOD_VTABLE_FORMAT;

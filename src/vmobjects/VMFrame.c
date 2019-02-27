@@ -122,7 +122,7 @@ bool _VMFrame_has_context(void* _self) {
 }
 
 
-pVMFrame _VMFrame_get_context_level(void* _self, int level) {
+pVMFrame _VMFrame_get_context_level(void* _self, int64_t level) {
     pVMFrame self = (pVMFrame)_self;
     pVMFrame current = self;
   
@@ -152,7 +152,7 @@ pVMMethod _VMFrame_get_method(void* _self) {
 
 pVMObject _VMFrame_pop(void* _self) {
     pVMFrame self = (pVMFrame)_self;
-    int sp = self->stack_pointer;
+    size_t sp = self->stack_pointer;
     self->stack_pointer = sp - 1;
     return SEND(self, get_indexable_field, sp);
 }
@@ -179,33 +179,33 @@ void _VMFrame_reset_stack_pointer(void* _self) {
 }
 
 
-int _VMFrame_get_bytecode_index(void* _self) {
+size_t _VMFrame_get_bytecode_index(void* _self) {
     pVMFrame self = (pVMFrame)_self;
     return self->bytecode_index;
 }
 
 
-void _VMFrame_set_bytecode_index(void* _self, int index) {
+void _VMFrame_set_bytecode_index(void* _self, size_t index) {
     pVMFrame self = (pVMFrame)_self;
     self->bytecode_index = index;
 }
 
 
-pVMObject _VMFrame_get_stack_element(void* _self, int index) {
+pVMObject _VMFrame_get_stack_element(void* _self, size_t index) {
     pVMFrame self = (pVMFrame)_self;
     size_t sp = self->stack_pointer;
     return SEND(self, get_indexable_field, sp - index);
 }
 
 
-void _VMFrame_set_stack_element(void* _self, int index, pVMObject value) {
+void _VMFrame_set_stack_element(void* _self, size_t index, pVMObject value) {
     pVMFrame self = (pVMFrame)_self;
     size_t sp = self->stack_pointer;
     SEND(self, set_indexable_field, sp - index, value);    
 }
 
 
-pVMObject _VMFrame_get_local(void* _self, int index, int context_level) {
+pVMObject _VMFrame_get_local(void* _self, size_t index, size_t context_level) {
     pVMFrame self = (pVMFrame)_self;
     pVMFrame context = SEND(self, get_context_level, context_level);
     size_t lo = context->local_offset;
@@ -213,7 +213,7 @@ pVMObject _VMFrame_get_local(void* _self, int index, int context_level) {
 }
 
 
-void _VMFrame_set_local(void* _self, int index, int context_level,
+void _VMFrame_set_local(void* _self, size_t index, size_t context_level,
     pVMObject value
 ) {
     pVMFrame self = (pVMFrame)_self;
@@ -223,14 +223,14 @@ void _VMFrame_set_local(void* _self, int index, int context_level,
 }
 
 
-int _VMFrame_argument_stack_index(void* _self, int index) {
+size_t _VMFrame_argument_stack_index(void* _self, size_t index) {
     pVMFrame self = (pVMFrame)_self;
     pVMMethod meth = SEND(self, get_method);
     return SEND(meth, get_number_of_arguments) - index - 1;
 }
 
 
-pVMObject _VMFrame_get_argument(void* _self, int index, int context_level) {
+pVMObject _VMFrame_get_argument(void* _self, size_t index, size_t context_level) {
     pVMFrame self = (pVMFrame)_self;
     // get the context
     pVMFrame context = SEND(self, get_context_level, context_level);
@@ -240,7 +240,7 @@ pVMObject _VMFrame_get_argument(void* _self, int index, int context_level) {
 }
 
 
-void _VMFrame_set_argument(void* _self, int index, int context_level,
+void _VMFrame_set_argument(void* _self, size_t index, size_t context_level,
     pVMObject value
 ) {
     pVMFrame self = (pVMFrame)_self;
@@ -258,8 +258,8 @@ void _VMFrame_copy_arguments_from(void* _self, pVMFrame frame) {
     // - arguments are at the top of the stack of frame.
     // - copy them into the argument area of the current frame
     pVMMethod meth = SEND(self, get_method);
-    int num_args = SEND(meth, get_number_of_arguments);
-    for(int i=0; i < num_args; ++i) {
+    int64_t num_args = SEND(meth, get_number_of_arguments);
+    for(size_t i=0; i < num_args; ++i) {
         pVMObject stackElem = SEND(frame, get_stack_element, num_args - 1 - i);
         SEND(self, set_indexable_field, i, stackElem);
     }
@@ -280,7 +280,7 @@ void _VMFrame_print_stack_trace(void* _self) {
     pVMSymbol holderSym = SEND(holder, get_name);
     
     // sending bytecode
-    int bc_idx = self->bytecode_index;
+    size_t bc_idx = self->bytecode_index;
     if(!SEND(self, is_bootstrap_frame)) 
         bc_idx -= 2; // length of SEND / SUPER_SEND
     uint8_t bc = SEND(method, get_bytecode, bc_idx);

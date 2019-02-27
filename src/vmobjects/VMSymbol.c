@@ -55,14 +55,12 @@ pVMSymbol VMSymbol_new(const char* restrict string) {
  * Initialize a VMSymbol
  */
 void _VMSymbol_init(void* _self, ...) {
-    pVMSymbol self = (pVMSymbol)_self;    
-    SUPER(VMObject, self, init, 0);
-    
     va_list args;
     va_start(args, _self);
-    const char* embed = va_arg(args, char*);
+
+    SUPER(VMString, _self, init, va_arg(args, char*));
+
     va_end(args);
-    strcpy(self->chars, embed);
 }
 
 
@@ -128,7 +126,7 @@ const char* _VMSymbol_get_plain_string(void* _self) {
                 strcat(plain_string, "_");
                 break;
             default: {
-                int l = strlen(plain_string);
+                int64_t l = strlen(plain_string);
                 plain_string[l] = self->chars[i];
                 plain_string[l + 1] = '\0';
                 break;
@@ -138,11 +136,6 @@ const char* _VMSymbol_get_plain_string(void* _self) {
     char* result = (char*)internal_allocate(strlen(plain_string) + 1);
     strcpy(result, plain_string);
     return (const char*)result;
-}
-
-
-const char* _VMSymbol_get_chars(void* _self) {
-    return (const char*)(((pVMSymbol)_self)->chars);
 }
 
 
@@ -157,10 +150,9 @@ bool VMSymbol_vtable_inited = false;
 
 VTABLE(VMSymbol)* VMSymbol_vtable(void) {
     if(! VMSymbol_vtable_inited) {
-        *((VTABLE(VMObject)*)&_VMSymbol_vtable) = *VMObject_vtable();
+        *((VTABLE(VMString)*)&_VMSymbol_vtable) = *VMString_vtable();
         _VMSymbol_vtable.init             = METHOD(VMSymbol, init);        
         _VMSymbol_vtable.get_plain_string = METHOD(VMSymbol, get_plain_string);
-        _VMSymbol_vtable.get_chars        = METHOD(VMSymbol, get_chars);
 
         VMSymbol_vtable_inited = true;
     }

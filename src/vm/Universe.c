@@ -43,7 +43,6 @@ THE SOFTWARE.
 #include <vmobjects/VMArray.h>
 #include <vmobjects/VMInvokable.h>
 #include <vmobjects/VMBlock.h>
-#include <vmobjects/VMBigInteger.h>
 #include <vmobjects/VMInteger.h>
 #include <vmobjects/VMDouble.h>
 #include <vmobjects/VMString.h>
@@ -69,11 +68,9 @@ pVMClass metaclass_class;
 
 pVMClass nil_class;
 pVMClass integer_class;
-pVMClass biginteger_class;
 pVMClass array_class;
 pVMClass method_class;
 pVMClass symbol_class;
-pVMClass frame_class;
 pVMClass primitive_class;
 pVMClass string_class;
 pVMClass system_class;
@@ -106,7 +103,7 @@ static int  get_path_class_ext(pString **tokens, pString arg);
 
 //file-local variables
 static pString* class_path=NULL;
-static int cp_count=0;
+static size_t cp_count=0;
 static pHashmap globals_dictionary=NULL;
 
 ///////////////////////////////////
@@ -116,9 +113,9 @@ static int get_path_class_ext(pString **tokens, pString arg) {
 #define EXT_TOKENS 2    
 
     // index last path/file separator
-    int fp_index = SEND(arg, lastIndexOfChar, *file_separator);
+    intptr_t fp_index = SEND(arg, lastIndexOfChar, *file_separator);
     // index of filename/suffix separator
-    int ssep_index = SEND(arg, lastIndexOfChar, '.');
+    intptr_t ssep_index = SEND(arg, lastIndexOfChar, '.');
     
     if(fp_index < 0) { //no new path
         return ERR_FAIL;    
@@ -139,7 +136,6 @@ static int get_path_class_ext(pString **tokens, pString arg) {
     (*tokens)[1] = SEND(arg, substring, fp_index + 1, ssep_index);
     
     return ERR_SUCCESS;
-    
 }
 
 
@@ -180,7 +176,6 @@ static int add_class_path(const pString restrict cp) {
     class_path[cp_count++] = cp;
     
     return ERR_SUCCESS;    
-    
 }
 
 
@@ -220,6 +215,11 @@ void Universe_error_exit(const char* restrict err) {
 }
 
 
+void Universe_set_classpath(const char* classpath) {
+    setup_class_path(String_new(classpath));
+}
+
+
 const char** Universe_handle_arguments(
     int* vm_argc, int argc, const char** argv
 ) {
@@ -238,7 +238,7 @@ const char** Universe_handle_arguments(
                 print_usage_and_exit(argv[0]);
             
             // setup & skip class path
-            setup_class_path(String_new(argv[++i]));
+            Universe_set_classpath(argv[++i]);
 
         } else if(strcmp(argv[i], "-d") == 0) { // Dump  bytecode
             dump_bytecodes++;
@@ -288,21 +288,23 @@ const char** Universe_handle_arguments(
 }
 
 
-void Universe_initialize(int argc, const char** argv) {
+static pVMObject initialize_object_system() {
     /*
-     * affected globals:
      * affected file globals: globals_dictionary
      */
+    VMClass_init_primitive_map();
 
     // setup the Hashmap for all globals
     globals_dictionary = Hashmap_new();
     // init the Symboltable
     Symbol_table_init();
+
     ///////////////////////////////////
     //     allocate the nil object
     nil_object = VMObject_new();
+
     // allocate the Metaclass classes
-    metaclass_class = Universe_new_metaclass_class(); 
+    metaclass_class = Universe_new_metaclass_class();
     // allocate the rest of the system classes
     object_class    = Universe_new_system_class();
     nil_class       = Universe_new_system_class();
@@ -311,15 +313,13 @@ void Universe_initialize(int argc, const char** argv) {
     symbol_class    = Universe_new_system_class();
     method_class    = Universe_new_system_class();
     integer_class   = Universe_new_system_class();
-    biginteger_class= Universe_new_system_class();
-    frame_class     = Universe_new_system_class();
     primitive_class = Universe_new_system_class();
     string_class    = Universe_new_system_class();
     double_class    = Universe_new_system_class();
-        
+
     // setup the class reference for the nil object
     SEND(nil_object, set_class, nil_class);
-        
+
     // initialize the system classes.
     Universe_initialize_system_class(object_class, NULL, "Object");
     Universe_initialize_system_class(class_class, object_class, "Class");
@@ -327,16 +327,12 @@ void Universe_initialize(int argc, const char** argv) {
     Universe_initialize_system_class(nil_class, object_class, "Nil");
     Universe_initialize_system_class(array_class, object_class, "Array");
     Universe_initialize_system_class(method_class, array_class, "Method");
-    Universe_initialize_system_class(symbol_class, object_class, "Symbol");
     Universe_initialize_system_class(integer_class, object_class, "Integer");
-    Universe_initialize_system_class(biginteger_class, object_class,
-                                     "BigInteger");
-    Universe_initialize_system_class(frame_class, array_class, "Frame");
-    Universe_initialize_system_class(primitive_class, object_class,
-                                     "Primitive");
+    Universe_initialize_system_class(primitive_class, object_class, "Primitive");
     Universe_initialize_system_class(string_class, object_class, "String");
+    Universe_initialize_system_class(symbol_class, string_class, "Symbol");
     Universe_initialize_system_class(double_class, object_class, "Double");
-    
+
     // load methods and fields into the system classes
     Universe_load_system_class(object_class);
     Universe_load_system_class(class_class);
@@ -346,54 +342,91 @@ void Universe_initialize(int argc, const char** argv) {
     Universe_load_system_class(method_class);
     Universe_load_system_class(symbol_class);
     Universe_load_system_class(integer_class);
-    Universe_load_system_class(biginteger_class);
-    Universe_load_system_class(frame_class);
     Universe_load_system_class(primitive_class);
     Universe_load_system_class(string_class);
     Universe_load_system_class(double_class);
 
     // load the generic block class
     block_class = Universe_load_class(Universe_symbol_for("Block"));
-    
+
     // setup the true and false objects
     pVMSymbol trueSymbol = Universe_symbol_for("True");
     true_class  = Universe_load_class(trueSymbol);
     true_object = Universe_new_instance(true_class);
-    
+
     pVMSymbol falseSymbol = Universe_symbol_for("False");
     false_class  = Universe_load_class(falseSymbol);
     false_object = Universe_new_instance(false_class);
-    
+
     // load the system class and create an instance of it
     system_class = Universe_load_class(Universe_symbol_for("System"));
     pVMObject system_object = Universe_new_instance(system_class);
-    
+
     // put special objects and classes into the dictionary of globals
     Universe_set_global(Universe_symbol_for("nil"), nil_object);
     Universe_set_global(Universe_symbol_for("true"), true_object);
     Universe_set_global(Universe_symbol_for("false"), false_object);
     Universe_set_global(Universe_symbol_for("system"), system_object);
-    Universe_set_global(Universe_symbol_for("System"), 
+    Universe_set_global(Universe_symbol_for("System"),
                         (pVMObject)system_class);
-    Universe_set_global(Universe_symbol_for("Block"), 
+    Universe_set_global(Universe_symbol_for("Block"),
                         (pVMObject)block_class);
-    
+
     Universe_set_global(trueSymbol,  (pVMObject) true_class);
     Universe_set_global(falseSymbol, (pVMObject) false_class);
-    
+
     // initialize symbols required by the interpreter
     doesNotUnderstand_sym = Universe_symbol_for("doesNotUnderstand:arguments:");
     unknownGlobal_sym = Universe_symbol_for("unknownGlobal:");
     escapedBlock_sym = Universe_symbol_for("escapedBlock:");
     run_sym = Universe_symbol_for("run:");
-    
-    // create a fake bootstrap method to simplify later frame traversal
+
+    return system_object;
+}
+
+
+// create a fake bootstrap method to simplify later frame traversal
+static pVMMethod create_bootstrap_method() {
     pVMMethod bootstrap_method =
         Universe_new_method(Universe_symbol_for("bootstrap"), 1, 0, 0, 2);
     SEND(bootstrap_method, set_bytecode, 0, BC_HALT);
     TSEND(VMInvokable, bootstrap_method, set_holder, system_class);
-    
-     
+    return bootstrap_method;
+}
+
+
+pVMObject Universe_interpret(const char* class_name, const char* method_name) {
+    gc_initialize();
+    initialize_object_system();
+    pVMMethod bootstrap_method = create_bootstrap_method();
+
+    // lookup the class and method
+    pVMClass class = Universe_load_class(Universe_symbol_for(class_name));
+    pVMObject method = (pVMObject)SEND(SEND(class, get_class), lookup_invokable,
+                                       Universe_symbol_for(method_name));
+
+    Universe_assert(method != NULL);
+
+    // create a fake bootstrap frame with the system object on the stack
+    Interpreter_initialize(nil_object);
+    pVMFrame bootstrap_frame = Interpreter_push_new_frame(bootstrap_method, (pVMFrame) nil_object);
+    SEND(bootstrap_frame, push, (pVMObject)class);
+
+    // invoke the method on the class object
+    TSEND(VMInvokable, method, invoke, bootstrap_frame);
+
+    // start the interpreter
+    Interpreter_start();
+
+    return SEND(bootstrap_frame, pop);
+}
+
+
+void Universe_start(int argc, const char** argv) {
+    gc_initialize();
+    pVMObject system_object = initialize_object_system();
+    pVMMethod bootstrap_method = create_bootstrap_method();
+
     // start the shell if no filename is given
     if(argc == 0) {
       Shell_set_bootstrap_method(bootstrap_method);
@@ -468,7 +501,7 @@ pVMSymbol Universe_symbol_for(const char* restrict string) {
 }
 
 
-pVMArray Universe_new_array(int size) {
+pVMArray Universe_new_array(int64_t size) {
     // Allocate a new array and set its class to be the array class
     pVMArray result = VMArray_new((size_t)size);
     SEND((pVMObject)result, set_class, array_class);
@@ -508,7 +541,7 @@ pVMArray Universe_new_array_from_argv(int argc, const char** argv) {
 }
 
 
-pVMBlock Universe_new_block(pVMMethod method, pVMFrame context, int arguments) {
+pVMBlock Universe_new_block(pVMMethod method, pVMFrame context, int64_t arguments) {
     // Allocate a new block and set its class to be the block class
     pVMBlock result = VMBlock_new(method, context);
     SEND((pVMObject)result, set_class,
@@ -521,7 +554,7 @@ pVMBlock Universe_new_block(pVMMethod method, pVMFrame context, int arguments) {
 
 pVMClass Universe_new_class(pVMClass class_of_class) {
     // Allocate a new class and set its class to be the given class class
-    int num_fields = SEND(class_of_class, get_number_of_instance_fields);
+    intptr_t num_fields = SEND(class_of_class, get_number_of_instance_fields);
     pVMClass result;
     
     if(num_fields) //this is a normal class as class class
@@ -540,13 +573,14 @@ pVMFrame Universe_new_frame(pVMFrame previous_frame, pVMMethod method, pVMFrame 
     // Compute the maximum number of stack locations (including arguments,
     // locals and extra buffer to support doesNotUnderstand) and set the number
     // of indexable fields accordingly
-    int length = SEND(method, get_number_of_arguments) +
-                 SEND(method, get_number_of_locals) +
-                 SEND(method, get_maximum_number_of_stack_elements) + 2;
+    // + 3 for the use by #doesNotUnderstand and #escapedBlock
+    int64_t length = SEND(method, get_number_of_arguments) +
+                     SEND(method, get_number_of_locals) +
+                     SEND(method, get_maximum_number_of_stack_elements) + 3;
     
     // Allocate a new frame and set its class to be the frame class
     pVMFrame result = VMFrame_new(length, method, context, previous_frame);
-    SEND((pVMObject)result, set_class, frame_class);
+    SEND((pVMObject)result, set_class, (pVMClass)nil_object);
     
     // Reset the stack pointer and the bytecode index
     SEND(result, reset_stack_pointer);
@@ -582,20 +616,10 @@ pVMObject Universe_new_instance(pVMClass instance_class) {
 }
 
 
-pVMInteger Universe_new_integer(int32_t value) {
+pVMInteger Universe_new_integer(int64_t value) {
     // Allocate a new integer and set its class to be the integer class
     pVMInteger result = VMInteger_new_with(value);
     SEND((pVMObject)result, set_class, integer_class);
-    
-    // Return the freshly allocated integer
-    return result;
-}
-
-
-pVMBigInteger Universe_new_biginteger(int64_t value) {
-    // Allocate a new integer and set its class to be the integer class
-    pVMBigInteger result = VMBigInteger_new_with(value);
-    SEND((pVMObject)result, set_class, biginteger_class);
     
     // Return the freshly allocated integer
     return result;
@@ -734,11 +758,11 @@ pVMClass Universe_get_block_class(void) {
 }
 
 
-pVMClass Universe_get_block_class_with_args(int number_of_arguments) {
+pVMClass Universe_get_block_class_with_args(int64_t number_of_arguments) {
     // Compute the name of the block class with the given number of arguments
     char block_name[7];
     Universe_assert(number_of_arguments <10); // buffer overflow otherwise
-    sprintf(block_name, "Block%d", number_of_arguments);
+    sprintf(block_name, "Block%lld", number_of_arguments);
     pVMSymbol name = Universe_symbol_for(block_name);
     
     // Lookup the specific block class in the dictionary of globals and return
@@ -751,7 +775,7 @@ pVMClass Universe_get_block_class_with_args(int number_of_arguments) {
     
     // Add the appropriate value primitive to the block class
     SEND(result, add_instance_primitive,
-         VMBlock_get_evaluation_primitive(number_of_arguments));
+         VMBlock_get_evaluation_primitive(number_of_arguments), true);
     
     // Insert the block class into the dictionary of globals
     Universe_set_global(name, (pVMObject)result);
@@ -800,7 +824,7 @@ void Universe_load_system_class(pVMClass system_class) {
 
 
 pVMClass Universe_load_class_basic(pVMSymbol name, pVMClass system_class) {
-    debug_log("%s\n", SEND(name, get_chars));
+    debug_log("Universe_load_class_basic %s cp_count %zd\n", SEND(name, get_chars), cp_count);
 
     pVMClass result;
     // Try loading the class from all different paths

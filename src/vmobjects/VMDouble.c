@@ -41,7 +41,7 @@ pVMDouble VMDouble_new(void) {
     if(result) {
         result->_vtable = VMDouble_vtable();
         gc_start_uninterruptable_allocation();
-        INIT(result, 0);
+        INIT(result, (double) 0);
         gc_end_uninterruptable_allocation();
     }
     return result;
@@ -68,7 +68,7 @@ pVMDouble VMDouble_new_with(const double dble) {
 void _VMDouble_init(void* _self, ...) {
     pVMDouble self = (pVMDouble)_self;
     
-    SUPER(VMObject, self, init, 0);
+    SUPER(VMObject, self, init, (intptr_t) 0);
     
     va_list args; va_start(args, _self);
     self->embedded_double = va_arg(args, double);

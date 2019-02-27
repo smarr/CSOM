@@ -132,13 +132,13 @@ size_t _VMMethod__get_offset(void* _self) {
 //  Instance Methods (Starting with _VMMethod_) 
 //
 
-int _VMMethod_get_number_of_locals(void* _self) {
+int64_t _VMMethod_get_number_of_locals(void* _self) {
     pVMMethod self = (pVMMethod)_self;
     return self->number_of_locals;
 }
 
 
-int _VMMethod_get_maximum_number_of_stack_elements(void* _self) {
+int64_t _VMMethod_get_maximum_number_of_stack_elements(void* _self) {
     pVMMethod self = (pVMMethod)_self;
     return self->maximum_number_of_stack_elements;
 }
@@ -157,26 +157,26 @@ void _VMMethod_set_holder_all(void* _self, pVMClass value) {
     }
 }
 
-pVMObject _VMMethod_get_constant(void* _self, int bytecode_index) {
+pVMObject _VMMethod_get_constant(void* _self, size_t bytecode_index) {
     pVMMethod self = (pVMMethod)_self;
     uint8_t bc = SEND(self, get_bytecode, bytecode_index + 1);
     return SEND((pVMArray)self, get_indexable_field, bc);
 }
 
 
-int _VMMethod_get_number_of_arguments(void* _self) {
+int64_t _VMMethod_get_number_of_arguments(void* _self) {
     pVMMethod self = (pVMMethod)_self;
     return self->number_of_arguments;
 }
 
 
-int _VMMethod_get_number_of_bytecodes(void* _self) {
+int64_t _VMMethod_get_number_of_bytecodes(void* _self) {
     pVMMethod self = (pVMMethod)_self;
     return self->bytecodes_length;
 }
 
 
-uint8_t _VMMethod_get_bytecode(void* _self, int index) {
+uint8_t _VMMethod_get_bytecode(void* _self, size_t index) {
     pVMMethod self = (pVMMethod)_self;
     #ifdef DEBUG
         if(index >= self->bytecodes_length)
@@ -193,7 +193,7 @@ uint8_t _VMMethod_get_bytecode(void* _self, int index) {
 }
 
 
-void _VMMethod_set_bytecode(void* _self, int index, uint8_t value) {
+void _VMMethod_set_bytecode(void* _self, size_t index, uint8_t value) {
     pVMMethod self = (pVMMethod)_self;
     #ifdef DEBUG
         if(index >= self->bytecodes_length)

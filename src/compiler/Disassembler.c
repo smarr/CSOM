@@ -35,7 +35,6 @@ THE SOFTWARE.
 #include <interpreter/Interpreter.h>
 
 #include <vmobjects/VMArray.h>
-#include <vmobjects/VMBigInteger.h>
 #include <vmobjects/VMBlock.h>
 #include <vmobjects/VMClass.h>
 #include <vmobjects/VMDouble.h>
@@ -75,11 +74,8 @@ static inline void _Disassembler_dispatch(pVMObject o) {
             debug_print("\"%s\"", SEND((pVMString)o, get_chars));
         } else if(c == double_class)
             debug_print("%g", SEND((pVMDouble)o, get_embedded_double));
-        else if(c == biginteger_class)
-            debug_print("%lld", SEND((pVMBigInteger)o,
-                                     get_embedded_biginteger));
         else if(c == integer_class)
-            debug_print("%d", SEND((pVMInteger)o, get_embedded_integer));
+            debug_print("%lld", SEND((pVMInteger)o, get_embedded_integer));
         else if(c == symbol_class) {
             debug_print("#%s", SEND((pVMSymbol)o, get_chars));
         } else
@@ -123,12 +119,12 @@ void Disassembler_dump(pVMClass class) {
 void Disassembler_dump_method(pVMMethod method, const char* indent) {
     debug_print("(\n");
     {   // output stack information
-        int locals =SEND(method, get_number_of_locals); 
-        int max_stack = SEND(method, get_maximum_number_of_stack_elements);  
+        int64_t locals =SEND(method, get_number_of_locals);
+        int64_t max_stack = SEND(method, get_maximum_number_of_stack_elements);
         debug_dump("%s<%d locals, %d stack>\n", indent, locals, max_stack);
     }
     // output bytecodes
-    for(int bc_idx = 0; 
+    for(size_t bc_idx = 0; 
         bc_idx < SEND(method, get_number_of_bytecodes); 
         bc_idx += bytecodes_get_bytecode_length(
             SEND(method, get_bytecode, bc_idx))
@@ -211,7 +207,7 @@ void Disassembler_dump_method(pVMMethod method, const char* indent) {
 /**
  * Dump bytecode from the frame running
  */
-void Disassembler_dump_bytecode(pVMFrame frame, pVMMethod method, int bc_idx) {
+void Disassembler_dump_bytecode(pVMFrame frame, pVMMethod method, size_t bc_idx) {
     static long long indentc = 0;
     static char      ikind   = '@';
     uint8_t          bc      = BC_0;
@@ -285,7 +281,7 @@ void Disassembler_dump_bytecode(pVMFrame frame, pVMMethod method, int bc_idx) {
             pVMFrame ctxt = SEND(frame, get_outer_context);
             pVMObject arg = SEND(ctxt, get_argument, 0, 0);
             pVMSymbol name = (pVMSymbol)SEND(method, get_constant, bc_idx);
-            int field_index = SEND((pVMObject)arg, get_field_index, name);
+            int64_t field_index = SEND((pVMObject)arg, get_field_index, name);
            
             pVMObject o = SEND(arg, get_field, field_index);
             pVMClass c = SEND(o, get_class);

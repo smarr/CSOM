@@ -100,15 +100,15 @@ size_t _VMArray__get_offset(void* _self) {
     }
 
 
-pVMObject _VMArray_get_indexable_field(void* _self, int index) {
+pVMObject _VMArray_get_indexable_field(void* _self, int64_t index) {
     pVMArray self = (pVMArray)_self;
     //CHECK_INDEX;
     if(index >= SEND(self, get_number_of_indexable_fields) || index < 0) {
         char* s = (char*)internal_allocate(128);
         if(index >= SEND(self, get_number_of_indexable_fields))
-            sprintf(s, "index too large in array access: %d", index);
+            sprintf(s, "index too large in array access: %lld", index);
         else
-            sprintf(s, "index too small in array access: %d", index);
+            sprintf(s, "index too small in array access: %lld", index);
         Universe_error_exit(s);
     }
     // get the indexable field with the given index
@@ -116,15 +116,15 @@ pVMObject _VMArray_get_indexable_field(void* _self, int index) {
 }
 
 
-void _VMArray_set_indexable_field(void* _self, int index, pVMObject value) {
+void _VMArray_set_indexable_field(void* _self, int64_t index, pVMObject value) {
     pVMArray self = (pVMArray)_self;
     //CHECK_INDEX;
     if(index >= SEND(self, get_number_of_indexable_fields) || index < 0) {
         char* s = (char*)internal_allocate(128);
         if(index >= SEND(self, get_number_of_indexable_fields))
-            sprintf(s, "index too large in array access: %d", index);
+            sprintf(s, "index too large in array access: %lld", index);
         else
-            sprintf(s, "index too small in array access: %d", index);
+            sprintf(s, "index too small in array access: %lld", index);
         Universe_error_exit(s);
     }
     // set the indexable field with the given index to the given value
@@ -132,7 +132,7 @@ void _VMArray_set_indexable_field(void* _self, int index, pVMObject value) {
 }
 
 
-int _VMArray_get_number_of_indexable_fields(void* _self) {
+int64_t _VMArray_get_number_of_indexable_fields(void* _self) {
     pVMArray self = (pVMArray)_self;
     // retrieve the number of indexable fields in this array
     return self->num_of_fields - SEND(self, _get_offset);
@@ -166,7 +166,7 @@ void _VMArray_copy_indexable_fields_to(void* _self, pVMArray destination) {
 
 void _VMArray_mark_references(void* _self) {
     pVMArray self = (pVMArray)_self;
-	int size_of_indexable_fields = SEND(self, get_number_of_indexable_fields);
+	int64_t size_of_indexable_fields = SEND(self, get_number_of_indexable_fields);
 	for(int i=0;i<size_of_indexable_fields;i++) {
 		gc_mark_object(SEND(self, get_indexable_field, i));
 	}

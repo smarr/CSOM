@@ -35,6 +35,7 @@ THE SOFTWARE.
 
 #include <misc/debug.h>
 #include <misc/Hashmap.h>
+#include <misc/StringHashmap.h>
 
 #include <vm/Universe.h>
 
@@ -58,7 +59,7 @@ THE SOFTWARE.
 #endif
 
 // private
-int number_of_super_instance_fields(void* _self);
+int64_t number_of_super_instance_fields(void* _self);
 
 //
 //  Class Methods (Starting with VMClass_) 
@@ -76,7 +77,7 @@ pVMClass VMClass_new(void) {
 /**
  * Create a new VMClass with a specific number of fields
  */
-pVMClass VMClass_new_num_fields(int number_of_fields) {
+pVMClass VMClass_new_num_fields(intptr_t number_of_fields) {
     // calculate Class size without fields
     size_t class_stub_size = sizeof(VMClass) - 
                              sizeof(pVMObject) * 
@@ -162,7 +163,7 @@ void _VMClass_init(void* _self, ...) {
     pVMClass self = (pVMClass)_self;    
     va_list args;
     va_start(args, _self);
-    SUPER(VMObject, self, init, va_arg(args, int));
+    SUPER(VMObject, self, init, va_arg(args, intptr_t));
     va_end(args);
 }
 
@@ -244,7 +245,7 @@ void _VMClass_set_instance_invokables(void* _self, pVMArray value) {
 }
 
 
-int _VMClass_get_number_of_instance_invokables(void* _self) {
+int64_t _VMClass_get_number_of_instance_invokables(void* _self) {
     pVMClass self = (pVMClass)_self;
     // return the number of instance invokables in this class
     pVMArray arr = SEND(self, get_instance_invokables);
@@ -252,7 +253,7 @@ int _VMClass_get_number_of_instance_invokables(void* _self) {
 }
 
 
-pVMObject _VMClass_get_instance_invokable(void* _self, int index) {
+pVMObject _VMClass_get_instance_invokable(void* _self, int64_t index) {
     pVMClass self = (pVMClass)_self;
     // get the instance invokable with the given index
     pVMArray arr = SEND(self, get_instance_invokables);
@@ -260,7 +261,7 @@ pVMObject _VMClass_get_instance_invokable(void* _self, int index) {
 }
 
 
-void _VMClass_set_instance_invokable(void* _self, int idx, pVMObject value) {
+void _VMClass_set_instance_invokable(void* _self, int64_t idx, pVMObject value) {
     pVMClass self = (pVMClass)_self;
     // set this class as the holder of the given invokable
     TSEND(VMInvokable, value,  set_holder, self);
@@ -292,10 +293,10 @@ pVMObject _VMClass_lookup_invokable(void* _self, pVMSymbol signature) {
 }
 
 
-int _VMClass_lookup_field_index(void* _self, pVMSymbol field_name) {
+int64_t _VMClass_lookup_field_index(void* _self, pVMSymbol field_name) {
     pVMClass self = (pVMClass)_self;
     // lookup field with given name in array of instance fields
-    for(int i = SEND(self, get_number_of_instance_fields) - 1; i >= 0; i--) {
+    for(int64_t i = SEND(self, get_number_of_instance_fields) - 1; i >= 0; i--) {
       // return the current index if the name matches
       if(field_name == SEND(self, get_instance_field_name, i))
         return i;
@@ -325,9 +326,9 @@ bool _VMClass_add_instance_invokable(void* _self, pVMObject value) {
 }
 
 
-void _VMClass_add_instance_primitive(void* _self, pVMPrimitive value) {
+void _VMClass_add_instance_primitive(void* _self, pVMPrimitive value, bool warn) {
     pVMClass self = (pVMClass)_self;
-    if(SEND(self, add_instance_invokable, (pVMObject)value)) {
+    if(SEND(self, add_instance_invokable, (pVMObject)value) && warn) {
         pVMSymbol sym = TSEND(VMInvokable, value, get_signature);
         debug_warn("Primitive %s is not in class definition for class %s.\n",
                    sym->chars,
@@ -336,7 +337,7 @@ void _VMClass_add_instance_primitive(void* _self, pVMPrimitive value) {
 }
 
 
-pVMSymbol _VMClass_get_instance_field_name(void* _self, int index) {
+pVMSymbol _VMClass_get_instance_field_name(void* _self, int64_t index) {
     pVMClass self = (pVMClass)_self;
     // get the name of the instance field with the given index
     if(index >= number_of_super_instance_fields(self)) {
@@ -352,7 +353,7 @@ pVMSymbol _VMClass_get_instance_field_name(void* _self, int index) {
 }
 
 
-int _VMClass_get_number_of_instance_fields(void* _self) {
+int64_t _VMClass_get_number_of_instance_fields(void* _self) {
     pVMClass self = (pVMClass)_self;
     // get the total number of instance fields in this class
     return
@@ -374,7 +375,7 @@ bool _VMClass_has_primitives(void* _self) {
 }
 
 
-int number_of_super_instance_fields(void* _self) {
+int64_t number_of_super_instance_fields(void* _self) {
     pVMClass self = (pVMClass)_self;
     /*
      * get the total number of instance fields defined in super classes
@@ -475,13 +476,17 @@ bool is_responsible(void* handle, const char* class) {
 #define INSTANCE_METHOD_FORMAT_S "_%s_%s"
 // as in _AClass_anInstanceMethod
 
+static pStringHashmap primitive_map = NULL;
+
+void VMClass_init_primitive_map() {
+    primitive_map = StringHashmap_new();
+}
 
 /**
  * set the routines for primitive marked invokables of the given class
  */
 void set_primitives(pVMClass class, void* handle, const char* cname,
-    const char* restrict format
-) {    
+    const char* restrict format, pVMClass target) {
     pVMPrimitive the_primitive;
     routine_fn   routine=NULL;
     
@@ -495,27 +500,44 @@ void set_primitives(pVMClass class, void* handle, const char* cname,
             // get it's selector
             pVMSymbol sig = TSEND(VMInvokable, the_primitive, get_signature);
             const char* selector = SEND(sig, get_plain_string);
-            
-            { //string block                
+
+            { //string block
                 char symbol[strlen(cname) + strlen(selector) + 2 + 1];
                                                                 //2 for 2x '_'
                 sprintf(symbol, format, cname, selector);
-                 
+
+                bool loaded = (bool) SEND(primitive_map, get, (void*)symbol);
+
+                if (loaded) {
+                    // we already loaded this symbol
+                    continue;
+                }
+
                 // try loading the primitive
                 routine = (routine_fn)dlsym(handle, symbol);
+                SEND(primitive_map, put, (void*)symbol, (void*)true);
             }
             
-            if(!routine) {
+            if(!routine && class == target) {
                 debug_error("could not load primitive '%s' for class %s\n"
                             "ERR: routine not in library\n",
                             selector,
                             cname);
                 Universe_exit(ERR_FAIL);
             }
-            
-            // set routine
-            SEND(the_primitive, set_routine, routine);
-            the_primitive->empty = false;
+
+            if (routine && class != target) {
+                // need new invokable in the target class, because we are loading
+                // the primitive for a method defined in a superclass
+                the_primitive = VMPrimitive_get_empty_primitive(sig);
+                SEND(target, add_instance_primitive, the_primitive, false);
+            }
+
+            if (routine) {
+                SEND(the_primitive, set_routine, routine);
+                the_primitive->empty = false;
+            }
+
             internal_free((void*) selector);
         }
     }
@@ -525,7 +547,7 @@ void set_primitives(pVMClass class, void* handle, const char* cname,
 /**
  * Load all primitives for the class given _and_ its metaclass
  */
-void _VMClass_load_primitives(void* _self, const pString* cp, int cp_count) {
+void _VMClass_load_primitives(void* _self, const pString* cp, size_t cp_count) {
     pVMClass self = (pVMClass)_self;
     // the library handle
     void* dlhandle=NULL;
@@ -533,7 +555,7 @@ void _VMClass_load_primitives(void* _self, const pString* cp, int cp_count) {
     const char* cname = SEND(self->name, get_chars);
 
     // iterate the classpathes
-    for(int i = 0; (i < cp_count) && !dlhandle; i++) {
+    for(size_t i = 0; (i < cp_count) && !dlhandle; i++) {
 
         // check the core library
         pString loadstring = gen_core_loadstring(cp[i]);
@@ -579,8 +601,16 @@ void _VMClass_load_primitives(void* _self, const pString* cp, int cp_count) {
         Universe_exit(ERR_FAIL);
     }
     // do the actual loading for both class and metaclass
-    set_primitives(self, dlhandle, cname, INSTANCE_METHOD_FORMAT_S);
-    set_primitives(self->class, dlhandle, cname, CLASS_METHOD_FORMAT_S);
+    set_primitives(self, dlhandle, cname, INSTANCE_METHOD_FORMAT_S, self);
+    set_primitives(self->class, dlhandle, cname, CLASS_METHOD_FORMAT_S, self->class);
+
+    // do load
+    pVMClass clazz = self;
+    while (SEND(clazz, has_super_class)) {
+        clazz = SEND(clazz, get_super_class);
+        set_primitives(clazz, dlhandle, cname, INSTANCE_METHOD_FORMAT_S, self);
+    }
+
 }
 
 

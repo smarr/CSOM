@@ -342,8 +342,8 @@ void gen_push_variable(method_generation_context* mgenc, const char* var) {
     // is done by examining all available lexical contexts, starting with the
     // innermost (i.e., the one represented by mgenc).
     
-    int index = 0;
-    int context = 0;
+    size_t index = 0;
+    size_t context = 0;
     bool is_argument = false;
     if(method_genc_find_var(mgenc, var, &index, &context, &is_argument))
         if(is_argument)
@@ -368,8 +368,8 @@ void gen_pop_variable(method_generation_context* mgenc, const char* var) {
     // is done by examining all available lexical contexts, starting with the
     // innermost (i.e., the one represented by mgenc).
     
-    int index = 0;
-    int context = 0;
+    size_t index = 0;
+    size_t context = 0;
     bool is_argument = false;
     if(method_genc_find_var(mgenc, var, &index, &context, &is_argument))
         if(is_argument)

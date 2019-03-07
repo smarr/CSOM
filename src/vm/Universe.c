@@ -513,11 +513,12 @@ pVMArray Universe_new_array(int64_t size) {
 
 pVMArray Universe_new_array_list(pList list) {
     // Allocate a new array with the same length as the list
-    pVMArray result = Universe_new_array(SEND(list, size));
+    size_t size = SEND(list, size);
+    pVMArray result = Universe_new_array(size);
     
     if(result) {
         // Copy all elements from the list into the array
-        for(int i = 0; i < SEND(list, size); i++) {
+        for(size_t i = 0; i < size; i++) {
             pVMObject elem =  (pVMObject)SEND(list, get, i);
             SEND(result, set_indexable_field, i, elem);
         }

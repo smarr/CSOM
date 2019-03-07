@@ -112,8 +112,8 @@ int8_t method_genc_find_literal_index(
 bool method_genc_find_var(
     method_generation_context* mgenc,
     const char* var,
-    int* index,
-    int* context,
+    size_t* index,
+    size_t* context,
     bool* is_argument
 ) {
     // Searching proceeds as follows:

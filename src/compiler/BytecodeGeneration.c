@@ -72,12 +72,12 @@ void emit_DUP(method_generation_context* mgenc) {
 }
 
 
-void emit_PUSH_LOCAL(method_generation_context* mgenc, int idx, int ctx) {
+void emit_PUSH_LOCAL(method_generation_context* mgenc, size_t idx, size_t ctx) {
     EMIT3(BC_PUSH_LOCAL, idx, ctx);
 }
 
 
-void emit_PUSH_ARGUMENT(method_generation_context* mgenc, int idx, int ctx) {
+void emit_PUSH_ARGUMENT(method_generation_context* mgenc, size_t idx, size_t ctx) {
     EMIT3(BC_PUSH_ARGUMENT, idx, ctx);
 }
 
@@ -116,12 +116,12 @@ void emit_POP(method_generation_context* mgenc) {
 }
 
 
-void emit_POP_LOCAL(method_generation_context* mgenc, int idx, int ctx) {
+void emit_POP_LOCAL(method_generation_context* mgenc, size_t idx, size_t ctx) {
     EMIT3(BC_POP_LOCAL, idx, ctx);
 }
 
 
-void emit_POP_ARGUMENT(method_generation_context* mgenc, int idx, int ctx) {
+void emit_POP_ARGUMENT(method_generation_context* mgenc, size_t idx, size_t ctx) {
     EMIT3(BC_POP_ARGUMENT, idx, ctx);
 }
 

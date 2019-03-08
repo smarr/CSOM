@@ -121,9 +121,14 @@ bool supports_class(const char* name) {
  * All work that needs to be done before the actual primitives are assigned
  * should be called from this function.
  */
+static bool initialized = false;
+
 void init_csp(void) {
     // Call init funcions.
-    __System_init();
-    __Integer_init();
+    if (!initialized) {
+        __System_init();
+        __Integer_init();
+        initialized = true;
+    }
 }
 

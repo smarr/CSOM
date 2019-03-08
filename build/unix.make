@@ -141,13 +141,19 @@ profiling : LDFLAGS+=-pg
 profiling: all
 
 # emscripten : DBG_FLAGS=-g
+emscripten : EMBED_FILES+=--embed-file Smalltalk --embed-file Examples --embed-file TestSuite
 emscripten : EXP_FN=-s EXPORTED_FUNCTIONS="['_strcmp']" -s ENVIRONMENT=node -s EXPORT_ALL=1 -s LINKABLE=1 -s WASM=1 -s EXIT_RUNTIME=1
-emscripten : MAIN_MODULE=-s MAIN_MODULE=1 --embed-file Smalltalk --embed-file Examples --embed-file TestSuite $(EXP_FN)
+emscripten : MAIN_MODULE=-s MAIN_MODULE=1 $(EMBED_FILES) $(EXP_FN)
 emscripten : SIDE_MODULE=-s SIDE_MODULE=1 $(EXP_FN)
 emscripten : CC=emcc
 emscripten : LDFLAGS+=
 emscripten : DEF_EMSCRIPTEN=-D__EMSCRIPTEN__
 emscripten: all
+
+em-awfy : AWFY_ROOT?=../../benchmarks/SOM
+em-awfy : EMBED_FILES+=--embed-file $(AWFY_ROOT)
+em-awfy: emscripten
+
 
 .c.pic.o:
 	$(CC) $(CFLAGS) -fPIC -c $< -o $*.pic.o

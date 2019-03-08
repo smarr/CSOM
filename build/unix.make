@@ -31,8 +31,9 @@ ifeq ($(CC),)
 	CC		= gcc
 endif
 
-CFLAGS		=-O3 $(COMPILER_ARCH) -Wno-endif-labels -std=gnu99 $(DBG_FLAGS) $(INCLUDES)
-LDFLAGS		=-O3 $(COMPILER_ARCH) $(LIBRARIES)
+OPT_FLAGS	=-O3
+CFLAGS		=$(COMPILER_ARCH) -Wno-endif-labels -std=gnu99 $(DBG_FLAGS) $(OPT_FLAGS) $(INCLUDES)
+LDFLAGS		=$(COMPILER_ARCH) $(LIBRARIES)
 
 INSTALL		=install
 
@@ -131,7 +132,8 @@ OSTOOL			= $(BUILD_DIR)/ostool.exe
 all: $(OSTOOL) $(SRC_DIR)/platform.h CORE $(SRC_DIR)/CSOM
 
 
-debug : DBG_FLAGS=-DDEBUG -g
+debug : OPT_FLAGS=-O0
+debug : DBG_FLAGS=-DDEBUG -g3
 debug: all
 
 profiling : DBG_FLAGS=-g -pg
@@ -148,7 +150,7 @@ emscripten : DEF_EMSCRIPTEN=-D__EMSCRIPTEN__
 emscripten: all
 
 .c.pic.o:
-	$(CC) $(CFLAGS) -fPIC -g -c $< -o $*.pic.o
+	$(CC) $(CFLAGS) -fPIC -c $< -o $*.pic.o
 
 
 clean:

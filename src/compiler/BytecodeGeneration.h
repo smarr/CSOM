@@ -39,16 +39,16 @@ THE SOFTWARE.
 
 void emit_HALT(method_generation_context* mgenc);
 void emit_DUP(method_generation_context* mgenc);
-void emit_PUSH_LOCAL(method_generation_context* mgenc, int idx, int ctx);
-void emit_PUSH_ARGUMENT(method_generation_context* mgenc, int idx, int ctx);
+void emit_PUSH_LOCAL(method_generation_context* mgenc, size_t idx, size_t ctx);
+void emit_PUSH_ARGUMENT(method_generation_context* mgenc, size_t idx, size_t ctx);
 void emit_PUSH_FIELD(method_generation_context* mgenc, pVMSymbol field);
 void emit_PUSH_BLOCK(method_generation_context* mgenc, pVMMethod block);
 void emit_PUSH_CONSTANT(method_generation_context* mgenc, pVMObject cst);
 void emit_PUSH_CONSTANT_String(method_generation_context* mgenc, pVMString str);
 void emit_PUSH_GLOBAL(method_generation_context* mgenc, pVMSymbol global);
 void emit_POP(method_generation_context* mgenc);
-void emit_POP_LOCAL(method_generation_context* mgenc, int idx, int ctx);
-void emit_POP_ARGUMENT(method_generation_context* mgenc, int idx, int ctx);
+void emit_POP_LOCAL(method_generation_context* mgenc, size_t idx, size_t ctx);
+void emit_POP_ARGUMENT(method_generation_context* mgenc, size_t idx, size_t ctx);
 void emit_POP_FIELD(method_generation_context* mgenc, pVMSymbol field);
 void emit_SEND(method_generation_context* mgenc, pVMSymbol msg);
 void emit_SUPER_SEND(method_generation_context* mgenc, pVMSymbol msg);

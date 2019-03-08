@@ -543,6 +543,17 @@ void set_primitives(pVMClass class, void* handle, const char* cname,
     }
 }
 
+static void init_lib(void* dlhandle) {
+    // ...and is responsible:
+    // explicitely call the libirary initializer
+    void* init_csp = dlsym(dlhandle, "init_csp");
+    if (init_csp) {
+        ((init_csp_fn)init_csp)();
+    } else {
+        dlclose(dlhandle);
+        Universe_error_exit("Library does not define the init_csp() initializer.");
+    }
+}
 
 /**
  * Load all primitives for the class given _and_ its metaclass
@@ -563,6 +574,7 @@ void _VMClass_load_primitives(void* _self, const pString* cp, size_t cp_count) {
         SEND(loadstring, free);
         if(dlhandle && is_responsible(dlhandle, cname))
             // the core library is found and responsible
+            init_lib(dlhandle);
             break;
         
         // the core library is not found or respondible, 
@@ -573,15 +585,7 @@ void _VMClass_load_primitives(void* _self, const pString* cp, size_t cp_count) {
         if(dlhandle) {
             // the class library was found...
             if(is_responsible(dlhandle, cname)) {
-                // ...and is responsible:
-                // explicitely call the libirary initializer
-                void* init_csp = dlsym(dlhandle, "init_csp");
-                if (init_csp) {
-                    ((init_csp_fn)init_csp)();
-                } else {
-                    dlclose(dlhandle);
-                    Universe_error_exit("Library does not define the init_csp() initializer.");
-                }
+                init_lib(dlhandle);
                 break;
             } else {
                 // ... but says not responsible, but have to

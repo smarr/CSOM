@@ -39,9 +39,9 @@ void   _List_deep_free(void* _self);
 void   _List_addAll(void* _self, pList list);
 
 void   _List_clear(void* _self);
-int    _List_indexOf(void* _self, void* ptr);
-int    _List_size(void* _self);
-void*  _List_get(void* _self, int index);
+size_t _List_indexOf(void* _self, void* ptr);
+size_t _List_size(void* _self);
+void*  _List_get(void* _self, size_t index);
 
 void   _List_init(void* _self, ...);
 
@@ -208,33 +208,33 @@ void _List_clear(void* _self) {
 }
 
 
-int _List_indexOf(void* _self, void* ptr) {
+size_t _List_indexOf(void* _self, void* ptr) {
     pList self = (pList)_self;
     pListElem elem = self->head;
-    for(int result = 0; elem; result++, elem = elem->next)
+    for(size_t result = 0; elem; result++, elem = elem->next)
         if(elem->data == ptr)
             return result;
     return -1;
 }
 
 
-int _List_indexOfCString(void* _self, const char* cstring) {
+size_t _List_indexOfCString(void* _self, const char* cstring) {
     pList self = (pList)_self;
     pListElem elem = self->head;
-    for(int result = 0; elem; result++, elem = elem->next)
+    for(size_t result = 0; elem; result++, elem = elem->next)
         if(strcmp(cstring, SEND((pString)elem->data, chars)) == 0)
             return result;
     return -1;
 }
 
 
-int _List_size(void* _self) {
+size_t _List_size(void* _self) {
     pList self = (pList)_self;
     return self->size;
 }
 
 
-void* _List_get(void* _self, int index) {
+void* _List_get(void* _self, size_t index) {
     pList self = (pList)_self;
     pListElem elem = self->head;
     while(index-- && elem)

@@ -342,8 +342,8 @@ void gen_push_variable(method_generation_context* mgenc, const char* var) {
     // is done by examining all available lexical contexts, starting with the
     // innermost (i.e., the one represented by mgenc).
     
-    int index = 0;
-    int context = 0;
+    size_t index = 0;
+    size_t context = 0;
     bool is_argument = false;
     if(method_genc_find_var(mgenc, var, &index, &context, &is_argument))
         if(is_argument)
@@ -368,8 +368,8 @@ void gen_pop_variable(method_generation_context* mgenc, const char* var) {
     // is done by examining all available lexical contexts, starting with the
     // innermost (i.e., the one represented by mgenc).
     
-    int index = 0;
-    int context = 0;
+    size_t index = 0;
+    size_t context = 0;
     bool is_argument = false;
     if(method_genc_find_var(mgenc, var, &index, &context, &is_argument))
         if(is_argument)
@@ -474,10 +474,26 @@ void superclass(Lexer* l, class_generation_context* cgenc) {
         class_genc_set_class_fields_of_super(cgenc, SEND(SEND(super_class, get_class), get_instance_fields));
     } else {
         // we hardcode here the field names for Class
-        // since Object class superclass = Class
+        // SOM doesn't make them accessible normally anymore.
+        // On the language level, we only have the primitives.
+        // But to keep the implementation simple and allow classes to have
+        // fields, we add them back in here.
+
+        // We do this when the super_name is nil, because that means the class
+        // is Object, and we want to add the fields there on the class-side
+        // since Object class superclass = Class.
         // We avoid here any kind of dynamic solution to avoid further complexity.
         // However, that makes it static, it is going to make it harder to
         // change the definition of Class and Object
+
+        // There are exactly 4 fields
+        Universe_assert(4 == SIZE_DIFF_VMOBJECT(VMClass));
+
+        const char* field_names[] = {
+            "superClass", "name", "instanceFields", "instanceInvokables"};
+
+        pVMArray class_fields = Universe_new_array_from_argv(4, field_names);
+        class_genc_set_class_fields_of_super(cgenc, class_fields);
     }
 }
 

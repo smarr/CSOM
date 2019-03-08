@@ -230,7 +230,7 @@
 		F6F205680C7DB2B40074678D /* Block.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Block.h; path = src/primitives/Block.h; sourceTree = SOURCE_ROOT; };
 		F6F205690C7DB2B40074678D /* Class.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Class.c; path = src/primitives/Class.c; sourceTree = SOURCE_ROOT; };
 		F6F2056A0C7DB2B40074678D /* Class.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Class.h; path = src/primitives/Class.h; sourceTree = SOURCE_ROOT; };
-		F6F2056B0C7DB2B40074678D /* Core.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Core.c; path = src/primitives/Core.c; sourceTree = SOURCE_ROOT; };
+		F6F2056B0C7DB2B40074678D /* Core.c */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.c; name = Core.c; path = src/primitives/Core.c; sourceTree = SOURCE_ROOT; tabWidth = 4; };
 		F6F2056C0C7DB2B40074678D /* Double.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Double.c; path = src/primitives/Double.c; sourceTree = SOURCE_ROOT; };
 		F6F2056D0C7DB2B40074678D /* Double.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Double.h; path = src/primitives/Double.h; sourceTree = SOURCE_ROOT; };
 		F6F205700C7DB2B40074678D /* Integer.c */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.c; name = Integer.c; path = src/primitives/Integer.c; sourceTree = SOURCE_ROOT; tabWidth = 4; };

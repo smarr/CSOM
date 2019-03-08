@@ -513,11 +513,12 @@ pVMArray Universe_new_array(int64_t size) {
 
 pVMArray Universe_new_array_list(pList list) {
     // Allocate a new array with the same length as the list
-    pVMArray result = Universe_new_array(SEND(list, size));
+    size_t size = SEND(list, size);
+    pVMArray result = Universe_new_array(size);
     
     if(result) {
         // Copy all elements from the list into the array
-        for(int i = 0; i < SEND(list, size); i++) {
+        for(size_t i = 0; i < size; i++) {
             pVMObject elem =  (pVMObject)SEND(list, get, i);
             SEND(result, set_indexable_field, i, elem);
         }
@@ -767,7 +768,7 @@ pVMClass Universe_get_block_class_with_args(int64_t number_of_arguments) {
     
     // Lookup the specific block class in the dictionary of globals and return
     // it
-    if(Universe_has_global(name)) 
+    if(Universe_has_global(name))
         return (pVMClass)Universe_get_global(name);
 
     // Get the block class for blocks with the given number of arguments
@@ -801,6 +802,10 @@ pVMClass Universe_load_class(pVMSymbol name) {
     // Load primitives (if necessary) and return the resulting class
     if (SEND(result, has_primitives) || SEND(result->class, has_primitives)) 
         SEND(result, load_primitives, class_path, cp_count);
+
+    // Insert the class into the dictionary of globals
+    Universe_set_global(name, (pVMObject)result);
+
     return result;
 }
 

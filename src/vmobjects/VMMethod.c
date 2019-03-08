@@ -74,8 +74,8 @@ pVMMethod VMMethod_new(size_t number_of_bytecodes, size_t number_of_constants,
 
 pVMMethod VMMethod_assemble(method_generation_context* mgenc) {
     // create a method instance with the given number of bytecodes and literals
-    int num_literals = SEND(mgenc->literals, size);
-    int num_locals = SEND(mgenc->locals, size);
+    size_t num_literals = SEND(mgenc->literals, size);
+    size_t num_locals = SEND(mgenc->locals, size);
 
     pVMMethod meth = Universe_new_method(mgenc->signature, mgenc->bp,
         SEND(mgenc->literals, size), num_locals,

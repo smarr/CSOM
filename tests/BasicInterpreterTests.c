@@ -30,44 +30,47 @@ static const double dbl375 = 3.75;
 
 static const Test tests[] = {
 //    {"Self", "assignSuper", 42, ProgramDefinitionError.class},
+//    {"Self", "assignSelf", 42, ProgramDefinitionError.class},
 
     {"MethodCall", "test", (void*) 42, INTEGER},
     {"MethodCall", "test2", (void*) 42, INTEGER},
 
-    {"NonLocalReturn", "test", "NonLocalReturn", CLASS},
     {"NonLocalReturn", "test1", (void*) 42, INTEGER},
     {"NonLocalReturn", "test2", (void*) 43, INTEGER},
     {"NonLocalReturn", "test3", (void*)  3, INTEGER},
     {"NonLocalReturn", "test4", (void*) 42, INTEGER},
     {"NonLocalReturn", "test5", (void*) 22, INTEGER},
 
-    {"Blocks", "arg1", (void*) 42, INTEGER},
-    {"Blocks", "arg2", (void*) 77, INTEGER},
-    {"Blocks", "argAndLocal",   (void*) 8, INTEGER},
-    {"Blocks", "argAndContext", (void*) 8, INTEGER},
+    {"Blocks", "testArg1", (void*) 42, INTEGER},
+    {"Blocks", "testArg2", (void*) 77, INTEGER},
+    {"Blocks", "testArgAndLocal",   (void*) 8, INTEGER},
+    {"Blocks", "testArgAndContext", (void*) 8, INTEGER},
 
-    {"Return", "returnSelf", "Return", CLASS},
-    {"Return", "returnSelfImplicitly", "Return", CLASS},
-    {"Return", "noReturnReturnsSelf", "Return", CLASS},
-    {"Return", "blockReturnsImplicitlyLastValue", (void*) 4, INTEGER},
+    {"Return", "testReturnSelf", "Return", CLASS},
+    {"Return", "testReturnSelfImplicitly", "Return", CLASS},
+    {"Return", "testNoReturnReturnsSelf", "Return", CLASS},
+    {"Return", "testBlockReturnsImplicitlyLastValue", (void*) 4, INTEGER},
 
     {"IfTrueIfFalse", "test",  (void*) 42, INTEGER},
     {"IfTrueIfFalse", "test2", (void*) 33, INTEGER},
     {"IfTrueIfFalse", "test3", (void*)  4, INTEGER},
 
-    {"CompilerSimplification", "returnConstantSymbol", "constant", SYMBOL},
-    {"CompilerSimplification", "returnConstantInt", (void*) 42, INTEGER},
-    {"CompilerSimplification", "returnSelf", "CompilerSimplification", CLASS},
-    {"CompilerSimplification", "returnSelfImplicitly", "CompilerSimplification",
+    {"CompilerSimplification", "testReturnConstantSymbol", "constant", SYMBOL},
+    {"CompilerSimplification", "testReturnConstantInt", (void*) 42, INTEGER},
+    {"CompilerSimplification", "testReturnSelf", "CompilerSimplification", CLASS},
+    {"CompilerSimplification", "testReturnSelfImplicitly", "CompilerSimplification",
         CLASS},
     {"CompilerSimplification", "testReturnArgumentN", (void*) 55, INTEGER},
     {"CompilerSimplification", "testReturnArgumentA", (void*) 44, INTEGER},
     {"CompilerSimplification", "testSetField", "foo", SYMBOL},
     {"CompilerSimplification", "testGetField", (void*) 40, INTEGER},
 
+    {"Hash", "testHash", (void*) 444, INTEGER},
+
     {"Arrays", "testEmptyToInts", (void*) 3, INTEGER},
     {"Arrays", "testPutAllInt", (void*) 5, INTEGER},
     {"Arrays", "testPutAllNil", "Nil", CLASS},
+    {"Arrays", "testPutAllBlock", (void*) 3, INTEGER},
     {"Arrays", "testNewWithAll", (void*) 1, INTEGER},
 
     {"BlockInlining", "testNoInlining", (void*) 1, INTEGER},
@@ -89,10 +92,14 @@ static const Test tests[] = {
 
     {"BlockInlining", "testToDoNestDoNestIfTrue", (void*) 2, INTEGER},
 
-    {"NonLocalVars", "writeDifferentTypes", (void*) &dbl375, DOUBLE},
+    {"NonLocalVars", "testWriteDifferentTypes", (void*) &dbl375, DOUBLE},
+
+    {"ObjectCreation", "test", (void*) 1000000, INTEGER},
 
     {"Regressions", "testSymbolEquality", (void*) 1, INTEGER},
     {"Regressions", "testSymbolReferenceEquality", (void*) 1, INTEGER},
+
+    {"NumberOfTests", "numberOfTests", (void*) 51, INTEGER},
 
     {NULL}
 };

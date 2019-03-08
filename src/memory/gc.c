@@ -176,7 +176,7 @@ void gc_mark_reachable_objects() {
 void gc_mark_object(void* _self) {
     pVMObject self = (pVMObject) _self;
     if (   ((void*) self >= (void*)  object_space) 
-        && ((void*) self <= (void*) (object_space + OBJECT_SPACE_SIZE))) 
+        && ((void*) self <= (void*) ((intptr_t) object_space + OBJECT_SPACE_SIZE)))
     {
         if (self->gc_field != 1) {
             // mark self before recursively marking contained references
@@ -241,7 +241,7 @@ void gc_show_memory() {
             object_aligner = 0;
         }
         pointer = (void*)((intptr_t)pointer + object_size);
-    } while ((void*)pointer < (void*)(object_space + OBJECT_SPACE_SIZE));    
+    } while ((void*)pointer < (void*)((intptr_t) object_space + OBJECT_SPACE_SIZE));
 }
 
 
@@ -312,7 +312,7 @@ void gc_collect() {
         // set the pointer to the next object in the heap
         pointer = (void*)((intptr_t)pointer + object_size);
 
-    } while ((void*)pointer < (void*)(object_space + OBJECT_SPACE_SIZE));
+    } while ((void*)pointer < (void*)((intptr_t)object_space + OBJECT_SPACE_SIZE));
 
     // combine free_entries, which are next to each other
     gc_merge_free_spaces();
@@ -431,7 +431,7 @@ void* gc_allocate_object(size_t size) {
 void gc_free(void* ptr) {
     // do nothing when called for an object inside the object_space
     if ((   ptr < (void*)  object_space) 
-        || (ptr >= (void*) (object_space + OBJECT_SPACE_SIZE))) 
+        || (ptr >= (void*) ((intptr_t)object_space + OBJECT_SPACE_SIZE))) 
     {
         internal_free(ptr);
     }

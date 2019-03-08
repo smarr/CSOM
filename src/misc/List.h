@@ -45,10 +45,10 @@ VTABLE(List) {
     void  (*addAll)(void*, pList list); \
     void  (*clear)(void*); \
     void  (*deep_free)(void*); \
-    int   (*indexOf)(void*, void* ptr); \
-    int   (*indexOfCString)(void*, const char* str); \
-    int   (*size)(void*); \
-    void* (*get)(void*, int index)
+    size_t (*indexOf)(void*, void* ptr); \
+    size_t (*indexOfCString)(void*, const char* str); \
+    size_t (*size)(void*); \
+    void* (*get)(void*, size_t index)
     
     LIST_VTABLE_FORMAT;
 };
@@ -64,7 +64,7 @@ struct _List {
     VTABLE(List)* _vtable;
 #define LIST_FORMAT \
     OOOBJECT_FORMAT; \
-    int size; \
+    size_t size; \
     pListElem head; \
     pListElem last
 

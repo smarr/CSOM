@@ -32,7 +32,7 @@ matrix:
         - docker run -e PWD=/src -dit --name emscripten -v $(pwd):/src trzeci/emscripten:sdk-incoming-64bit bash
       script:
         - docker exec -it emscripten make emscripten
-        - node CSOM.js -cp Smalltalk TestSuite/TestHarness.som
+        - ./som-em.sh -cp Smalltalk TestSuite/TestHarness.som
 
 script:
     - export CC=${COMPILER} # hack around a Travis issue

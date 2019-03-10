@@ -166,6 +166,7 @@ clean:
 clobber: $(OSTOOL) clean
 	rm -f `$(OSTOOL) x "$(CSOM_NAME)"` $(ST_DIR)/`$(OSTOOL) s "$(CORE_NAME)"`
 	rm -f $(OSTOOL)
+	rm -f CSOM.js CSOM.wasm Smalltalk/SOMCore.wasm
 	rm -f $(SRC_DIR)/platform.h
 
 $(OSTOOL): $(BUILD_DIR)/ostool.c

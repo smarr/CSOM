@@ -572,10 +572,11 @@ void _VMClass_load_primitives(void* _self, const pString* cp, size_t cp_count) {
         pString loadstring = gen_core_loadstring(cp[i]);
         dlhandle = load_lib(loadstring);
         SEND(loadstring, free);
-        if(dlhandle && is_responsible(dlhandle, cname))
+        if(dlhandle && is_responsible(dlhandle, cname)) {
             // the core library is found and responsible
             init_lib(dlhandle);
             break;
+        }
         
         // the core library is not found or respondible, 
         // continue w/ class file

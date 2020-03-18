@@ -59,10 +59,10 @@ THE SOFTWARE.
  * Java-like; see http://mindprod.com/jgloss/hashcode.html
  */
 static inline int64_t string_hash(const char* restrict string) {
-    int64_t result = 0;
+    uint64_t result = 0;
     char* ptr = (char*)string;
     while(ptr[0])
-        result = (31 * result + *ptr++) % INT64_MAX;
+        result = (31 * result + *ptr++) % UINT64_MAX;
     return result;
 }
 

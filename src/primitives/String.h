@@ -36,5 +36,8 @@ void  _String_length(pVMObject object, pVMFrame frame);
 void  _String_equal(pVMObject object, pVMFrame frame);
 void  _String_primSubstringFrom_to_(pVMObject object, pVMFrame frame);
 
+void  _String_isWhiteSpace(pVMObject object, pVMFrame frame);
+void  _String_isLetters(pVMObject object, pVMFrame frame);
+void  _String_isDigits(pVMObject object, pVMFrame frame);
 
 #endif // CORE_STRING_H_

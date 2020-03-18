@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "String.h"
 
 #include <string.h>
+#include <ctype.h>
 
 
 void  _String_concatenate_(pVMObject object, pVMFrame frame) {
@@ -115,4 +116,67 @@ void  _String_primSubstringFrom_to_(pVMObject object, pVMFrame frame) {
     SEND(frame, push, (pVMObject)Universe_new_string(result));
     
     internal_free(result);
+}
+
+
+void  _String_isWhiteSpace(pVMObject object, pVMFrame frame) {
+    pVMString self = (pVMString)SEND(frame, pop);
+    const char* string = SEND(self, get_chars);
+
+    size_t length = strlen(string);
+
+    for (size_t i = 0; i < length; i++) {
+        if (!isspace(string[i])) {
+            SEND(frame, push, false_object);
+            return;
+        }
+    }
+
+    if (length > 0) {
+        SEND(frame, push, true_object);
+    } else {
+        SEND(frame, push, false_object);
+    }
+}
+
+
+void  _String_isLetters(pVMObject object, pVMFrame frame) {
+    pVMString self = (pVMString)SEND(frame, pop);
+    const char* string = SEND(self, get_chars);
+
+    size_t length = strlen(string);
+
+    for (size_t i = 0; i < length; i++) {
+        if (!isalpha(string[i])) {
+            SEND(frame, push, false_object);
+            return;
+        }
+    }
+
+    if (length > 0) {
+        SEND(frame, push, true_object);
+    } else {
+        SEND(frame, push, false_object);
+    }
+}
+
+
+void  _String_isDigits(pVMObject object, pVMFrame frame) {
+    pVMString self = (pVMString)SEND(frame, pop);
+    const char* string = SEND(self, get_chars);
+
+    size_t length = strlen(string);
+
+    for (size_t i = 0; i < length; i++) {
+        if (!isdigit(string[i])) {
+            SEND(frame, push, false_object);
+            return;
+        }
+    }
+
+    if (length > 0) {
+        SEND(frame, push, true_object);
+    } else {
+        SEND(frame, push, false_object);
+    }
 }

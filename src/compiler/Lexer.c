@@ -149,6 +149,7 @@ void lexEscapeChar(Lexer* l, char** t) {
     case 'n': *(*t)++ = '\n'; break;
     case 'r': *(*t)++ = '\r'; break;
     case 'f': *(*t)++ = '\f'; break;
+    case '0': *(*t)++ = '\0'; break;
     case '\'': *(*t)++ = '\''; break;
     case '\\': *(*t)++ = '\\'; break;
   }

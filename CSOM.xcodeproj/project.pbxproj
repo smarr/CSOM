@@ -182,7 +182,7 @@
 		F6F204050C7DA4310074678D /* Interpreter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Interpreter.h; sourceTree = "<group>"; };
 		F6F204080C7DA4310074678D /* gc.c */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.c; name = gc.c; path = src/memory/gc.c; sourceTree = SOURCE_ROOT; tabWidth = 4; };
 		F6F204090C7DA4310074678D /* gc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gc.h; path = src/memory/gc.h; sourceTree = SOURCE_ROOT; };
-		F6F2040B0C7DA4310074678D /* debug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = debug.h; path = src/misc/debug.h; sourceTree = SOURCE_ROOT; };
+		F6F2040B0C7DA4310074678D /* debug.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; name = debug.h; path = src/misc/debug.h; sourceTree = SOURCE_ROOT; tabWidth = 4; };
 		F6F2040C0C7DA4310074678D /* defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = defs.h; path = src/misc/defs.h; sourceTree = SOURCE_ROOT; };
 		F6F2040D0C7DA4310074678D /* Hashmap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Hashmap.c; path = src/misc/Hashmap.c; sourceTree = SOURCE_ROOT; };
 		F6F2040E0C7DA4310074678D /* Hashmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Hashmap.h; path = src/misc/Hashmap.h; sourceTree = SOURCE_ROOT; };
@@ -241,7 +241,7 @@
 		F6F2057A0C7DB2B40074678D /* String.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = String.h; path = src/primitives/String.h; sourceTree = SOURCE_ROOT; };
 		F6F2057B0C7DB2B40074678D /* Symbol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Symbol.c; path = src/primitives/Symbol.c; sourceTree = SOURCE_ROOT; };
 		F6F2057C0C7DB2B40074678D /* Symbol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Symbol.h; path = src/primitives/Symbol.h; sourceTree = SOURCE_ROOT; };
-		F6F2057D0C7DB2B40074678D /* System.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = System.c; path = src/primitives/System.c; sourceTree = SOURCE_ROOT; };
+		F6F2057D0C7DB2B40074678D /* System.c */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.c; name = System.c; path = src/primitives/System.c; sourceTree = SOURCE_ROOT; tabWidth = 4; };
 		F6F2057E0C7DB2B40074678D /* System.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = System.h; path = src/primitives/System.h; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -586,6 +586,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 08FB7794FE84155DC02AAC07 /* CSOM */;

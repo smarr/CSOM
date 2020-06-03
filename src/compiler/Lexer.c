@@ -24,6 +24,7 @@
 
 #include <string.h>
 
+#include <misc/debug.h>
 #include <memory/gc.h>
 
 const char* const symnames[] = {
@@ -59,22 +60,36 @@ Lexer* Lexer_from_string(const char* stream) {
 }
 
 #define _BC (l->buf[l->bufp])
-#define EOB (l->buf[l->bufp]==0)
+#define EOB ((l->bufp >= BUFSIZ) || (l->buf[l->bufp]==0))
 #define _MATCH(C, S) \
-  if(_BC == (C)) { l->sym = (S); l->symc = _BC; sprintf(l->text, "%c", _BC); l->bufp++;}
+  if(_BC == (C)) { l->sym = (S); l->symc = _BC; sprintf(l->text, "%c", _BC); incBufP(l);}
 
 #define SEPARATOR "----"
 #define PRIMITIVE "primitive"
+
+static void incBufP(Lexer* const l) {
+  l->bufp++;
+  if (l->bufp >= BUFSIZ) {
+    debug_error("Lexer failed to read file. Run out of file reading buffer space.");
+    exit(ERR_FAIL);
+  }
+}
 
 int fillbuffer(Lexer* const l) {
   if (!l->infile) // string stream
     return -1;
   int p = 0;
   do {
-    if(!feof(l->infile))
+    if (p >= BUFSIZ) {
+      debug_error("Lexer failed to read file. Run out of file reading buffer space.");
+      exit(ERR_FAIL);
+    }
+    
+    if (!feof(l->infile)) {
       l->buf[p] = fgetc(l->infile);
-    else
+    } else {
       l->buf[p] = '\n';
+    }
   } while(l->buf[p++] != '\n');
   l->buf[p - 1] = 0;
   l->bufp = 0;
@@ -88,7 +103,7 @@ void skipWhiteSpace(Lexer* l) {
       l->line_num += 1;
     }
 
-    l->bufp++;
+    incBufP(l);
     while (EOB) {
       if (fillbuffer(l) == -1) {
         return;
@@ -103,14 +118,14 @@ void skipComment(Lexer* l) {
       if (_BC == '\n') {
         l->line_num += 1;
       }
-      l->bufp++;
+      incBufP(l);
       while (EOB) {
         if (fillbuffer(l) == -1) {
           return;
         }
       }
     } while(_BC != '"');
-    l->bufp++;
+    incBufP(l);
   }
 }
 
@@ -122,7 +137,9 @@ void lexNumber(Lexer* l) {
   bool saw_decimal_mark = false;
 
   do {
-    *t++ = l->buf[l->bufp++];
+    *t++ = l->buf[l->bufp];
+    incBufP(l);
+
     char char_arr[3];
     char_arr[0] = l->buf[l->bufp + 0];
     char_arr[1] = l->buf[l->bufp + 1];
@@ -134,7 +151,8 @@ void lexNumber(Lexer* l) {
         isdigit(l->buf[l->bufp + 1])) {
       l->sym = Double;
       saw_decimal_mark = true;
-      *t++ = l->buf[l->bufp++];
+      *t++ = l->buf[l->bufp];
+      incBufP(l);
     }
   } while(isdigit(_BC));
   *t = 0;
@@ -153,18 +171,18 @@ void lexEscapeChar(Lexer* l, char** t) {
     case '\'': *(*t)++ = '\''; break;
     case '\\': *(*t)++ = '\\'; break;
   }
-  l->bufp++;
+  incBufP(l);
 }
 
 void lexStringChar(Lexer* l, char** t) {
   char current = _BC;
 
   if (current == '\\') {
-    l->bufp++;
+    incBufP(l);
     lexEscapeChar(l, t);
   } else {
     *(*t)++ = current;
-    l->bufp++;
+    incBufP(l);
   }
 }
 
@@ -172,7 +190,7 @@ void lexString(Lexer* l) {
   l->sym = STString;
   l->symc = 0;
   char* t = l->text;
-  l->bufp++;
+  incBufP(l);
 
   while(_BC != '\'') {
     if (_BC == '\n') {
@@ -187,7 +205,7 @@ void lexString(Lexer* l) {
   }
 
   *t = 0;
-  l->bufp++;
+  incBufP(l);
 }
 
 void lexOperator(Lexer* l) {
@@ -195,8 +213,10 @@ void lexOperator(Lexer* l) {
     l->sym = OperatorSequence;
     l->symc = 0;
     char* t = l->text;
-    while(_ISOP(_BC))
-      *t++ = l->buf[l->bufp++];
+    while(_ISOP(_BC)) {
+      *t++ = _BC;
+      incBufP(l);
+    }
     *t = 0;
   }
   else _MATCH('~', Not)
@@ -238,12 +258,15 @@ Symbol Lexer_get_sym(Lexer* l) {
   else _MATCH(']', EndBlock)
   else if(_BC == ':') {
     if(l->buf[l->bufp+1] == '=') {
-      l->bufp += 2;
+      incBufP(l);
+      incBufP(l);
+
       l->sym = Assign;
       l->symc = 0;
       sprintf(l->text, ":=");
     } else {
-      l->bufp++;
+      incBufP(l);
+
       l->sym = Colon;
       l->symc = ':';
       sprintf(l->text, ":");
@@ -257,8 +280,10 @@ Symbol Lexer_get_sym(Lexer* l) {
   else if(_BC == '-') {
     if(!strncmp(l->buf + l->bufp, SEPARATOR, strlen(SEPARATOR))) {
       char* t = l->text;
-      while(_BC == '-')
-        *t++ = l->buf[l->bufp++];
+      while(_BC == '-') {
+        *t++ = _BC;
+        incBufP(l);
+      }
       *t = 0;
       l->sym = Separator;
     } else {
@@ -277,17 +302,21 @@ Symbol Lexer_get_sym(Lexer* l) {
   else if(isalpha(_BC)) {
     char* t = l->text;
     l->symc = 0;
-    while(isalpha(_BC) || isdigit(_BC) || _BC == '_')
-      *t++ = l->buf[l->bufp++];
+    while(isalpha(_BC) || isdigit(_BC) || _BC == '_') {
+      *t++ = _BC;
+      incBufP(l);
+    }
     l->sym = Identifier;
-    if(l->buf[l->bufp] == ':') {
+    if (_BC == ':') {
       l->sym = Keyword;
-      l->bufp++;
+      incBufP(l);
       *t++ = ':';
-      if(isalpha(_BC)) {
+      if (isalpha(_BC)) {
         l->sym = KeywordSequence;
-        while(isalpha(_BC) || _BC == ':')
-          *t++ = l->buf[l->bufp++];
+        while (isalpha(_BC) || _BC == ':') {
+          *t++ = _BC;
+          incBufP(l);
+        }
       }
     }
     *t = 0;
@@ -306,7 +335,7 @@ Symbol Lexer_get_sym(Lexer* l) {
 void Lexer_peek(Lexer* l) {
   Symbol saveSym = l->sym;
   char saveSymc = l->symc;
-  char saveText[256];
+  char saveText[BUFSIZ];
   strcpy(saveText, l->text);
   if (l->peekDone)
     fprintf(stderr, "Cannot peek twice!\n");

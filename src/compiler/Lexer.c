@@ -196,6 +196,10 @@ void lexString(Lexer* l) {
     if (_BC == '\n') {
       l->line_num += 1;
     }
+    if (t >= l->text + BUFSIZ) {
+      debug_error("%s:%d: String too long. Doesn't fit into parse buffer.", l->file_name, l->line_num);
+      exit(ERR_FAIL);
+    }
     lexStringChar(l, &t);
     while (EOB) {
       if (fillbuffer(l) == -1) {

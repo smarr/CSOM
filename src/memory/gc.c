@@ -135,8 +135,9 @@ void reset_alloc_stat(void);
 void gc_set_heap_size(uint32_t heap_size) {
     // this can only be done before the heap is initialised - afterwards, it
     // yields an error message and terminates the VM
-    if(object_space != NULL)
+    if (object_space != NULL) {
         Universe_error_exit("attempt to change heap size after initialisation");
+    }
     OBJECT_SPACE_SIZE = 1024 * 1024 * heap_size;
 }
 
@@ -387,16 +388,14 @@ void* gc_allocate(size_t size) {
             } else {
                 before_entry->next = replace_entry;
             }
-        }  else { 
+        } else {
             // no space was left
             // running the GC here will most certainly result in data loss!
             fprintf(stderr,"Not enough heap! Data loss is possible\n");
             fprintf(stderr, "FREE-Size: %zd, uninterruptable_counter: %d\n",
                 size_of_free_heap, uninterruptable_counter);
             
-            gc_collect();
-            //fulfill initial request
-            result = gc_allocate(size);
+            exit(ERR_FAIL);
         }
     }
            

@@ -94,11 +94,13 @@ void  _System_exit_(pVMObject object, pVMFrame frame) {
 void  _System_printString_(pVMObject object, pVMFrame frame) {
     pVMString arg = (pVMString)SEND(frame, pop);
     printf("%s", SEND(arg, get_chars));
+    fflush(stdout);
 }
 
 
 void  _System_printNewline(pVMObject object, pVMFrame frame) {
-    printf("\n");    
+    printf("\n");
+    fflush(stdout);
 }
 
 

@@ -99,7 +99,9 @@ static const Test tests[] = {
     {"Regressions", "testSymbolEquality", (void*) 1, INTEGER},
     {"Regressions", "testSymbolReferenceEquality", (void*) 1, INTEGER},
 
-    {"NumberOfTests", "numberOfTests", (void*) 51, INTEGER},
+    {"BinaryOperation", "test", (void*) 11, INTEGER},
+
+    {"NumberOfTests", "numberOfTests", (void*) 52, INTEGER},
 
     {NULL}
 };

@@ -36,7 +36,8 @@ THE SOFTWARE.
     va_list ap; \
     va_start(ap, (x)); \
     (void)vfprintf((f), (x), ap); \
-    va_end(ap)
+    va_end(ap); \
+    fflush(f)
 
 
 static inline void debug_print(const char* fmt, ...) {
@@ -53,7 +54,8 @@ static inline void debug_prefix(const char* prefix) {
     va_list ap; \
     va_start(ap, (x)); \
     (void)vfprintf(stderr, (x), ap); \
-    va_end(ap)
+    va_end(ap); \
+    fflush(stderr)
 
 
 static inline void debug_info(const char* fmt, ...) {

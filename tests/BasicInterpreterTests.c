@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-
+#include <compiler/Parser.h>
 #include <memory/gc.h>
 
 #include <vm/Universe.h>
@@ -171,6 +171,8 @@ void run_test(Test test) {
 
 
 bool run_all_tests() {
+    Parser_init_constants();
+    
     bool has_failures = false;
     for (int i = 0; tests[i].class_name != NULL; i += 1) {
         printf("Test: %s>>#%s\n", tests[i].class_name, tests[i].method_name);

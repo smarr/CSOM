@@ -400,6 +400,18 @@ static Symbol binaryOpSyms[] = {
 static Symbol keywordSelectorSyms[] = { Keyword, KeywordSequence };
 
 
+static pString selfStr;
+static pString superStr;
+static pString blockSelfStr;
+
+
+void Parser_init_constants() {
+    selfStr = String_new("self", strlen("self"));
+    superStr = String_new("super", strlen("super"));
+    blockSelfStr = String_new("$block self", strlen("$block self"));
+}
+
+
 #pragma mark Parser grammar
 
 

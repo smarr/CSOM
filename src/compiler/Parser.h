@@ -43,4 +43,6 @@ Lexer* Parser_init(const FILE* fp, const char* fname);
 Lexer* Parser_init_string(const char* stream);
 void Parser_classdef(Lexer* l, class_generation_context* cgenc);
 
+void Parser_init_constants(void);
+
 #endif // PARSER_H_

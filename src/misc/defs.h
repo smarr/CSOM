@@ -28,6 +28,7 @@ THE SOFTWARE.
  */
 
 #include <stdint.h>
+#include <stddef.h>
 
 
 //
@@ -58,11 +59,12 @@ THE SOFTWARE.
  * A String hashing inline function
  * Java-like; see http://mindprod.com/jgloss/hashcode.html
  */
-static inline int64_t string_hash(const char* restrict string) {
+static inline int64_t string_hash(const char* restrict string, size_t length) {
     uint64_t result = 0;
-    char* ptr = (char*)string;
-    while(ptr[0])
-        result = (31 * result + *ptr++) % UINT64_MAX;
+
+    for (size_t i = 0; i < length; i++) {
+        result = 31 * result + string[i];
+    }
     return result;
 }
 

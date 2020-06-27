@@ -132,7 +132,7 @@ void _VMPrimitive_set_routine(void* _self, routine_fn routine) {
 
 void empty_routine(pVMObject self, pVMFrame frame) {
     pVMSymbol sig = TSEND(VMInvokable, self, get_signature);
-    debug_warn("undefined primitive %s called", SEND(sig, get_chars));
+    debug_warn("undefined primitive %s called", SEND(sig, get_rawChars));
 }
 
 

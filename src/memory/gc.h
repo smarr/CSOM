@@ -67,7 +67,6 @@ void gc_finalize(void);
 
 
 void*  internal_allocate(size_t size);
-char*  internal_allocate_string(const char* restrict str);
 void   internal_free(void* ptr);
 
 

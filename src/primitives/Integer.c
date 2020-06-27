@@ -259,7 +259,7 @@ void Integer_fromString_(pVMObject object, pVMFrame frame) {
     pVMString self = (pVMString)SEND(frame, pop);
     SEND(frame, pop);
     
-    int64_t integer = atol(SEND(self, get_chars));
+    int64_t integer = atol(SEND(self, get_rawChars));
     
     SEND(frame, push, (pVMObject)Universe_new_integer(integer));
 }

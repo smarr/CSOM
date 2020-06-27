@@ -38,13 +38,13 @@ THE SOFTWARE.
 /**
  * Create a new VMSymbol with an initial C-string
  */
-pVMSymbol VMSymbol_new(const char* restrict string) {
+pVMSymbol VMSymbol_new(pString restrict string) {
     pVMSymbol result = (pVMSymbol)gc_allocate_object(
-        sizeof(VMSymbol) + sizeof(char) * (strlen(string) + 1));
+        sizeof(VMSymbol) + sizeof(char) * string->length);
     if (result) {
         result->_vtable = VMSymbol_vtable();
         gc_start_uninterruptable_allocation();
-        INIT(result, string);
+        INIT(result, string->chars, string->length);
         gc_end_uninterruptable_allocation();
     }
     return result;
@@ -58,7 +58,7 @@ void _VMSymbol_init(void* _self, ...) {
     va_list args;
     va_start(args, _self);
 
-    SUPER(VMString, _self, init, va_arg(args, char*));
+    SUPER(VMString, _self, init, va_arg(args, char*), va_arg(args, size_t));
 
     va_end(args);
 }

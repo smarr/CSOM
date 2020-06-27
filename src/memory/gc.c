@@ -487,11 +487,6 @@ void internal_free(void* ptr) {
 }
 
 
-char* internal_allocate_string(const char* restrict str) {
-    return strdup(str);
-}
-
-
 /**
  * Sets up the heap and the free_list managing the free entries
  * inside the heap.

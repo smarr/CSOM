@@ -39,7 +39,7 @@ THE SOFTWARE.
 pVMString VMString_new(const char* restrict chars) {
     pVMString result = (pVMString)gc_allocate_object(
         sizeof(VMString) + sizeof(char) * (strlen(chars) + 1));
-    if(result) {
+    if (result) {
         result->_vtable = VMString_vtable();
         gc_start_uninterruptable_allocation();
         INIT(result, chars);

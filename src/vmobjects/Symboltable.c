@@ -51,7 +51,8 @@ void Symbol_table_init(void) {
 
 
 void Symbol_table_destruct(void) {
-    if(symtab)
+    if (symtab) {
         SEND(symtab, free);
+    }
 }
 

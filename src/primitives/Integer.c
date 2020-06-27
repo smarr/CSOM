@@ -244,6 +244,7 @@ void  _Integer_lessthan(pVMObject object, pVMFrame frame) {
 
 void  _Integer_asString(pVMObject object, pVMFrame frame) {
     pVMInteger self = (pVMInteger)SEND(frame, pop);
+
     // temporary storage for the number string
     // use c99 snprintf-goodie
     int64_t integer = SEND(self,  get_embedded_integer);

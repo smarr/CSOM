@@ -561,7 +561,7 @@ static void init_lib(void* dlhandle) {
 void _VMClass_load_primitives(void* _self, const pString* cp, size_t cp_count) {
     pVMClass self = (pVMClass)_self;
     // the library handle
-    void* dlhandle=NULL;
+    void* dlhandle = NULL;
     // cached object properties
     const char* cname = SEND(self->name, get_chars);
 

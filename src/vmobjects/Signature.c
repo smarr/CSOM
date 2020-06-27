@@ -34,17 +34,20 @@ THE SOFTWARE.
 
 int Signature_get_number_of_arguments(pVMSymbol sig) {
     // check default binaries
-    if(Signature_is_binary(sig)) return 2;
-    else {
         const char* str = SEND(sig, get_chars);
+    if (Signature_is_binary(sig)) {
+        return 2;
+    } else {
         // colons in str
         int num_colons = 0;
         
         // search the str
         for(int i = 0 ; i < strlen(str); i++) 
-            if(str[i] == ':')
+            if (str[i] == ':') {
                 // additional colon found
                 num_colons++;
+            }
+        }
         
         // The number of arguments is equal to the number of colons plus one
         // (->> SELF)

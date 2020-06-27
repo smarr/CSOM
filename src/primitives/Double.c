@@ -137,6 +137,7 @@ void  _Double_lessthan(pVMObject object, pVMFrame frame) {
 
 void  _Double_asString(pVMObject object, pVMFrame frame) {
     pVMDouble self = (pVMDouble)SEND(frame, pop);
+
     // temporary storage for the number string
     // use c99 snprintf-goodie
     double dbl = SEND(self, get_embedded_double);

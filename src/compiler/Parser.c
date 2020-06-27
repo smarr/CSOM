@@ -345,8 +345,8 @@ void gen_push_variable(method_generation_context* mgenc, const char* var) {
     size_t index = 0;
     size_t context = 0;
     bool is_argument = false;
-    if(method_genc_find_var(mgenc, var, &index, &context, &is_argument))
-        if(is_argument)
+    if (method_genc_find_var(mgenc, var, &index, &context, &is_argument))
+        if (is_argument)
             emit_PUSH_ARGUMENT(mgenc, index, context);
         else
             emit_PUSH_LOCAL(mgenc, index, context);
@@ -371,13 +371,15 @@ void gen_pop_variable(method_generation_context* mgenc, const char* var) {
     size_t index = 0;
     size_t context = 0;
     bool is_argument = false;
-    if(method_genc_find_var(mgenc, var, &index, &context, &is_argument))
-        if(is_argument)
+    if (method_genc_find_var(mgenc, var, &index, &context, &is_argument)) {
+        if (is_argument) {
             emit_POP_ARGUMENT(mgenc, index, context);
-        else
+        } else {
             emit_POP_LOCAL(mgenc, index, context);
-    else
         emit_POP_FIELD(mgenc, Universe_symbol_for(var));
+        }
+    } else {
+    }
 }
 
 

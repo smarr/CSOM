@@ -59,7 +59,7 @@ int64_t _StringHashmapElem_key_hash(void* _self) {
 pHashmapElem StringHashmapElem_new(void* k, void* v) {
     pStringHashmapElem result =
         (pStringHashmapElem)internal_allocate(sizeof(StringHashmapElem));
-    if(result) {
+    if (result) {
         result->_vtable = StringHashmapElem_vtable();
         INIT(result, k, v);
     }

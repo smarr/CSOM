@@ -111,7 +111,7 @@ pVMClass SourcecodeCompiler_compile_class(const char* path,
     strcat(fname, filename);
     strcat(fname, ".som");
 
-    if(access(fname, F_OK & R_OK) == -1) {
+    if (access(fname, F_OK & R_OK) == -1) {
         //file not found or not readable       
         debug_info("Unable to open specified classpath, trying next one. ");
         debug_info("File: %s\n", fname);

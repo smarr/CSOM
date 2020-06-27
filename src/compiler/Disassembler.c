@@ -87,7 +87,7 @@ static inline void _Disassembler_dispatch(pVMObject o) {
  * Dump a class and all subsequent methods.
  */
 void Disassembler_dump(pVMClass class) {
-    for(int i = 0; i < SEND(class, get_number_of_instance_invokables); i++) {
+    for (int i = 0; i < SEND(class, get_number_of_instance_invokables); i++) {
         pVMObject inv = SEND(class, get_instance_invokable, i);
         // output header and skip if the Invokable is a Primitive
         pVMSymbol sig = TSEND(VMInvokable, inv, get_signature);
@@ -95,7 +95,7 @@ void Disassembler_dump(pVMClass class) {
         pVMSymbol cname = SEND(class, get_name);
         const char* cname_s = SEND(cname, get_chars);
         debug_dump("%s>>%s = ", cname_s, sig_s);
-        if(TSEND(VMInvokable, inv, is_primitive)) {
+        if (TSEND(VMInvokable, inv, is_primitive)) {
             debug_print("<primitive>\n");
             continue;
         }

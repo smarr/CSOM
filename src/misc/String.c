@@ -48,7 +48,7 @@ pString String_new(const char* restrict cstring) {
         return NULL;
     
     pString result = (pString)internal_allocate(sizeof(String));
-    if(result) {
+    if (result) {
         result->_vtable = String_vtable();
         INIT(result, cstring);        
     }    
@@ -58,7 +58,7 @@ pString String_new(const char* restrict cstring) {
 
 pString String_new_from(pString restrict string) {
     pString result = (pString)internal_allocate(sizeof(String));
-    if(result) {
+    if (result) {
         result->_vtable = String_vtable();
         INIT(result, string->chars);        
     }    
@@ -190,7 +190,7 @@ pString _String_concatChar(void* _self, char other) {
 intptr_t _String_indexOf(void* _self, pString pattern) {
     pString self = (pString)_self;
     char* pos = strstr(self->chars, pattern->chars);
-    if(pos >= self->chars)
+    if (pos >= self->chars)
         return self->chars - pos;
     else
         //not found
@@ -202,17 +202,19 @@ intptr_t _String_indexOfChar(void* _self, char pattern) {
     pString self = (pString)_self;
     char* pos = strchr(self->chars, pattern);
     if(pos >= self->chars)
+    if (pos >= self->chars) {
         return pos - self->chars;
-    else
-        //not found
+    } else {
+        // not found
         return -1;
+    }
 }
 
 
 intptr_t _String_lastIndexOfChar(void* _self, char pattern) {
     pString self = (pString)_self;
     char* pos = strrchr(self->chars, pattern);
-    if(pos >= self->chars)
+    if (pos >= self->chars)
         return pos - self->chars;
     else
         //not found
@@ -222,7 +224,7 @@ intptr_t _String_lastIndexOfChar(void* _self, char pattern) {
 
 int _String_charAt(void* _self, size_t position) {
     pString self = (pString)_self;
-    if(position <= self->length)
+    if (position <= self->length)
         return self->chars[position];
     else
         return -1;
@@ -231,10 +233,12 @@ int _String_charAt(void* _self, size_t position) {
 
 pString _String_substring(void* _self, size_t start, size_t end) {
     pString self = (pString)_self;
-    if((start > self->length) || (end > self->length))
+    if ((start > self->length) || (end > self->length))
         // boundary excess
         return NULL;
+
     size_t new_length = end + 1 - start;
+
     char tmp[new_length + 1];
     (strncpy(tmp, self->chars + start, new_length))[new_length] = '\0';
     

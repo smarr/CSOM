@@ -41,7 +41,7 @@ THE SOFTWARE.
 pVMSymbol VMSymbol_new(const char* restrict string) {
     pVMSymbol result = (pVMSymbol)gc_allocate_object(
         sizeof(VMSymbol) + sizeof(char) * (strlen(string) + 1));
-    if(result) {
+    if (result) {
         result->_vtable = VMSymbol_vtable();
         gc_start_uninterruptable_allocation();
         INIT(result, string);

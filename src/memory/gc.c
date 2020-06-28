@@ -232,7 +232,7 @@ void gc_show_memory() {
                 fprintf(stderr,"-xx-");
             } else {
                 pVMSymbol class_name = SEND(SEND(object, get_class), get_name);
-                fprintf(stderr,"-%ld %s %p-", object_size, SEND(class_name, get_plain_string), object);
+                fprintf(stderr,"|%ld %s %p", object_size, SEND(class_name, get_plain_string), object);
             }
         }
         // aligns the output by inserting a line break after 36 objects

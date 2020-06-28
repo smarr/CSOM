@@ -268,7 +268,7 @@ const char** Universe_handle_arguments(
                 add_class_path(ext_path_tokens[0]);
                                 
                 // copy filename back to args
-                argv[i] = strdup(SEND(ext_path_tokens[1], chars));
+                argv[i] = strndup(SEND(ext_path_tokens[1], rawChars), SEND(ext_path_tokens[1], length));
                 SEND(ext_path_tokens[1], free);
 
                 // guaranteed not to be used/referenced any more
@@ -818,7 +818,7 @@ void Universe_load_system_class(pVMClass system_class) {
     // check class loading.
     if(!result) {
         pVMSymbol cname = SEND(system_class, get_name);
-        debug_error("can't load system class:\t%s", SEND(cname, get_chars));
+        debug_error("can't load system class:\t%s", SEND(cname, get_rawChars));
         Universe_exit(ERR_FAIL);
     }
 
@@ -829,14 +829,16 @@ void Universe_load_system_class(pVMClass system_class) {
 
 
 pVMClass Universe_load_class_basic(pVMSymbol name, pVMClass system_class) {
-    debug_log("Universe_load_class_basic %s cp_count %zd\n", SEND(name, get_chars), cp_count);
+    debug_log("Universe_load_class_basic %s cp_count %zd\n", SEND(name, get_rawChars), cp_count);
 
     pVMClass result;
     // Try loading the class from all different paths
     for(int i = 0; i < cp_count; i++) {
         // Load the class from a file and return the loaded class
-        result = SourcecodeCompiler_compile_class(SEND(class_path[i], chars), 
-                                                  SEND(name, get_chars),
+        result = SourcecodeCompiler_compile_class(SEND(class_path[i], rawChars),
+                                                  SEND(class_path[i], length),
+                                                  SEND(name, get_rawChars),
+                                                  SEND(name, get_length),
                                                   system_class);
         if(result) {
             if(dump_bytecodes) {

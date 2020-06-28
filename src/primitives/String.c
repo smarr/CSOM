@@ -121,9 +121,8 @@ void  _String_primSubstringFrom_to_(pVMObject object, pVMFrame frame) {
 
 void  _String_isWhiteSpace(pVMObject object, pVMFrame frame) {
     pVMString self = (pVMString)SEND(frame, pop);
-    const char* string = SEND(self, get_chars);
-
-    size_t length = strlen(string);
+    const char* string = SEND(self, get_rawChars);
+    size_t length = SEND(self, get_length);
 
     for (size_t i = 0; i < length; i++) {
         if (!isspace(string[i])) {
@@ -142,9 +141,8 @@ void  _String_isWhiteSpace(pVMObject object, pVMFrame frame) {
 
 void  _String_isLetters(pVMObject object, pVMFrame frame) {
     pVMString self = (pVMString)SEND(frame, pop);
-    const char* string = SEND(self, get_chars);
-
-    size_t length = strlen(string);
+    const char* string = SEND(self, get_rawChars);
+    size_t length = SEND(self, get_length);
 
     for (size_t i = 0; i < length; i++) {
         if (!isalpha(string[i])) {
@@ -163,9 +161,8 @@ void  _String_isLetters(pVMObject object, pVMFrame frame) {
 
 void  _String_isDigits(pVMObject object, pVMFrame frame) {
     pVMString self = (pVMString)SEND(frame, pop);
-    const char* string = SEND(self, get_chars);
-
-    size_t length = strlen(string);
+    const char* string = SEND(self, get_rawChars);
+    size_t length = SEND(self, get_length);
 
     for (size_t i = 0; i < length; i++) {
         if (!isdigit(string[i])) {

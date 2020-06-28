@@ -140,7 +140,7 @@ static void assert_equals(pVMObject result, Test test) {
     if (test.expected_type == CLASS) {
         const char* expected = (const char*) test.expected_result;
         pVMClass actual = (pVMClass) result;
-        const char* actual_class_name = SEND(SEND(actual, get_name), get_chars);
+        const char* actual_class_name = SEND(SEND(actual, get_name), get_rawChars);
 
         assert_desc(strcmp(expected, actual_class_name) == 0,
                     "Assertion failed. Expected class %s, but got %s",
@@ -151,7 +151,7 @@ static void assert_equals(pVMObject result, Test test) {
     if (test.expected_type == SYMBOL) {
         const char* expected = (const char*) test.expected_result;
         pVMSymbol actual = (pVMSymbol) result;
-        const char* actual_str = SEND(actual, get_chars);
+        const char* actual_str = SEND(actual, get_rawChars);
 
         assert_desc(strcmp(expected, actual_str) == 0,
                     "Assertion failed. Expected symbol %s, but got %s",

@@ -29,7 +29,7 @@ THE SOFTWARE.
 
 #include <vmobjects/VMSymbol.h>
 
-pVMSymbol Symbol_table_lookup(const char* restrict);
+pVMSymbol Symbol_table_lookup(pString restrict);
 void      Symbol_table_insert(pVMSymbol);
 
 void      Symbol_table_init(void);

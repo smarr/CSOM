@@ -399,14 +399,19 @@ int64_t number_of_super_instance_fields(void* _self) {
  * generate the string containing the path to a primitive library which may be 
  * located at the classpath given.
  */
-pString gen_loadstring(const pString restrict cp, 
-                       const char* cname
-                       ) {
-   
+pString gen_loadstring(const pString restrict cp, const char* cname, size_t cnameLen) {
     pString loadstring = String_new_from(cp);
-    SEND(loadstring, concatChars, file_separator);
-    SEND(loadstring, concatChars, cname);
-    SEND(loadstring, concatChars, shared_extension);
+    pString old = loadstring;
+    loadstring = SEND(old, concatChars, file_separator, strlen(file_separator));
+    internal_free(old);
+
+    old = loadstring;
+    loadstring = SEND(old, concatChars, cname, cnameLen);
+    internal_free(old);
+
+    old = loadstring;
+    loadstring = SEND(loadstring, concatChars, shared_extension, strlen(shared_extension));
+    internal_free(old);
     
     return loadstring;
 }
@@ -442,11 +447,13 @@ void* load_lib(const pString restrict path) {
     static void* handle = NULL;
     
     // try load lib
-    if((handle=dlopen(SEND(path, chars), DL_LOADMODE)))
-        //found.
+    if ((handle = dlopen(SEND(path, rawChars), DL_LOADMODE))) {
+        // found
         return handle;
-    else
+    } else {
+        printf("dlopen failed with: %s\n", dlerror());
         return NULL;
+    }
 }
 
 
@@ -505,9 +512,11 @@ void set_primitives(pVMClass class, void* handle, const char* cname,
             { //string block
                 char symbol[strlen(cname) + strlen(selector) + 2 + 1];
                                                                 //2 for 2x '_'
-                sprintf(symbol, format, cname, selector);
+                size_t length = sprintf(symbol, format, cname, selector);
+                pString symbolString = String_new(symbol, length);
 
-                bool loaded = (bool) SEND(primitive_map, get, (void*)symbol);
+                bool loaded = (bool) SEND(primitive_map, get, symbolString);
+
 
                 if (loaded) {
                     // we already loaded this symbol
@@ -516,7 +525,7 @@ void set_primitives(pVMClass class, void* handle, const char* cname,
 
                 // try loading the primitive
                 routine = (routine_fn)dlsym(handle, symbol);
-                SEND(primitive_map, put, (void*)symbol, (void*)true);
+                SEND(primitive_map, put, symbolString, (void*)true);
             }
             
             if(!routine && class == target) {

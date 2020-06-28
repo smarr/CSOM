@@ -134,8 +134,8 @@
 		0A775BB9221859D800CB6FA5 /* Method.c */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.c.c; path = Method.c; sourceTree = "<group>"; tabWidth = 4; };
 		0A775BBB2218CE4C00CB6FA5 /* Primitive.h */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = Primitive.h; sourceTree = "<group>"; tabWidth = 4; };
 		0A775BBC2218CE4C00CB6FA5 /* Primitive.c */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.c.c; path = Primitive.c; sourceTree = "<group>"; tabWidth = 4; };
-		0AADABDF221CACDC00CB801F /* Lexer.h */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = Lexer.h; sourceTree = "<group>"; tabWidth = 4; };
-		0AADABE0221CACDC00CB801F /* Lexer.c */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.c.c; path = Lexer.c; sourceTree = "<group>"; tabWidth = 4; };
+		0AADABDF221CACDC00CB801F /* Lexer.h */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.c.h; path = Lexer.h; sourceTree = "<group>"; tabWidth = 2; };
+		0AADABE0221CACDC00CB801F /* Lexer.c */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.c.c; path = Lexer.c; sourceTree = "<group>"; tabWidth = 2; };
 		0AF36BFD2219806A00985926 /* tests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = tests; sourceTree = BUILT_PRODUCTS_DIR; };
 		0AF36BFF2219806A00985926 /* main.c */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; tabWidth = 4; };
 		0AF36C04221980A700985926 /* BasicInterpreterTests.c */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.c; path = BasicInterpreterTests.c; sourceTree = "<group>"; tabWidth = 4; };

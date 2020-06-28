@@ -222,9 +222,9 @@ static void keywordPattern(Lexer* l, method_generation_context* mgenc);
 static void methodBlock(Lexer* l, method_generation_context* mgenc);
 static pVMSymbol unarySelector(Lexer* l);
 static pVMSymbol binarySelector(Lexer* l);
-static char* identifier(Lexer* l);
+static pString identifier(Lexer* l);
 static pString keyword(Lexer* l);
-static char* argument(Lexer* l);
+static pString argument(Lexer* l);
 static void blockContents(Lexer* l, method_generation_context* mgenc);
 static void locals(Lexer* l, method_generation_context* mgenc);
 static void blockBody(Lexer* l, method_generation_context* mgenc, bool seen_period);
@@ -235,7 +235,7 @@ static void assignments(Lexer* lexer, method_generation_context* mgenc, pList l)
 static pString assignment(Lexer* l, method_generation_context* mgenc);
 static void evaluation(Lexer* l, method_generation_context* mgenc);
 static void primary(Lexer* l, method_generation_context* mgenc, bool* super);
-static char* variable(Lexer* l);
+static pString variable(Lexer* l);
 static void messages(Lexer* l, method_generation_context* mgenc, bool super);
 static void unaryMessage(Lexer* l, method_generation_context* mgenc, bool super);
 static void binaryMessage(Lexer* l, method_generation_context* mgenc, bool super);
@@ -254,7 +254,7 @@ static pVMObject literalSymbol(Lexer* l);
 static pVMObject literalString(Lexer* l);
 static pVMSymbol selector(Lexer* l);
 static pVMSymbol keywordSelector(Lexer* l);
-static char* string(Lexer* l);
+static pString string(Lexer* l);
 static void nestedBlock(Lexer* l, method_generation_context* mgenc);
 static void blockPattern(Lexer* l, method_generation_context* mgenc);
 static void blockArguments(Lexer* l, method_generation_context* mgenc);
@@ -336,7 +336,7 @@ bool expectOneOf(Lexer* l, Symbol* ss) {
 #pragma mark helper functions for pushing / popping variables
 
 
-void gen_push_variable(method_generation_context* mgenc, const char* var) {
+void gen_push_variable(method_generation_context* mgenc, pString var) {
     // The purpose of this function is to find out whether the variable to be
     // pushed on the stack is a local variable, argument, or object field. This
     // is done by examining all available lexical contexts, starting with the
@@ -351,18 +351,18 @@ void gen_push_variable(method_generation_context* mgenc, const char* var) {
         else
             emit_PUSH_LOCAL(mgenc, index, context);
     else if(method_genc_find_field(mgenc, var)) {
-        pVMSymbol fieldName = Universe_symbol_for(var);
+        pVMSymbol fieldName = Universe_symbol_for_str(var);
         SEND(mgenc->literals, addIfAbsent, fieldName);
         emit_PUSH_FIELD(mgenc, fieldName);
     } else {
-        pVMSymbol global = Universe_symbol_for(var);
+        pVMSymbol global = Universe_symbol_for_str(var);
         SEND(mgenc->literals, addIfAbsent, global);
         emit_PUSH_GLOBAL(mgenc, global);
     }
 }
 
 
-void gen_pop_variable(method_generation_context* mgenc, const char* var) {
+void gen_pop_variable(method_generation_context* mgenc, pString var) {
     // The purpose of this function is to find out whether the variable to be
     // popped off the stack is a local variable, argument, or object field. This
     // is done by examining all available lexical contexts, starting with the
@@ -376,9 +376,9 @@ void gen_pop_variable(method_generation_context* mgenc, const char* var) {
             emit_POP_ARGUMENT(mgenc, index, context);
         } else {
             emit_POP_LOCAL(mgenc, index, context);
-        emit_POP_FIELD(mgenc, Universe_symbol_for(var));
         }
     } else {
+        emit_POP_FIELD(mgenc, Universe_symbol_for_str(var));
     }
 }
 
@@ -481,10 +481,10 @@ void superclass(Lexer* l, class_generation_context* cgenc) {
 
         accept(l, Identifier);
     } else
-        cgenc->super_name = Universe_symbol_for("Object");
+        cgenc->super_name = Universe_symbol_for_cstr("Object");
 
     // Load the super class, if it is not nil (break the dependency cycle)
-    if (cgenc->super_name != Universe_symbol_for("nil")) {
+    if (cgenc->super_name != Universe_symbol_for_cstr("nil")) {
         pVMClass super_class = Universe_load_class(cgenc->super_name);
         class_genc_set_instance_fields_of_super(cgenc, SEND(super_class, get_instance_fields));
         class_genc_set_class_fields_of_super(cgenc, SEND(SEND(super_class, get_class), get_instance_fields));
@@ -517,8 +517,8 @@ void superclass(Lexer* l, class_generation_context* cgenc) {
 void instanceFields(Lexer* l, class_generation_context* cgenc) {
     if(accept(l, Or)) {
         while(l->sym == Identifier) {
-            char* var = variable(l);
-            SEND(cgenc->instance_fields, add, Universe_symbol_for(var));
+            pString var = variable(l);
+            SEND(cgenc->instance_fields, add, Universe_symbol_for_str(var));
             internal_free(var);
         }
         expect(l, Or);
@@ -529,8 +529,8 @@ void instanceFields(Lexer* l, class_generation_context* cgenc) {
 void classFields(Lexer* l, class_generation_context* cgenc) {
     if(accept(l, Or)) {
         while(l->sym == Identifier) {
-            char* var = variable(l);
-            SEND(cgenc->class_fields, add, Universe_symbol_for(var));
+            pString var = variable(l);
+            SEND(cgenc->class_fields, add, Universe_symbol_for_str(var));
             internal_free(var);
         }
         expect(l, Or);
@@ -594,7 +594,7 @@ void keywordPattern(Lexer* l, method_generation_context* mgenc) {
         internal_free(arg);
     } while(l->sym == Keyword);
     
-    mgenc->signature = Universe_symbol_for(SEND(kw, chars));
+    mgenc->signature = Universe_symbol_for_str(kw);
     SEND(kw, free);
 }
 
@@ -618,9 +618,9 @@ void methodBlock(Lexer* l, method_generation_context* mgenc) {
 
 
 pVMSymbol unarySelector(Lexer* l) {
-    const char* id = identifier(l);
-    pVMSymbol result = Universe_symbol_for(id);
-    internal_free((void*) id);
+    pString id = identifier(l);
+    pVMSymbol result = Universe_symbol_for_str(id);
+    internal_free(id);
     return result;
 }
 
@@ -648,8 +648,8 @@ pVMSymbol binarySelector(Lexer* l) {
 }
 
 
-char* identifier(Lexer* l) {
-    char* s = internal_allocate_string(l->text);
+pString identifier(Lexer* l) {
+    pString s = Lexer_get_text(l);
     if(accept(l, Primitive))
         ; // text is set
     else
@@ -660,14 +660,14 @@ char* identifier(Lexer* l) {
 
 
 pString keyword(Lexer* l) {
-    pString s = String_new(l->text);
+    pString s = Lexer_get_text(l);
     expect(l, Keyword);
     
     return s;
 }
 
 
-char* argument(Lexer* l) {
+pString argument(Lexer* l) {
     return variable(l);
 }
 
@@ -749,7 +749,7 @@ void assignation(Lexer* lexer, method_generation_context* mgenc) {
         emit_DUP(mgenc);
     for(i = 0; i < SEND(l, size); i++) {
         pString s = (pString)SEND(l, get, i);
-        gen_pop_variable(mgenc, SEND(s, chars));
+        gen_pop_variable(mgenc, s);
     }
     
     SEND(l, deep_free);
@@ -767,15 +767,13 @@ void assignments(Lexer* lexer, method_generation_context* mgenc, pList l) {
 
 
 pString assignment(Lexer* l, method_generation_context* mgenc) {
-    char* v = variable(l);
-    pVMSymbol var = Universe_symbol_for(v);
+    pString v = variable(l);
+    pVMSymbol var = Universe_symbol_for_str(v);
     SEND(mgenc->literals, addIfAbsent, var);
     
     expect(l, Assign);
-    
-    pString vString = String_new(v);
-    internal_free(v);
-    return vString;
+
+    return v;
 }
 
 
@@ -832,7 +830,7 @@ void primary(Lexer* l, method_generation_context* mgenc, bool* super) {
 }
 
 
-char* variable(Lexer* l) {
+pString variable(Lexer* l) {
     return identifier(l);
 }
 
@@ -908,7 +906,7 @@ void keywordMessage(Lexer* l, method_generation_context* mgenc, bool super) {
         formula(l, mgenc);
     } while(l->sym == Keyword);
     
-    pVMSymbol msg = Universe_symbol_for(SEND(kw, chars));
+    pVMSymbol msg = Universe_symbol_for_str(kw);
     SEND(kw, free);
     SEND(mgenc->literals, addIfAbsent, msg);
     
@@ -1017,9 +1015,9 @@ pVMObject literalDouble(Lexer* l, bool negateValue) {
 pVMObject literalSymbol(Lexer* l) {
     pVMSymbol symb;
     expect(l, Pound);
-    if(l->sym == STString) {
-        char* s = string(l);
-        symb = Universe_symbol_for(s);
+    if (l->sym == STString) {
+        pString s = string(l);
+        symb = Universe_symbol_for_str(s);
         internal_free(s);
     } else
         symb = selector(l);
@@ -1029,10 +1027,10 @@ pVMObject literalSymbol(Lexer* l) {
 
 
 pVMObject literalString(Lexer* l) {
-    char* s = string(l);
-    pVMString str = Universe_new_string(s);
+    pString s = string(l);
+    pVMString str = Universe_new_string_str(s);
     internal_free(s);
-    
+
     return (pVMObject)str;
 }
 
@@ -1068,16 +1066,17 @@ pVMSymbol selector(Lexer* l) {
 
 
 pVMSymbol keywordSelector(Lexer* l) {
-    char* s = internal_allocate_string(l->text);
+    pString s = Lexer_get_text(l);
     expectOneOf(l, keywordSelectorSyms);
-    pVMSymbol symb = Universe_symbol_for(s);
+    pVMSymbol symb = Universe_symbol_for_str(s);
     internal_free(s);
+
     return symb;
 }
 
 
-char* string(Lexer* l) {
-    char* s = internal_allocate_string(l->text);
+pString string(Lexer* l) {
+    pString s = Lexer_get_text(l);
     expect(l, STString);
     return s; // literal strings are at most BUFSIZ long
 }
@@ -1098,7 +1097,7 @@ void nestedBlock(Lexer* l, method_generation_context* mgenc) {
     strcpy(block_sig, BLOCK_METHOD);
     memset(block_sig + BLOCK_METHOD_L, ':', arg_size - 1);
 
-    mgenc->signature = Universe_symbol_for(block_sig);
+    mgenc->signature = Universe_symbol_for_cstr(block_sig);
     internal_free(block_sig);
     
     blockContents(l, mgenc);

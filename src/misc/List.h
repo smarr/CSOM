@@ -39,14 +39,15 @@ VTABLE(List) {
 #define LIST_VTABLE_FORMAT \
     OOOBJECT_VTABLE_FORMAT; \
     void  (*add)(void*, void* ptr); \
-    void  (*addCString)(void*, const char* cstring); \
+    void  (*addString)(void*, pString str); \
     void  (*addIfAbsent)(void*, void* ptr); \
-    void  (*addCStringIfAbsent)(void*, const char* cstring); \
+    void  (*addStringIfAbsent)(void*, pString str); \
     void  (*addAll)(void*, pList list); \
     void  (*clear)(void*); \
     void  (*deep_free)(void*); \
     size_t (*indexOf)(void*, void* ptr); \
-    size_t (*indexOfCString)(void*, const char* str); \
+    size_t (*indexOfString)(void*, pString str); \
+    size_t (*indexOfStringLen)(void*, const char* restrict str, size_t length); \
     size_t (*size)(void*); \
     void* (*get)(void*, size_t index)
     

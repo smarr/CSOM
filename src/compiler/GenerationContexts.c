@@ -111,7 +111,7 @@ int8_t method_genc_find_literal_index(
 
 bool method_genc_find_var(
     method_generation_context* mgenc,
-    const char* var,
+    pString var,
     size_t* index,
     size_t* context,
     bool* is_argument
@@ -140,7 +140,7 @@ bool method_genc_find_var(
 
 
 bool method_genc_find_field(method_generation_context* mgenc,
-    const char* field
+    pString field
 ) {
     pList fields = mgenc->holder_genc->class_side ?
         mgenc->holder_genc->class_fields :

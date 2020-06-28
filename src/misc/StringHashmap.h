@@ -62,7 +62,7 @@ struct _StringHashmapElem {
 #pragma mark class methods
 
 
-pHashmapElem StringHashmapElem_new(void* key, void *value);
+pHashmapElem StringHashmapElem_new(pString key, void *value);
 
 
 #pragma mark vtable initialization

@@ -42,11 +42,13 @@ Lexer* Lexer_create(const FILE* fp, const char* file_name) {
   lexer->line_num = 0;
   lexer->sym = NONE;
   lexer->symc = 0;
-  lexer->text[0] = 0;
+  lexer->_text[0] = 0;
+  lexer->_textLength = 0;
   lexer->peekDone = false;
   lexer->nextSym = NONE;
   lexer->nextSymc = 0;
-  lexer->nextText[0] = 0;
+  lexer->_nextText[0] = 0;
+  lexer->_nextTextLength = 0;
   lexer->buf[0] = 0;
   lexer->bufp = 0;
   return lexer;
@@ -59,10 +61,24 @@ Lexer* Lexer_from_string(const char* stream) {
   return lexer;
 }
 
+pString Lexer_get_text(Lexer* l) {
+  pString result = String_new(l->_text, l->_textLength);
+
+  l->_text[0] = 0;
+  l->_textLength = 0;
+
+  return result;
+}
+
+void Lexer_consumed_text(Lexer* l) {
+  l->_text[0] = 0;
+  l->_textLength = 0;
+}
+
 #define _BC (l->buf[l->bufp])
 #define EOB ((l->bufp >= BUFSIZ) || (l->buf[l->bufp]==0))
 #define _MATCH(C, S) \
-  if(_BC == (C)) { l->sym = (S); l->symc = _BC; sprintf(l->text, "%c", _BC); incBufP(l);}
+  if(_BC == (C)) { l->sym = (S); l->symc = _BC; l->_textLength = sprintf(l->_text, "%c", _BC); incBufP(l);}
 
 #define SEPARATOR "----"
 #define PRIMITIVE "primitive"
@@ -129,15 +145,28 @@ void skipComment(Lexer* l) {
   }
 }
 
+void addChar(Lexer* l, char character) {
+  if (l->_textLength >= BUFSIZ) {
+    debug_error("%s:%d: Element too long. Doesn't fit into text buffer.", l->file_name, l->line_num);
+    exit(ERR_FAIL);
+  }
+
+  l->_text[l->_textLength] = character;
+  l->_textLength++;
+}
+
+void terminateText(Lexer* l) {
+  l->_text[l->_textLength] = '\0';
+}
+
 void lexNumber(Lexer* l) {
   l->sym = Integer;
   l->symc = 0;
-  char* t = l->text;
 
   bool saw_decimal_mark = false;
 
   do {
-    *t++ = l->buf[l->bufp];
+    addChar(l, l->buf[l->bufp]);
     incBufP(l);
 
     char char_arr[3];
@@ -151,37 +180,36 @@ void lexNumber(Lexer* l) {
         isdigit(l->buf[l->bufp + 1])) {
       l->sym = Double;
       saw_decimal_mark = true;
-      *t++ = l->buf[l->bufp];
+      addChar(l, l->buf[l->bufp]);
       incBufP(l);
     }
   } while(isdigit(_BC));
-  *t = 0;
 }
 
-void lexEscapeChar(Lexer* l, char** t) {
+void lexEscapeChar(Lexer* l) {
   char current = _BC;
 
   switch (current) {
-    case 't': *(*t)++ = '\t'; break;
-    case 'b': *(*t)++ = '\b'; break;
-    case 'n': *(*t)++ = '\n'; break;
-    case 'r': *(*t)++ = '\r'; break;
-    case 'f': *(*t)++ = '\f'; break;
-    case '0': *(*t)++ = '\0'; break;
-    case '\'': *(*t)++ = '\''; break;
-    case '\\': *(*t)++ = '\\'; break;
+    case 't': addChar(l, '\t'); break;
+    case 'b': addChar(l, '\b'); break;
+    case 'n': addChar(l, '\n'); break;
+    case 'r': addChar(l, '\r'); break;
+    case 'f': addChar(l, '\f'); break;
+    case '0': addChar(l, '\0'); break;
+    case '\'': addChar(l, '\''); break;
+    case '\\': addChar(l, '\\'); break;
   }
   incBufP(l);
 }
 
-void lexStringChar(Lexer* l, char** t) {
+void lexStringChar(Lexer* l) {
   char current = _BC;
 
   if (current == '\\') {
     incBufP(l);
-    lexEscapeChar(l, t);
+    lexEscapeChar(l);
   } else {
-    *(*t)++ = current;
+    addChar(l, current);
     incBufP(l);
   }
 }
@@ -189,7 +217,6 @@ void lexStringChar(Lexer* l, char** t) {
 void lexString(Lexer* l) {
   l->sym = STString;
   l->symc = 0;
-  char* t = l->text;
   incBufP(l);
 
   while(_BC != '\'') {
@@ -197,22 +224,16 @@ void lexString(Lexer* l) {
       if (fillbuffer(l) == -1) {
         return;
       }
-      *t++ = '\n';
-    }
-
-    if (t >= l->text + BUFSIZ) {
-      debug_error("%s:%d: String too long. Doesn't fit into parse buffer.", l->file_name, l->line_num);
-      exit(ERR_FAIL);
+      addChar(l, '\n');
     }
 
     if (_BC == '\n') {
       l->line_num += 1;
     } else if (_BC != '\'') {
-      lexStringChar(l, &t);
+      lexStringChar(l);
     }
   }
 
-  *t = 0;
   incBufP(l);
 }
 
@@ -220,12 +241,11 @@ void lexOperator(Lexer* l) {
   if(_ISOP(l->buf[l->bufp + 1])) {
     l->sym = OperatorSequence;
     l->symc = 0;
-    char* t = l->text;
+
     while(_ISOP(_BC)) {
-      *t++ = _BC;
+      addChar(l, _BC);
       incBufP(l);
     }
-    *t = 0;
   }
   else _MATCH('~', Not)
   else _MATCH('&', And)
@@ -248,9 +268,14 @@ Symbol Lexer_get_sym(Lexer* l) {
     l->peekDone = false;
     l->sym = l->nextSym;
     l->symc = l->nextSymc;
-    strcpy(l->text, l->nextText);
+    strncpy(l->_text, l->_nextText, l->_nextTextLength);
+    l->_textLength = l->_nextTextLength;
+    terminateText(l);
+
     return l->sym;
   }
+
+  Lexer_consumed_text(l);
 
   do {
     if (EOB)
@@ -271,13 +296,13 @@ Symbol Lexer_get_sym(Lexer* l) {
 
       l->sym = Assign;
       l->symc = 0;
-      sprintf(l->text, ":=");
+      l->_textLength = sprintf(l->_text, ":=");
     } else {
       incBufP(l);
 
       l->sym = Colon;
       l->symc = ':';
-      sprintf(l->text, ":");
+      l->_textLength = sprintf(l->_text, ":");
     }
   }
   else _MATCH('(', NewTerm)
@@ -287,12 +312,11 @@ Symbol Lexer_get_sym(Lexer* l) {
   else _MATCH('.', Period)
   else if(_BC == '-') {
     if(!strncmp(l->buf + l->bufp, SEPARATOR, strlen(SEPARATOR))) {
-      char* t = l->text;
+
       while(_BC == '-') {
-        *t++ = _BC;
+        addChar(l, _BC);
         incBufP(l);
       }
-      *t = 0;
       l->sym = Separator;
     } else {
       lexOperator(l);
@@ -305,29 +329,27 @@ Symbol Lexer_get_sym(Lexer* l) {
     l->bufp += strlen(PRIMITIVE);
     l->sym = Primitive;
     l->symc = 0;
-    sprintf(l->text, PRIMITIVE);
+    l->_textLength = sprintf(l->_text, PRIMITIVE);
   }
   else if(isalpha(_BC)) {
-    char* t = l->text;
     l->symc = 0;
     while(isalpha(_BC) || isdigit(_BC) || _BC == '_') {
-      *t++ = _BC;
+      addChar(l, _BC);
       incBufP(l);
     }
     l->sym = Identifier;
     if (_BC == ':') {
       l->sym = Keyword;
       incBufP(l);
-      *t++ = ':';
+      addChar(l, ':');
       if (isalpha(_BC)) {
         l->sym = KeywordSequence;
         while (isalpha(_BC) || _BC == ':') {
-          *t++ = _BC;
+          addChar(l, _BC);
           incBufP(l);
         }
       }
     }
-    *t = 0;
   }
   else if(isdigit(_BC)) {
     lexNumber(l);
@@ -335,8 +357,10 @@ Symbol Lexer_get_sym(Lexer* l) {
   else {
     l->sym = NONE;
     l->symc = _BC;
-    sprintf(l->text, "%c", _BC);
+    l->_textLength = sprintf(l->_text, "%c", _BC);
   }
+
+  terminateText(l);
   return l->sym;
 }
 
@@ -344,16 +368,28 @@ void Lexer_peek(Lexer* l) {
   Symbol saveSym = l->sym;
   char saveSymc = l->symc;
   char saveText[BUFSIZ];
-  strcpy(saveText, l->text);
-  if (l->peekDone)
+  strncpy(saveText, l->_text, l->_textLength);
+  size_t saveTextLength = l->_textLength;
+  saveText[saveTextLength] = '\0';
+
+  if (l->peekDone) {
     fprintf(stderr, "Cannot peek twice!\n");
+  }
+
   Lexer_get_sym(l);
   l->nextSym = l->sym;
   l->nextSymc = l->symc;
-  strcpy(l->nextText, l->text);
+
+  strncpy(l->_nextText, l->_text, l->_textLength);
+  l->_nextTextLength = l->_textLength;
+  l->_nextText[l->_textLength] = '\0';
+
   l->sym = saveSym;
   l->symc = saveSymc;
-  strcpy(l->text, saveText);
+  strncpy(l->_text, saveText, saveTextLength);
+  l->_textLength = saveTextLength;
+  terminateText(l);
+
   l->peekDone = true;
 }
 

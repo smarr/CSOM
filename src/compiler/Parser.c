@@ -312,7 +312,7 @@ bool expect(Lexer* l, Symbol s) {
     fprintf(stderr, "Error parsing %s:%d: unexpected symbol. Expected %s, but found %s",
             l->file_name, l->line_num, symnames[s], symnames[l->sym]);
     if(_PRINTABLE_SYM)
-        fprintf(stderr, " (%s)", l->text);
+        fprintf(stderr, " (%s)", l->_text);
     fprintf(stderr, ": %s\n", l->buf);
     return false;
 }
@@ -327,7 +327,7 @@ bool expectOneOf(Lexer* l, Symbol* ss) {
         fprintf(stderr, "%s, ", symnames[*ss++]);
     fprintf(stderr, "but found %s", symnames[l->sym]);
     if(_PRINTABLE_SYM)
-        fprintf(stderr, " (%s)", l->text);
+        fprintf(stderr, " (%s)", l->_text);
     fprintf(stderr, ": %s\n", l->buf);
     return false;
 }
@@ -476,7 +476,9 @@ void Parser_classdef(Lexer* l, class_generation_context* cgenc) {
 
 void superclass(Lexer* l, class_generation_context* cgenc) {
     if(l->sym == Identifier) {
-        cgenc->super_name = Universe_symbol_for(l->text);
+        cgenc->super_name = Universe_symbol_for_chars(l->_text, l->_textLength);
+        Lexer_consumed_text(l);
+
         accept(l, Identifier);
     } else
         cgenc->super_name = Universe_symbol_for("Object");
@@ -624,7 +626,8 @@ pVMSymbol unarySelector(Lexer* l) {
 
 
 pVMSymbol binarySelector(Lexer* l) {
-    pVMSymbol symb = Universe_symbol_for(l->text);
+    pVMSymbol symb = Universe_symbol_for_chars(l->_text, l->_textLength);
+    Lexer_consumed_text(l);
     
     if(accept(l, Or))
         ;
@@ -988,7 +991,9 @@ pVMObject negativeDecimal(Lexer* l) {
 
 
 pVMObject literalInteger(Lexer* l, bool negateValue) {
-    int64_t i = strtoll(l->text, NULL, 10);
+    int64_t i = strtoll(l->_text, NULL, 10);
+    Lexer_consumed_text(l);
+
     expect(l, Integer);
 
     if (negateValue) {
@@ -999,7 +1004,9 @@ pVMObject literalInteger(Lexer* l, bool negateValue) {
 
 
 pVMObject literalDouble(Lexer* l, bool negateValue) {
-    double d = strtod(l->text, NULL);
+    double d = strtod(l->_text, NULL);
+    Lexer_consumed_text(l);
+
     if (negateValue) {
         d = 0 - d;
     }

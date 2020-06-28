@@ -44,7 +44,7 @@ pVMSymbol VMSymbol_new(pString restrict string) {
     if (result) {
         result->_vtable = VMSymbol_vtable();
         gc_start_uninterruptable_allocation();
-        INIT(result, string->chars, string->length);
+        INIT(result, (char*) string->chars, string->length);
         gc_end_uninterruptable_allocation();
     }
     return result;
@@ -57,8 +57,10 @@ pVMSymbol VMSymbol_new(pString restrict string) {
 void _VMSymbol_init(void* _self, ...) {
     va_list args;
     va_start(args, _self);
+    char* chars = va_arg(args, char*);
+    size_t len  = va_arg(args, size_t);
 
-    SUPER(VMString, _self, init, va_arg(args, char*), va_arg(args, size_t));
+    SUPER(VMString, _self, init, chars, len);
 
     va_end(args);
 }

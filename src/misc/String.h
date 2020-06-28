@@ -41,13 +41,10 @@ VTABLE(String) {
 #define STRING_VTABLE_FORMAT \
     OOOBJECT_VTABLE_FORMAT; \
     size_t        (*length)(void*); \
-    size_t        (*size)(void*); \
-    const char*   (*chars)(void*); \
+    const char*   (*rawChars)(void*); \
     int           (*compareTo)(void*, pString other); \
-    int           (*compareToChars)(void*, const char* restrict other); \
     pString       (*concat)(void*, pString other); \
-    pString       (*concatChars)(void*, const char* restrict other); \
-    pString       (*concatChar)(void*, char other); \
+    pString       (*concatChars)(void*, const char* restrict other, size_t length); \
     intptr_t      (*indexOf)(void*, pString pattern); \
     intptr_t      (*indexOfChar)(void*, char pattern); \
     intptr_t      (*lastIndexOfChar)(void*, char pattern); \
@@ -55,7 +52,7 @@ VTABLE(String) {
     pString       (*substring)(void*, size_t start, size_t end); \
     pVMInteger    (*toInteger)(void*); \
     pVMDouble     (*toDouble)(void*); \
-    pString*      (*tokenize)(void*, size_t* length, \
+    pString*      (*tokenize)(void*, size_t* length_of_result, \
                               const char* restrict delimiters);
     
     STRING_VTABLE_FORMAT;
@@ -69,8 +66,8 @@ struct _String {
     VTABLE(String)* _vtable;    
 #define STRING_FORMAT \
     OOOBJECT_FORMAT; \
-    char* chars; \
-    size_t length
+    size_t length; \
+    char chars[0]
     
     STRING_FORMAT;
 }; 
@@ -86,7 +83,8 @@ struct _String {
 
 pString String_new(const char* restrict cstring, const size_t length);
 pString String_new_from(pString restrict string);
-
+pString String_new_concat(pString, pString);
+pString String_new_concat_str(pString restrict, const char* restrict, size_t);
 
 #pragma mark vtable initialization
 

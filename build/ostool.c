@@ -109,12 +109,7 @@ void print_header(void) {
 #else
     "#error \"no currently supported platform\"\n" 
 #endif // APPLE/linux/bsd/win32/sun
-
-#if defined(sun)
-/* mingw should follow */
-    "#define NEED_STRSEP\n\n"
-#endif
-    
+   
     "#define shared_extension \"" shared_extension "\"\n"
     "\n// EOF \n#endif // PLATFORM_H_\n");
 }

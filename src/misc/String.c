@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #include <string.h>
 #include <stdlib.h>
+#include <stddef.h>
 
 #include <misc/debug.h>
 
@@ -43,26 +44,59 @@ THE SOFTWARE.
 /**
  * Allocate a new String
  */
-pString String_new(const char* restrict cstring) {
+pString String_new(const char* restrict cstring, const size_t length) {
     if(cstring==NULL)
         return NULL;
     
-    pString result = (pString)internal_allocate(sizeof(String));
+    pString result = (pString)internal_allocate(sizeof(String) + ((1 + length) * sizeof(char)));
     if (result) {
         result->_vtable = String_vtable();
-        INIT(result, cstring);        
+        INIT(result, cstring, length);
     }    
     return result;
 }
 
 
 pString String_new_from(pString restrict string) {
-    pString result = (pString)internal_allocate(sizeof(String));
+    pString result = (pString)internal_allocate(
+        sizeof(String) + ((1 + string->length) * sizeof(char)));
     if (result) {
         result->_vtable = String_vtable();
-        INIT(result, string->chars);        
+        INIT(result, string->chars, string->length);
     }    
     return result;    
+}
+
+
+pString String_new_concat(pString strA, pString strB) {
+    return String_new_concat_str(strA, strB->chars, strB->length);
+}
+
+
+pString String_new_concat_str(pString strA, const char* restrict strB, size_t lengthB) {
+    pString result = (pString) internal_allocate(
+        sizeof(String) + ((strA->length + lengthB + 1) * sizeof(char)));
+    if (result) {
+        result->_vtable = String_vtable();
+        // make sure we initialize the object completely
+        INIT(result, "", 0);
+
+        // now, do the actual concatination work
+        size_t i = 0;
+        for (; i < strA->length; i++) {
+            result->chars[i] = strA->chars[i];
+        }
+
+        size_t j = 0;
+        for (; j < lengthB; i++, j++) {
+            result->chars[i] = strB[j];
+        }
+        
+        result->length = strA->length + lengthB;
+        result->chars[result->length] = '\0';
+        result->hash = string_hash(result->chars, result->length);
+    }
+    return result;
 }
 
 
@@ -75,10 +109,16 @@ void _String_init(void* _self, ...) {
     
     va_list args;
     va_start(args, _self);
-    self->chars = internal_allocate_string(va_arg(args, char*));
+    const char* restrict cstring = va_arg(args, char*);
+    self->length = va_arg(args, size_t);
     va_end(args);
-    self->length = strlen(self->chars);
-    self->hash = string_hash(self->chars);
+
+    for (size_t i = 0; i < self->length; i++) {
+        self->chars[i] = cstring[i];
+    }
+    self->chars[self->length] = '\0';
+
+    self->hash = string_hash(self->chars, self->length);
 }
 
 
@@ -89,8 +129,6 @@ void _String_init(void* _self, ...) {
 
 void _String_free(void* self) {
     pString _self = (pString)self;
-    if(_self->chars)
-        internal_free(_self->chars);
     SUPER(OOObject, _self, free);
 }
 
@@ -101,13 +139,7 @@ size_t _String_length(void* _self) {
 }
 
 
-size_t _String_size(void* _self) {
-    pString self = (pString)_self;
-    return self->length + 1;
-}
-
-
-const char* _String_chars(void* _self) {
+const char* _String_rawChars(void* _self) {
     pString self = (pString)_self;
     return (const char*)self->chars;
 }
@@ -115,75 +147,53 @@ const char* _String_chars(void* _self) {
 
 int _String_compareTo(void* _self, pString other) {
     pString self = (pString)_self;
-    return strcmp(self->chars, other->chars);    
+    size_t min_length = self->length < other->length ? self->length : other->length;
+    int result = memcmp(self->chars, other->chars, min_length);
+    if (result == 0) {
+        return (int) self->length - (int) other->length;
+    } else {
+        return result;
+    }
 }
 
 
-int _String_compareToChars(void* _self, const char* restrict other) {
-    pString self = (pString)_self;
-    return strcmp(self->chars, other);
+pString _String_concatChars(void* _self, const char* restrict chars, size_t length) {
+    pString self = (pString) _self;
+    pString result = String_new_concat_str(self, chars, length);
+    return result;
 }
-
-
 /**
- * The following 2 functions are private and hence does not adhere to the naming
+ * The following function is private and hence does not adhere to the naming
  * scheme used for methods.
  */
-pString concatenate_stub(void* _self, const char* restrict other, size_t len) {
-    pString self = (pString)_self;
-    size_t new_length = self->length + len;
-    
-    char* new_chars = internal_allocate(new_length + 1);
-    strcpy(new_chars, self->chars);
-    strncat(new_chars, other, len);
-    
-    internal_free(self->chars);
-    self->chars = new_chars;
-    self->length = new_length;
-    self->hash = string_hash(new_chars);
-    
-    return self;
-}
 
+pString stringsep(char **inString, size_t *inLength, const char * restrict delim) {
+    char *start = *inString;
 
-/**
- * stringsep
- * a replacement for strsep, for systems without it
- */
-#ifdef NEED_STRSEP
-#define strsep stringsep
-char *stringsep(char **instring, const char * restrict delim) {
-    register char *run, *start = *instring;
+    if (*inLength == 0) {
+        return NULL; // end of string to tokenize
+    }
 
-    if (!*instring) return 0; // end of string to tokenize
-    for (run=start; *run; ++run)
-        for (register char* d=(char*)delim; *d; ++d)
-            if (*run==*d) {	// token built
-                *run='\0';
-                *instring=run+1;
-                return start;
+    for (size_t i = 0; i < *inLength; i++) {
+        for (register char* d=(char*)delim; *d; ++d) {
+            if ((*inString)[i]==*d) {    // token built
+                pString result = String_new(start, i);
+                *inString = &(*inString)[i + 1];
+                *inLength = *inLength - (i + 1);
+                return result;
             }
-    *instring=NULL;
-    return start;
+        }
+    }
+
+    pString result = String_new(start, *inLength);
+    *inLength = 0;
+    return result;
 }
-#endif
 
 
 pString _String_concat(void* _self, pString other) {
     pString self = (pString)_self;
-    return concatenate_stub(self, other->chars, other->length);
-}
-
-
-pString _String_concatChars(void* _self, const char* restrict other) {
-    pString self = (pString)_self;
-    return concatenate_stub(self, other, strlen(other));
-}
-
-
-pString _String_concatChar(void* _self, char other) {
-    pString self = (pString)_self;
-    return concatenate_stub(self, &other, 1);
+    return String_new_concat(self, other);
 }
 
 
@@ -200,8 +210,7 @@ intptr_t _String_indexOf(void* _self, pString pattern) {
 
 intptr_t _String_indexOfChar(void* _self, char pattern) {
     pString self = (pString)_self;
-    char* pos = strchr(self->chars, pattern);
-    if(pos >= self->chars)
+    char* pos = memchr(self->chars, pattern, self->length);
     if (pos >= self->chars) {
         return pos - self->chars;
     } else {
@@ -210,10 +219,21 @@ intptr_t _String_indexOfChar(void* _self, char pattern) {
     }
 }
 
+static void *mem_r_chr(const void *s, int c, size_t n) {
+    // macOS is apparently missing this one
+    const char *start = s;
+    const char *end = &start[n]; //one too much on purpose
+    while (--end >= start) { //and this is why
+        if (c == *end) {
+            return (void *)end;
+        }
+    }
+    return NULL;
+}
 
 intptr_t _String_lastIndexOfChar(void* _self, char pattern) {
     pString self = (pString)_self;
-    char* pos = strrchr(self->chars, pattern);
+    char* pos = mem_r_chr(self->chars, pattern, self->length);
     if (pos >= self->chars)
         return pos - self->chars;
     else
@@ -240,9 +260,9 @@ pString _String_substring(void* _self, size_t start, size_t end) {
     size_t new_length = end + 1 - start;
 
     char tmp[new_length + 1];
-    (strncpy(tmp, self->chars + start, new_length))[new_length] = '\0';
+    strncpy(tmp, self->chars + start, new_length);
     
-    return String_new(tmp);
+    return String_new(tmp, new_length);
 }
 
 
@@ -258,34 +278,37 @@ pVMDouble _String_toDouble(void* _self) {
 }
 
 
-pString* _String_tokenize(void* _self, size_t* length,
+pString* _String_tokenize(void* _self, size_t* length_of_result /* out param */,
     const char* restrict delimiters
 ) {
     pString self = (pString)_self;
+    size_t selfLength = self->length;
     // count delimiters
     size_t delim_count = 0;
-    for(char* ptr = self->chars; *ptr; ptr++)
-        if(strchr(delimiters, *ptr))
+    for (size_t i = 0; i < selfLength; i++) {
+        if (strchr(delimiters, self->chars[i])) {
             delim_count++;
+        }
+    }
     
-    //temporary string copy
-    char* tempstring = internal_allocate_string(self->chars);
-    char* tempstring_ptr = tempstring;
-    
-    //resulting array
+    char* tempstring = self->chars;
+
+    // resulting array of String pointers
     pString* result = 
         (pString*)internal_allocate(sizeof(pString) * (delim_count + 1));
     
     pString* ptr = result;
-    char* sepr;
+    pString part;
+    size_t remainingLength = selfLength;
     do {
-        sepr = strsep(&tempstring, delimiters);
-        if(sepr != NULL)
-            *ptr++ = String_new(sepr);
-    } while(sepr != NULL);
-    
-    internal_free(tempstring_ptr);
-    *length = delim_count + 1;
+        part = stringsep(&tempstring, &remainingLength, delimiters);
+        if (part != NULL) {
+            *ptr = part;
+            ptr++;
+        }
+    } while (part != NULL);
+
+    *length_of_result = delim_count + 1;
     return result;    
 }
 
@@ -306,13 +329,10 @@ VTABLE(String)* String_vtable(void) {
         _String_vtable.init = METHOD(String, init);
 
         _String_vtable.length          = METHOD(String, length);
-        _String_vtable.size            = METHOD(String, size);
-        _String_vtable.chars           = METHOD(String, chars);
+        _String_vtable.rawChars        = METHOD(String, rawChars);
         _String_vtable.compareTo       = METHOD(String, compareTo);
-        _String_vtable.compareToChars  = METHOD(String, compareToChars);
         _String_vtable.concat          = METHOD(String, concat);
         _String_vtable.concatChars     = METHOD(String, concatChars);
-        _String_vtable.concatChar      = METHOD(String, concatChar);
         _String_vtable.indexOf         = METHOD(String, indexOf);
         _String_vtable.indexOfChar     = METHOD(String, indexOfChar);
         _String_vtable.lastIndexOfChar = METHOD(String, lastIndexOfChar);

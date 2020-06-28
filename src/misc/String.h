@@ -84,7 +84,7 @@ struct _String {
 #pragma mark class methods
 
 
-pString String_new(const char* restrict cstring);
+pString String_new(const char* restrict cstring, const size_t length);
 pString String_new_from(pString restrict string);
 
 

@@ -69,7 +69,7 @@ void  _String_asSymbol(pVMObject object, pVMFrame frame) {
 void  _String_hashcode(pVMObject object, pVMFrame frame) {
     pVMString self = (pVMString)SEND(frame, pop);
     if (self->hash == 0) {
-        self->hash = string_hash(self->chars);
+        self->hash = string_hash(self->chars, self->length);
     }
 
     SEND(frame, push, (pVMObject)Universe_new_integer(self->hash));    
@@ -78,8 +78,10 @@ void  _String_hashcode(pVMObject object, pVMFrame frame) {
 
 void  _String_length(pVMObject object, pVMFrame frame) {
     pVMString self = (pVMString)SEND(frame, pop);
-    size_t len = strlen(SEND(self, get_chars));
-    SEND(frame, push, (pVMObject)Universe_new_integer((int32_t)len));    
+
+    size_t length = SEND(self, get_length);
+
+    SEND(frame, push, (pVMObject) Universe_new_integer(length));
 }
 
 

@@ -99,9 +99,10 @@ pVMClass VMClass_new_num_fields(intptr_t number_of_fields) {
 
 pVMClass VMClass_assemble(class_generation_context* cgc) {
     // build class class name
-    const char* cgc_name = SEND(cgc->name, get_chars);
+    const char* cgc_name = SEND(cgc->name, get_rawChars);
+    size_t cgc_name_len = SEND(cgc->name, get_length);
     char* ccname =
-        (char*)internal_allocate(strlen(cgc_name) + 6 + 1); // 6: " class"
+        (char*)internal_allocate(cgc_name_len + 6 + 1); // 6: " class"
     strcpy(ccname, cgc_name);
     strcat(ccname, " class");
     pVMSymbol ccname_sym = Universe_symbol_for(ccname);
@@ -418,7 +419,7 @@ pString gen_loadstring(const pString restrict cp,
  */
 pString gen_core_loadstring(const pString restrict cp) {
     #define S_CORE "SOMCore"
-    pString result = gen_loadstring(cp, S_CORE);    
+    pString result = gen_loadstring(cp, S_CORE, strlen(S_CORE));
     return result;
 }
 
@@ -563,16 +564,17 @@ void _VMClass_load_primitives(void* _self, const pString* cp, size_t cp_count) {
     // the library handle
     void* dlhandle = NULL;
     // cached object properties
-    const char* cname = SEND(self->name, get_chars);
+    const char* cname = SEND(self->name, get_rawChars);
+    size_t cnameLen = SEND(self->name, get_length);
 
     // iterate the classpathes
-    for(size_t i = 0; (i < cp_count) && !dlhandle; i++) {
+    for (size_t i = 0; (i < cp_count) && !dlhandle; i++) {
 
         // check the core library
         pString loadstring = gen_core_loadstring(cp[i]);
         dlhandle = load_lib(loadstring);
         SEND(loadstring, free);
-        if(dlhandle && is_responsible(dlhandle, cname)) {
+        if (dlhandle && is_responsible(dlhandle, cname)) {
             // the core library is found and responsible
             init_lib(dlhandle);
             break;
@@ -580,12 +582,12 @@ void _VMClass_load_primitives(void* _self, const pString* cp, size_t cp_count) {
         
         // the core library is not found or respondible, 
         // continue w/ class file
-        loadstring = gen_loadstring(cp[i], cname);
+        loadstring = gen_loadstring(cp[i], cname, cnameLen);
         dlhandle = load_lib(loadstring);
         SEND(loadstring, free);
-        if(dlhandle) {
+        if (dlhandle) {
             // the class library was found...
-            if(is_responsible(dlhandle, cname)) {
+            if (is_responsible(dlhandle, cname)) {
                 init_lib(dlhandle);
                 break;
             } else {

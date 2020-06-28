@@ -216,7 +216,7 @@ void Universe_error_exit(const char* restrict err) {
 
 
 void Universe_set_classpath(const char* classpath) {
-    setup_class_path(String_new(classpath));
+    setup_class_path(String_new(classpath, strlen(classpath)));
 }
 
 
@@ -260,7 +260,7 @@ const char** Universe_handle_arguments(
             // copy remaining args for VM                        
             // temp vector for path
             pString* ext_path_tokens = NULL;
-            pString tmp_string = String_new(argv[i]);
+            pString tmp_string = String_new(argv[i], strlen(argv[i]));
             if(get_path_class_ext(&ext_path_tokens, tmp_string) ==
                ERR_SUCCESS
             ) {
@@ -282,7 +282,7 @@ const char** Universe_handle_arguments(
     }
 
     // Add local dir to class_path
-    add_class_path(String_new("."));
+    add_class_path(String_new(".", 1));
     
     return argv + vm_arg_start;
 }

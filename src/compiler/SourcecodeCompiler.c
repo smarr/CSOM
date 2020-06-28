@@ -92,29 +92,31 @@ pVMClass SourcecodeCompiler_compile_class_string(const char* stream,
 
 
 pVMClass SourcecodeCompiler_compile_class(const char* path,
+                                          size_t pathLength,
                                           // ^^^ without file_separator!
-                                          const char* filename, 
+                                          const char* filename,
+                                          size_t filenameLength,
                                           pVMClass system_class) {
     pVMClass result = system_class;
 
     // filename to be created
     //const char* path_c = SEND(path, chars);
     char* fname = (char*)internal_allocate(
-            strlen(path) +
+            pathLength +
             strlen(file_separator) +
-            strlen(filename) +
+            filenameLength +
             4 + // ".som"
             1
         );
-    strcpy(fname, path);
+    strncpy(fname, path, pathLength);
     strcat(fname, file_separator);
-    strcat(fname, filename);
+    strncat(fname, filename, filenameLength);
     strcat(fname, ".som");
 
     if (access(fname, F_OK & R_OK) == -1) {
         //file not found or not readable       
-        debug_info("Unable to open specified classpath, trying next one. ");
-        debug_info("File: %s\n", fname);
+        debug_info("Unable to open specified classpath, trying next one.\n");
+        debug_info("\t\tFile: %s\n", fname);
         
         // name no longer needed.
         internal_free(fname);

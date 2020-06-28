@@ -31,7 +31,9 @@ THE SOFTWARE.
 
 
 pVMClass SourcecodeCompiler_compile_class(const char* path,
-                                          const char* filename, 
+                                          size_t pathLength,
+                                          const char* filename,
+                                          size_t filenameLength,
                                           pVMClass system_class);
 pVMClass SourcecodeCompiler_compile_class_string(const char* stream,     
                                                  pVMClass system_class);

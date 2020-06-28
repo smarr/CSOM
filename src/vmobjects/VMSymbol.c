@@ -74,8 +74,8 @@ const char* _VMSymbol_get_plain_string(void* _self) {
     char plain_string[1024];
     plain_string[0] = '\0';
     
-    size_t l = strlen(self->chars);
-    for(size_t i = 0; i <= l; i++) {
+    size_t l = self->length;
+    for (size_t i = 0; i <= l; i++) {
         switch(self->chars[i]) {
             case '~':
                 strcat(plain_string, "tilde");

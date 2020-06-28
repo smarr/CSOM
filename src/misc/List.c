@@ -143,9 +143,10 @@ void _List_add(void* _self, void* ptr) {
 }
 
 
-void _List_addCString(void* _self, const char* cstring) {
+void _List_addString(void* _self, pString string) {
     pList self = (pList)_self;
-    SEND(self, add, String_new(cstring));
+    pString managedString = String_new(string->chars, string->length);
+    SEND(self, add, managedString);
 }
 
 
@@ -156,10 +157,11 @@ void _List_addIfAbsent(void* _self, void* ptr) {
 }
 
 
-void _List_addCStringIfAbsent(void* _self, const char* cstring) {
+void _List_addStringIfAbsent(void* _self, pString string) {
     pList self = (pList)_self;
-    if(SEND(self, indexOfCString, cstring) == -1)
-        SEND(self, addCString, cstring);
+    if (SEND(self, indexOfString, string) == -1) {
+        SEND(self, addString, string);
+    }
 }
 
 
@@ -218,12 +220,33 @@ size_t _List_indexOf(void* _self, void* ptr) {
 }
 
 
-size_t _List_indexOfCString(void* _self, const char* cstring) {
+size_t _List_indexOfString(void* _self, pString string) {
     pList self = (pList)_self;
     pListElem elem = self->head;
-    for(size_t result = 0; elem; result++, elem = elem->next)
-        if(strcmp(cstring, SEND((pString)elem->data, chars)) == 0)
+    size_t hash = string->hash;
+
+    for (size_t result = 0; elem; result++, elem = elem->next) {
+        pString dataString = (pString) elem->data;
+        if (dataString->hash == hash &&
+            (CString_compare(string->chars, string->length,
+                             SEND(dataString, rawChars), SEND(dataString, length)) == 0)) {
             return result;
+        }
+    }
+    return -1;
+}
+
+
+size_t _List_indexOfStringLen(void* _self, const char* restrict string, size_t length) {
+    pList self = (pList)_self;
+    pListElem elem = self->head;
+    for (size_t result = 0; elem; result++, elem = elem->next) {
+        pString dataString = (pString) elem->data;
+        if (CString_compare(string, length,
+                            SEND(dataString, rawChars), SEND(dataString, length)) == 0) {
+            return result;
+        }
+    }
     return -1;
 }
 
@@ -285,14 +308,15 @@ VTABLE(List)* List_vtable(void) {
         _List_vtable.free               = METHOD(List, free);
         _List_vtable.init               = METHOD(List, init);
         _List_vtable.add                = METHOD(List, add);
-        _List_vtable.addCString         = METHOD(List, addCString);
+        _List_vtable.addString          = METHOD(List, addString);
         _List_vtable.addIfAbsent        = METHOD(List, addIfAbsent);
-        _List_vtable.addCStringIfAbsent = METHOD(List, addCStringIfAbsent);
+        _List_vtable.addStringIfAbsent  = METHOD(List, addStringIfAbsent);
         _List_vtable.addAll             = METHOD(List, addAll);
         _List_vtable.clear              = METHOD(List, clear);
         _List_vtable.deep_free          = METHOD(List, deep_free);
         _List_vtable.indexOf            = METHOD(List, indexOf);
-        _List_vtable.indexOfCString     = METHOD(List, indexOfCString);
+        _List_vtable.indexOfString      = METHOD(List, indexOfString);
+        _List_vtable.indexOfStringLen   = METHOD(List, indexOfStringLen);
         _List_vtable.size               = METHOD(List, size);
         _List_vtable.get                = METHOD(List, get);
         List_vtable_inited = true;

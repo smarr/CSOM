@@ -122,8 +122,8 @@ bool method_genc_find_var(
     // 3. try 1+2 in surrounding context, if any
     // Return true on success, false otherwise.
     
-    if((*index = SEND(mgenc->locals, indexOfCString, var)) == -1) {
-        if((*index = SEND(mgenc->arguments, indexOfCString, var)) == -1) {
+    if((*index = SEND(mgenc->locals, indexOfString, var)) == -1) {
+        if((*index = SEND(mgenc->arguments, indexOfString, var)) == -1) {
             if(!mgenc->outer_genc)
                 return false;
             else {

@@ -418,7 +418,9 @@ void Parser_init_constants() {
 
 
 void Parser_classdef(Lexer* l, class_generation_context* cgenc) {
-    cgenc->name = Universe_symbol_for(l->text);
+    cgenc->name = Universe_symbol_for_chars(l->_text, l->_textLength);
+    Lexer_consumed_text(l);
+
     expect(l, Identifier);
     
     expect(l, Equal);
@@ -435,7 +437,7 @@ void Parser_classdef(Lexer* l, class_generation_context* cgenc) {
         mgenc.holder_genc = cgenc;
         
         // each method has a self variable
-        SEND(mgenc.arguments, addCString, "self");
+        SEND(mgenc.arguments, addString, selfStr);
         
         method(l, &mgenc);
         
@@ -458,7 +460,7 @@ void Parser_classdef(Lexer* l, class_generation_context* cgenc) {
             mgenc.holder_genc = cgenc;
             
             // each method has a self variable
-            SEND(mgenc.arguments, addCString, "self");
+            SEND(mgenc.arguments, addString, selfStr);
             
             method(l, &mgenc);
             
@@ -577,22 +579,24 @@ void unaryPattern(Lexer* l, method_generation_context* mgenc) {
 
 void binaryPattern(Lexer* l, method_generation_context* mgenc) {
     mgenc->signature = binarySelector(l);
-    char* arg = argument(l);
-    SEND(mgenc->arguments, addCStringIfAbsent, arg);
+    pString arg = argument(l);
+    SEND(mgenc->arguments, addStringIfAbsent, arg);
     internal_free(arg);
 }
 
 
 void keywordPattern(Lexer* l, method_generation_context* mgenc) {
-    pString kw = String_new("");
+    pString kw = String_new("", 0);
     do {
         pString key = keyword(l);
+        pString oldKw = kw;
         kw = SEND(kw, concat, key);
+        SEND(oldKw, free);
         SEND(key, free);
-        char* arg = argument(l);
-        SEND(mgenc->arguments, addCStringIfAbsent, arg);
-        internal_free(arg);
-    } while(l->sym == Keyword);
+        pString arg = argument(l);
+        SEND(mgenc->arguments, addStringIfAbsent, arg);
+        SEND(arg, free);
+    } while (l->sym == Keyword);
     
     mgenc->signature = Universe_symbol_for_str(kw);
     SEND(kw, free);
@@ -683,8 +687,8 @@ void blockContents(Lexer* l, method_generation_context* mgenc) {
 
 void locals(Lexer* l, method_generation_context* mgenc) {
     while(l->sym == Identifier) {
-        char* var = variable(l);
-        SEND(mgenc->locals, addCStringIfAbsent, var);
+        pString var = variable(l);
+        SEND(mgenc->locals, addStringIfAbsent, var);
         internal_free(var);
     }
 }
@@ -792,11 +796,11 @@ void primary(Lexer* l, method_generation_context* mgenc, bool* super) {
     *super = false;
     switch(l->sym) {
         case Identifier: {
-            char* var = variable(l);
-            if(strcmp(var, "super") == 0) {
+            pString var = variable(l);
+            if (SEND(var, compareTo, superStr) == 0) {
                 *super = true;
                 // sends to super push self as the receiver
-                gen_push_variable(mgenc, "self");
+                gen_push_variable(mgenc, selfStr);
             } else {
                 gen_push_variable(mgenc, var);
             }
@@ -898,7 +902,7 @@ void binaryOperand(Lexer* l, method_generation_context* mgenc, bool* super) {
 
 
 void keywordMessage(Lexer* l, method_generation_context* mgenc, bool super) {
-    pString kw = String_new("");
+    pString kw = String_new("", 0);
     do {
         pString key = keyword(l);
         kw = SEND(kw, concat, key);
@@ -1085,7 +1089,7 @@ pString string(Lexer* l) {
 void nestedBlock(Lexer* l, method_generation_context* mgenc) {
 #define BLOCK_METHOD   "$block method"
 #define BLOCK_METHOD_L (13)
-    SEND(mgenc->arguments, addCStringIfAbsent, "$block self");
+    SEND(mgenc->arguments, addStringIfAbsent, blockSelfStr);
     
     expect(l, NewBlock);
     if(l->sym == Colon)
@@ -1122,8 +1126,8 @@ void blockPattern(Lexer* l, method_generation_context* mgenc) {
 void blockArguments(Lexer* l, method_generation_context* mgenc) {
     do {
         expect(l, Colon);
-        char* arg = argument(l);
-        SEND(mgenc->arguments, addCStringIfAbsent, arg);
+        pString arg = argument(l);
+        SEND(mgenc->arguments, addStringIfAbsent, arg);
         internal_free(arg);
     } while(l->sym == Colon);
 }

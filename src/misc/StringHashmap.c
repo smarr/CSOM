@@ -46,13 +46,13 @@ void  _StringHashmap_put(void* _self, pString key, void* value);
  */
 bool _StringHashmapElem_key_equal_to(void* _self, pString other) {
     pStringHashmapElem self = (pStringHashmapElem)_self;
-    return 0 == strcmp((const char*)self->key, (const char*)other);
+    return 0 == SEND(other, compareTo, self->key);
 }
 
 
 int64_t _StringHashmapElem_key_hash(void* _self) {
     pStringHashmapElem self = (pStringHashmapElem)_self;
-    return string_hash((char*)self->key);
+    return self->key->hash;
 }
 
 
@@ -71,7 +71,7 @@ void _StringHashmapElem_init(void* _self, ...) {
     pStringHashmapElem self = (pStringHashmapElem)_self;
     va_list argp;
     va_start(argp, _self);
-    void* k = internal_allocate_string(va_arg(argp, char*));
+    pString k = va_arg(argp, pString);
     void* v = va_arg(argp, void*);
     SUPER(HashmapElem, self, init, k, v);
     va_end(argp);
@@ -134,7 +134,7 @@ void _StringHashmap_free(void* self) {
  */
 void* _StringHashmap_get(void* _self, pString key) {
     pStringHashmap self = (pStringHashmap)_self;
-    size_t hash = string_hash((const char*)key);
+    size_t hash = key->hash;
     return primitiveGet((pHashmap)self, key, hashf((pHashmap)self, hash));
 }
 

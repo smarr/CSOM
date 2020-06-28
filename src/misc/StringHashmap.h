@@ -41,7 +41,10 @@ THE SOFTWARE.
 
 VTABLE(StringHashmapElem) {
 #define STRINGHASHMAPELEM_VTABLE_FORMAT \
-    HASHMAPELEM_VTABLE_FORMAT
+    OOOBJECT_VTABLE_FORMAT; \
+    int64_t  (*key_hash)(void*); \
+    bool     (*key_equal_to)(void*,pString)
+
         
     STRINGHASHMAPELEM_VTABLE_FORMAT;
 };
@@ -53,7 +56,9 @@ VTABLE(StringHashmapElem) {
 struct _StringHashmapElem {
     VTABLE(StringHashmapElem)* _vtable;
 #define STRINGHASHMAPELEM_FORMAT \
-    HASHMAPELEM_FORMAT
+    OOOBJECT_FORMAT; \
+    pString key; \
+    void* value
         
     STRINGHASHMAPELEM_FORMAT;
 };
@@ -75,15 +80,19 @@ VTABLE(StringHashmapElem)* StringHashmapElem_vtable(void);
 
 
 //
-// The hash map implemented here for VM-internal purposes provides two different
-// ways for putting and getting elements. Keys are C strings, i.e.,
-// '\0'-terminated.
+// The hash map implemented here for VM-internal purposes uses keys
+// of time pString and values of arbitary type.
 //
 
 
 VTABLE(StringHashmap) {
 #define STRINGHASHMAP_VTABLE_FORMAT \
-    HASHMAP_VTABLE_FORMAT
+    OOOBJECT_VTABLE_FORMAT; \
+    void  (*put)(void*, pString key, void* value); \
+    void* (*get)(void*, pString key); \
+    bool  (*contains_key)(void*, pString key); \
+    void  (*clear)(void*); \
+    void  (*rehash)(void*, size_t newSize)
     
     STRINGHASHMAP_VTABLE_FORMAT;
 };

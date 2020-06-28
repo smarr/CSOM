@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include <misc/StringHashmap.h>
 
 // class variable
-static pHashmap symtab;
+static pStringHashmap symtab;
 
 pVMSymbol Symbol_table_lookup(pString restrict string) {
     return (pVMSymbol)SEND(symtab, get, string);
@@ -46,7 +46,7 @@ void Symbol_table_insert(pVMSymbol symbol) {
 
 
 void Symbol_table_init(void) {
-    symtab = (pHashmap)StringHashmap_new();
+    symtab = StringHashmap_new();
 }
 
 

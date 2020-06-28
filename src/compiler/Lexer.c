@@ -56,7 +56,7 @@ Lexer* Lexer_create(const FILE* fp, const char* file_name) {
 
 Lexer* Lexer_from_string(const char* stream) {
   Lexer* lexer = Lexer_create(NULL, NULL);
-  strncpy(lexer->buf, stream, BUFSIZ);
+  memcpy(lexer->buf, stream, BUFSIZ);
   lexer->file_name = "<string>";
   return lexer;
 }
@@ -268,7 +268,7 @@ Symbol Lexer_get_sym(Lexer* l) {
     l->peekDone = false;
     l->sym = l->nextSym;
     l->symc = l->nextSymc;
-    strncpy(l->_text, l->_nextText, l->_nextTextLength);
+    memcpy(l->_text, l->_nextText, l->_nextTextLength);
     l->_textLength = l->_nextTextLength;
     terminateText(l);
 
@@ -368,7 +368,7 @@ void Lexer_peek(Lexer* l) {
   Symbol saveSym = l->sym;
   char saveSymc = l->symc;
   char saveText[BUFSIZ];
-  strncpy(saveText, l->_text, l->_textLength);
+  memcpy(saveText, l->_text, l->_textLength);
   size_t saveTextLength = l->_textLength;
   saveText[saveTextLength] = '\0';
 
@@ -380,13 +380,13 @@ void Lexer_peek(Lexer* l) {
   l->nextSym = l->sym;
   l->nextSymc = l->symc;
 
-  strncpy(l->_nextText, l->_text, l->_textLength);
+  memcpy(l->_nextText, l->_text, l->_textLength);
   l->_nextTextLength = l->_textLength;
   l->_nextText[l->_textLength] = '\0';
 
   l->sym = saveSym;
   l->symc = saveSymc;
-  strncpy(l->_text, saveText, saveTextLength);
+  memcpy(l->_text, saveText, saveTextLength);
   l->_textLength = saveTextLength;
   terminateText(l);
 

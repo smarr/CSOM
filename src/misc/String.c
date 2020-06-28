@@ -266,7 +266,7 @@ pString _String_substring(void* _self, size_t start, size_t end) {
     size_t new_length = end + 1 - start;
 
     char tmp[new_length + 1];
-    strncpy(tmp, self->chars + start, new_length);
+    memcpy(tmp, self->chars + start, new_length);
     
     return String_new(tmp, new_length);
 }

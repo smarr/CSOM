@@ -91,7 +91,7 @@ void _VMString_init(void* _self, ...) {
     size_t length = va_arg(args, size_t);
     va_end(args);
     
-    strncpy(self->chars, embed, length);
+    memcpy(self->chars, embed, length);
     self->chars[length] = '\0';
     self->length = length;
     self->hash = 0;

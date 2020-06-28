@@ -145,7 +145,7 @@ bool method_genc_find_field(method_generation_context* mgenc,
     pList fields = mgenc->holder_genc->class_side ?
         mgenc->holder_genc->class_fields :
         mgenc->holder_genc->instance_fields;
-    return SEND(fields, indexOf, Universe_symbol_for(field)) != -1;
+    return SEND(fields, indexOf, Universe_symbol_for_str(field)) != -1;
 }
 
 

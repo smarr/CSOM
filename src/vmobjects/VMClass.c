@@ -105,7 +105,7 @@ pVMClass VMClass_assemble(class_generation_context* cgc) {
         (char*)internal_allocate(cgc_name_len + 6 + 1); // 6: " class"
     strcpy(ccname, cgc_name);
     strcat(ccname, " class");
-    pVMSymbol ccname_sym = Universe_symbol_for(ccname);
+    pVMSymbol ccname_sym = Universe_symbol_for_cstr(ccname);
     internal_free(ccname);
     
     // Load the super class

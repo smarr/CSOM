@@ -69,7 +69,7 @@ void _Integer__resendAsDouble(pVMObject object, const char* restrict operator,
     pVMDouble leftDouble =
         Universe_new_double((double)SEND(left, get_embedded_integer));
     pVMObject operands[] = { (pVMObject)right };
-    pVMSymbol op = Universe_symbol_for(operator);
+    pVMSymbol op = Universe_symbol_for_cstr(operator);
     SEND((pVMObject)leftDouble, send, op, operands, 1);
     SEND(op, free);
 }
@@ -250,7 +250,8 @@ void  _Integer_asString(pVMObject object, pVMFrame frame) {
     int64_t integer = SEND(self,  get_embedded_integer);
     char* strbuf = (char *)internal_allocate(snprintf(0, 0, "%lld", integer) +1);
     sprintf(strbuf, "%lld", integer);
-    SEND(frame, push, (pVMObject)Universe_new_string(strbuf));
+
+    SEND(frame, push, (pVMObject) Universe_new_string_cstr(strbuf));
     internal_free(strbuf);    
 }
 

@@ -115,7 +115,7 @@ pVMSymbol compute_signature_string(int32_t argc) {
     }
 
     // Return the signature string
-    return Universe_symbol_for(signature_string);
+    return Universe_symbol_for_cstr(signature_string);
 }
 
 

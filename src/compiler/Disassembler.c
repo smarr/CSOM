@@ -66,7 +66,7 @@ static inline void _Disassembler_dispatch(pVMObject o) {
         debug_print("{System Class object}");
     else if((pVMClass)o == block_class)
         debug_print("{Block Class object}");
-    else if(o == Universe_get_global(Universe_symbol_for("system")))
+    else if(o == Universe_get_global(Universe_symbol_for_cstr("system")))
         debug_print("{System}");
     else {
         pVMClass c = SEND(o, get_class);

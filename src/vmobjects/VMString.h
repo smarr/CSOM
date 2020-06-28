@@ -34,7 +34,8 @@ THE SOFTWARE.
 VTABLE(VMString) {
 #define VMSTRING_VTABLE_FORMAT \
     VMOBJECT_VTABLE_FORMAT; \
-    const char* (*get_chars)(void*)
+    const size_t (*get_length)(void*); \
+    const char* (*get_rawChars)(void*)
         
     VMSTRING_VTABLE_FORMAT;
 };
@@ -43,6 +44,7 @@ VTABLE(VMString) {
 
 #define VMSTRING_FORMAT \
     VMOBJECT_FORMAT; \
+    size_t length; \
     char chars[0]
 
 
@@ -54,7 +56,8 @@ struct _VMString {
 
 #pragma mark class methods
 
-pVMString VMString_new(const char* restrict chars);
+pVMString VMString_new(const char* restrict chars, size_t length);
+pVMString VMString_new_concat(pVMString a, pVMString b);
 
 #pragma mark vtable initialization
 

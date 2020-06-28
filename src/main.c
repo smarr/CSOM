@@ -27,9 +27,12 @@ THE SOFTWARE.
 #include <memory/gc.h>
 
 #include <vm/Universe.h>
+#include <compiler/Parser.h>
+
 
 int main(int argc, char** argv) {
     printf("This is CSOM.\n");
+    Parser_init_constants();
 
     int vm_argc = 0;    
     const char** vm_argv =

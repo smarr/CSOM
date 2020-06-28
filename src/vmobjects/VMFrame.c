@@ -287,22 +287,23 @@ void _VMFrame_print_stack_trace(void* _self) {
 
     // current selector, if any
     const char* s_sel = "";
-    if(bc == BC_SEND || bc == BC_SUPER_SEND) {
+    if (bc == BC_SEND || bc == BC_SUPER_SEND) {
         pVMSymbol sel = (pVMSymbol)SEND(method, get_constant, bc_idx);
-        s_sel = SEND(sel, get_chars);
+        s_sel = SEND(sel, get_rawChars);
     }
     
     debug_print("STACKTRACE:%20s>>%-20s%c@ %04d: %s%s\n",
-                SEND(holderSym, get_chars),
-                SEND(methodSym, get_chars),
+                SEND(holderSym, get_rawChars),
+                SEND(methodSym, get_rawChars),
                 TSEND(VMInvokable, method, is_primitive) ? '*' : ' ',
                 bc_idx,
                 bytecodes_get_bytecode_name(bc),
                 s_sel);
     
     // traverse contexts, if any
-    if(SEND(self, has_previous_frame))
-        SEND(self->previous_frame, print_stack_trace);    
+    if (SEND(self, has_previous_frame)) {
+        SEND(self->previous_frame, print_stack_trace);
+    }
 }
 
 

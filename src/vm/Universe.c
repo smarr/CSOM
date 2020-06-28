@@ -216,7 +216,7 @@ void Universe_error_exit(const char* restrict err) {
 
 
 void Universe_set_classpath(const char* classpath) {
-    setup_class_path(String_new(classpath));
+    setup_class_path(String_new(classpath, strlen(classpath)));
 }
 
 
@@ -260,7 +260,7 @@ const char** Universe_handle_arguments(
             // copy remaining args for VM                        
             // temp vector for path
             pString* ext_path_tokens = NULL;
-            pString tmp_string = String_new(argv[i]);
+            pString tmp_string = String_new(argv[i], strlen(argv[i]));
             if(get_path_class_ext(&ext_path_tokens, tmp_string) ==
                ERR_SUCCESS
             ) {
@@ -268,7 +268,7 @@ const char** Universe_handle_arguments(
                 add_class_path(ext_path_tokens[0]);
                                 
                 // copy filename back to args
-                argv[i] = strdup(SEND(ext_path_tokens[1], chars));
+                argv[i] = strndup(SEND(ext_path_tokens[1], rawChars), SEND(ext_path_tokens[1], length));
                 SEND(ext_path_tokens[1], free);
 
                 // guaranteed not to be used/referenced any more
@@ -282,7 +282,7 @@ const char** Universe_handle_arguments(
     }
 
     // Add local dir to class_path
-    add_class_path(String_new("."));
+    add_class_path(String_new(".", 1));
     
     return argv + vm_arg_start;
 }
@@ -347,39 +347,39 @@ static pVMObject initialize_object_system() {
     Universe_load_system_class(double_class);
 
     // load the generic block class
-    block_class = Universe_load_class(Universe_symbol_for("Block"));
+    block_class = Universe_load_class(Universe_symbol_for_cstr("Block"));
 
     // setup the true and false objects
-    pVMSymbol trueSymbol = Universe_symbol_for("True");
+    pVMSymbol trueSymbol = Universe_symbol_for_cstr("True");
     true_class  = Universe_load_class(trueSymbol);
     true_object = Universe_new_instance(true_class);
 
-    pVMSymbol falseSymbol = Universe_symbol_for("False");
+    pVMSymbol falseSymbol = Universe_symbol_for_cstr("False");
     false_class  = Universe_load_class(falseSymbol);
     false_object = Universe_new_instance(false_class);
 
     // load the system class and create an instance of it
-    system_class = Universe_load_class(Universe_symbol_for("System"));
+    system_class = Universe_load_class(Universe_symbol_for_cstr("System"));
     pVMObject system_object = Universe_new_instance(system_class);
 
     // put special objects and classes into the dictionary of globals
-    Universe_set_global(Universe_symbol_for("nil"), nil_object);
-    Universe_set_global(Universe_symbol_for("true"), true_object);
-    Universe_set_global(Universe_symbol_for("false"), false_object);
-    Universe_set_global(Universe_symbol_for("system"), system_object);
-    Universe_set_global(Universe_symbol_for("System"),
+    Universe_set_global(Universe_symbol_for_cstr("nil"), nil_object);
+    Universe_set_global(Universe_symbol_for_cstr("true"), true_object);
+    Universe_set_global(Universe_symbol_for_cstr("false"), false_object);
+    Universe_set_global(Universe_symbol_for_cstr("system"), system_object);
+    Universe_set_global(Universe_symbol_for_cstr("System"),
                         (pVMObject)system_class);
-    Universe_set_global(Universe_symbol_for("Block"),
+    Universe_set_global(Universe_symbol_for_cstr("Block"),
                         (pVMObject)block_class);
 
     Universe_set_global(trueSymbol,  (pVMObject) true_class);
     Universe_set_global(falseSymbol, (pVMObject) false_class);
 
     // initialize symbols required by the interpreter
-    doesNotUnderstand_sym = Universe_symbol_for("doesNotUnderstand:arguments:");
-    unknownGlobal_sym = Universe_symbol_for("unknownGlobal:");
-    escapedBlock_sym = Universe_symbol_for("escapedBlock:");
-    run_sym = Universe_symbol_for("run:");
+    doesNotUnderstand_sym = Universe_symbol_for_cstr("doesNotUnderstand:arguments:");
+    unknownGlobal_sym = Universe_symbol_for_cstr("unknownGlobal:");
+    escapedBlock_sym = Universe_symbol_for_cstr("escapedBlock:");
+    run_sym = Universe_symbol_for_cstr("run:");
 
     return system_object;
 }
@@ -388,7 +388,7 @@ static pVMObject initialize_object_system() {
 // create a fake bootstrap method to simplify later frame traversal
 static pVMMethod create_bootstrap_method() {
     pVMMethod bootstrap_method =
-        Universe_new_method(Universe_symbol_for("bootstrap"), 1, 0, 0, 2);
+        Universe_new_method(Universe_symbol_for_cstr("bootstrap"), 1, 0, 0, 2);
     SEND(bootstrap_method, set_bytecode, 0, BC_HALT);
     TSEND(VMInvokable, bootstrap_method, set_holder, system_class);
     return bootstrap_method;
@@ -401,9 +401,9 @@ pVMObject Universe_interpret(const char* class_name, const char* method_name) {
     pVMMethod bootstrap_method = create_bootstrap_method();
 
     // lookup the class and method
-    pVMClass class = Universe_load_class(Universe_symbol_for(class_name));
+    pVMClass class = Universe_load_class(Universe_symbol_for_cstr(class_name));
     pVMObject method = (pVMObject)SEND(SEND(class, get_class), lookup_invokable,
-                                       Universe_symbol_for(method_name));
+                                       Universe_symbol_for_cstr(method_name));
 
     Universe_assert(method != NULL);
 
@@ -450,7 +450,7 @@ void Universe_start(int argc, const char** argv) {
     // lookup the initialize invokable on the system class
     pVMObject initialize =
         (pVMObject)SEND(system_class, lookup_invokable,
-                        Universe_symbol_for("initialize:"));
+                        Universe_symbol_for_cstr("initialize:"));
         
     // invoke the initialize invokable
     TSEND(VMInvokable, initialize, invoke, bootstrap_frame);
@@ -492,12 +492,22 @@ void Universe_assert(bool value) {
 }
 
 
-pVMSymbol Universe_symbol_for(const char* restrict string) {
+pVMSymbol Universe_symbol_for_str(pString restrict string) {
     // Lookup the symbol in the symbol table
     pVMSymbol result = Symbol_table_lookup(string);
     
     // return found or newly cerated symbol
     return result ? : Universe_new_symbol(string); //new
+}
+
+
+pVMSymbol Universe_symbol_for_chars(const char* restrict chars, size_t length) {
+    return Universe_symbol_for_str(String_new(chars, length));
+}
+
+
+pVMSymbol Universe_symbol_for_cstr(const char* restrict chars) {
+    return Universe_symbol_for_chars(chars, strlen(chars));
 }
 
 
@@ -535,7 +545,7 @@ pVMArray Universe_new_array_from_argv(int argc, const char** argv) {
 
     for(int i = 0; i < argc; i++)
         SEND(result, set_indexable_field, i,
-            (pVMObject)Universe_new_string(argv[i]));
+            (pVMObject)Universe_new_string_cstr(argv[i]));
 
     // return the allocated and initialized array
     return result;
@@ -651,19 +661,36 @@ pVMClass Universe_new_metaclass_class(void) {
 }
 
 
-pVMString Universe_new_string(const char* cstring) {
+pVMString Universe_new_string_cstr(const char* cstring) {
+    return Universe_new_string_string(cstring, strlen(cstring));
+}
+
+
+pVMString Universe_new_string_str(pString str) {
+    return Universe_new_string_string(str->chars, str->length);
+}
+
+
+pVMString Universe_new_string_string(const char* restrict string, size_t length) {
     // Allocate a new string and set its class to be the string class
-    pVMString result = VMString_new(cstring);
+    pVMString result = VMString_new(string, length);
     SEND((pVMObject)result, set_class, string_class);
-    
-    // Return the freshly allocated string
+
     return result;
 }
 
 
-pVMSymbol Universe_new_symbol(const char* cstring) {
+pVMString Universe_new_string_concat(pVMString a, pVMString b) {
+    pVMString result = VMString_new_concat(a, b);
+    SEND((pVMObject)result, set_class, string_class);
+
+    return result;
+}
+
+
+pVMSymbol Universe_new_symbol(pString string) {
     // Allocate a new symbol and set its class to be the symbol class
-    pVMSymbol result = VMSymbol_new(cstring);
+    pVMSymbol result = VMSymbol_new(string);
     SEND((pVMObject)result, set_class, symbol_class);
     
     // Insert the new symbol into the symbol table
@@ -713,12 +740,12 @@ void Universe_initialize_system_class(pVMClass system_class,
     SEND(sys_class_class, set_instance_invokables, Universe_new_array(0));
     
     // Initialize the name of the system class
-    SEND(system_class, set_name, Universe_symbol_for(name));
+    SEND(system_class, set_name, Universe_symbol_for_cstr(name));
     char* class_class_name =
         (char*)internal_allocate(strlen(name) + 6 + 1); // 6: " class"
     strcpy(class_class_name, name);
     strcat(class_class_name, " class");
-    SEND(sys_class_class, set_name, Universe_symbol_for(class_class_name));
+    SEND(sys_class_class, set_name, Universe_symbol_for_cstr(class_class_name));
     internal_free(class_class_name);
     
     // Insert the system class into the dictionary of globals
@@ -764,7 +791,7 @@ pVMClass Universe_get_block_class_with_args(int64_t number_of_arguments) {
     char block_name[7];
     Universe_assert(number_of_arguments <10); // buffer overflow otherwise
     sprintf(block_name, "Block%lld", number_of_arguments);
-    pVMSymbol name = Universe_symbol_for(block_name);
+    pVMSymbol name = Universe_symbol_for_cstr(block_name);
     
     // Lookup the specific block class in the dictionary of globals and return
     // it
@@ -818,7 +845,7 @@ void Universe_load_system_class(pVMClass system_class) {
     // check class loading.
     if(!result) {
         pVMSymbol cname = SEND(system_class, get_name);
-        debug_error("can't load system class:\t%s", SEND(cname, get_chars));
+        debug_error("can't load system class:\t%s", SEND(cname, get_rawChars));
         Universe_exit(ERR_FAIL);
     }
 
@@ -829,14 +856,16 @@ void Universe_load_system_class(pVMClass system_class) {
 
 
 pVMClass Universe_load_class_basic(pVMSymbol name, pVMClass system_class) {
-    debug_log("Universe_load_class_basic %s cp_count %zd\n", SEND(name, get_chars), cp_count);
+    debug_log("Universe_load_class_basic %s cp_count %zd\n", SEND(name, get_rawChars), cp_count);
 
     pVMClass result;
     // Try loading the class from all different paths
     for(int i = 0; i < cp_count; i++) {
         // Load the class from a file and return the loaded class
-        result = SourcecodeCompiler_compile_class(SEND(class_path[i], chars), 
-                                                  SEND(name, get_chars),
+        result = SourcecodeCompiler_compile_class(SEND(class_path[i], rawChars),
+                                                  SEND(class_path[i], length),
+                                                  SEND(name, get_rawChars),
+                                                  SEND(name, get_length),
                                                   system_class);
         if(result) {
             if(dump_bytecodes) {

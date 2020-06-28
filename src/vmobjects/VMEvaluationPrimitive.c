@@ -104,7 +104,7 @@ pVMSymbol compute_signature_string(int32_t argc) {
     signature_string[0] = '\0';
     
     // Compute the signature string
-    if(argc == 1) {
+    if (argc == 1) {
         strcat(signature_string, VALUE_S);
     } else {
         strcat(signature_string, VALUE_S COLON_S);
@@ -115,7 +115,7 @@ pVMSymbol compute_signature_string(int32_t argc) {
     }
 
     // Return the signature string
-    return Universe_symbol_for(signature_string);
+    return Universe_symbol_for_cstr(signature_string);
 }
 
 

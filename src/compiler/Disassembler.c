@@ -66,18 +66,18 @@ static inline void _Disassembler_dispatch(pVMObject o) {
         debug_print("{System Class object}");
     else if((pVMClass)o == block_class)
         debug_print("{Block Class object}");
-    else if(o == Universe_get_global(Universe_symbol_for("system")))
+    else if(o == Universe_get_global(Universe_symbol_for_cstr("system")))
         debug_print("{System}");
     else {
         pVMClass c = SEND(o, get_class);
         if(c == string_class) {
-            debug_print("\"%s\"", SEND((pVMString)o, get_chars));
+            debug_print("\"%s\"", SEND((pVMString)o, get_rawChars));
         } else if(c == double_class)
             debug_print("%g", SEND((pVMDouble)o, get_embedded_double));
         else if(c == integer_class)
             debug_print("%lld", SEND((pVMInteger)o, get_embedded_integer));
         else if(c == symbol_class) {
-            debug_print("#%s", SEND((pVMSymbol)o, get_chars));
+            debug_print("#%s", SEND((pVMSymbol)o, get_rawChars));
         } else
             debug_print("address: %p", (void*)o);
     }
@@ -87,15 +87,15 @@ static inline void _Disassembler_dispatch(pVMObject o) {
  * Dump a class and all subsequent methods.
  */
 void Disassembler_dump(pVMClass class) {
-    for(int i = 0; i < SEND(class, get_number_of_instance_invokables); i++) {
+    for (int i = 0; i < SEND(class, get_number_of_instance_invokables); i++) {
         pVMObject inv = SEND(class, get_instance_invokable, i);
         // output header and skip if the Invokable is a Primitive
         pVMSymbol sig = TSEND(VMInvokable, inv, get_signature);
-        const char* sig_s = SEND(sig, get_chars);
+        const char* sig_s = SEND(sig, get_rawChars);
         pVMSymbol cname = SEND(class, get_name);
-        const char* cname_s = SEND(cname, get_chars);
+        const char* cname_s = SEND(cname, get_rawChars);
         debug_dump("%s>>%s = ", cname_s, sig_s);
-        if(TSEND(VMInvokable, inv, is_primitive)) {
+        if (TSEND(VMInvokable, inv, is_primitive)) {
             debug_print("<primitive>\n");
             continue;
         }
@@ -147,7 +147,7 @@ void Disassembler_dump_method(pVMMethod method, const char* indent) {
             case BC_PUSH_FIELD:{
                 pVMSymbol name = (pVMSymbol)SEND(method, get_constant, bc_idx);
                 debug_print("(index: %d) field: %s\n", BC_1,
-                    SEND(name, get_chars));
+                    SEND(name, get_rawChars));
                 break;
             }
             case BC_PUSH_BLOCK: {
@@ -163,14 +163,14 @@ void Disassembler_dump_method(pVMMethod method, const char* indent) {
                 pVMClass class = SEND(constant, get_class);
                 pVMSymbol cname = SEND(class, get_name);
                 debug_print("(index: %d) value: (%s) ", 
-                            BC_1, SEND(cname, get_chars));
+                            BC_1, SEND(cname, get_rawChars));
                 _Disassembler_dispatch(constant); debug_print("\n");
                 break;
             }
             case BC_PUSH_GLOBAL: {
                 pVMSymbol name = (pVMSymbol)SEND(method, get_constant, bc_idx);
                 debug_print("(index: %d) value: %s\n", BC_1,
-                            SEND(name, get_chars));
+                            SEND(name, get_rawChars));
                 break;
             }
             case BC_POP_LOCAL:
@@ -182,19 +182,19 @@ void Disassembler_dump_method(pVMMethod method, const char* indent) {
             case BC_POP_FIELD: {
                 pVMSymbol name = (pVMSymbol)SEND(method, get_constant, bc_idx);
                 debug_print("(index: %d) field: %s\n", BC_1,
-                    SEND(name, get_chars));
+                    SEND(name, get_rawChars));
                 break;
             }
             case BC_SEND: {
                 pVMSymbol name = (pVMSymbol)SEND(method, get_constant, bc_idx);
                 debug_print("(index: %d) signature: %s\n", BC_1,
-                    SEND(name, get_chars));
+                    SEND(name, get_rawChars));
                 break;
             }
             case BC_SUPER_SEND: {
                 pVMSymbol name = (pVMSymbol)SEND(method, get_constant, bc_idx);
                 debug_print("(index: %d) signature: %s\n", BC_1,
-                    SEND(name, get_chars));
+                    SEND(name, get_rawChars));
                 break;
             }
             default:
@@ -219,13 +219,13 @@ void Disassembler_dump_bytecode(pVMFrame frame, pVMMethod method, size_t bc_idx)
         pVMSymbol sig = TSEND(VMInvokable, method, get_signature);
         
         debug_trace("%20s>>%-20s% 10lld %c %04d: %s\t",
-                    SEND(cname, get_chars), SEND(sig, get_chars),
+                    SEND(cname, get_rawChars), SEND(sig, get_rawChars),
                     indentc, ikind, bc_idx,
                     bytecodes_get_bytecode_name(bc));        
     } else {
         pVMSymbol sig = TSEND(VMInvokable, method, get_signature);
         debug_trace("%-42s% 10lld %c %04d: %s\t", 
-                    SEND(sig, get_chars),
+                    SEND(sig, get_rawChars),
                     indentc, ikind, bc_idx,
                     bytecodes_get_bytecode_name(bc));
     }
@@ -242,7 +242,7 @@ void Disassembler_dump_bytecode(pVMFrame frame, pVMMethod method, size_t bc_idx)
             if(o) {
                 pVMClass c = SEND(o, get_class);
                 pVMSymbol cname = SEND(c, get_name);
-                debug_print("<to dup: (%s) ", SEND(cname, get_chars));
+                debug_print("<to dup: (%s) ", SEND(cname, get_rawChars));
                 //dispatch
                 _Disassembler_dispatch(o);
             } else
@@ -256,7 +256,7 @@ void Disassembler_dump_bytecode(pVMFrame frame, pVMMethod method, size_t bc_idx)
             pVMClass c = SEND(o, get_class);
             pVMSymbol cname = SEND(c, get_name);
             debug_print("local: %d, context: %d <(%s) ", 
-                        BC_1, BC_2, SEND(cname, get_chars));
+                        BC_1, BC_2, SEND(cname, get_rawChars));
             //dispatch
             _Disassembler_dispatch(o);
             debug_print(">\n");                        
@@ -269,7 +269,7 @@ void Disassembler_dump_bytecode(pVMFrame frame, pVMMethod method, size_t bc_idx)
             if(IS_A(class, VMClass)) {
                 pVMClass c = SEND(o, get_class);
                 pVMSymbol cname = SEND(c, get_name);
-                debug_print("<(%s) ", SEND(cname, get_chars));
+                debug_print("<(%s) ", SEND(cname, get_rawChars));
                 //dispatch
                 _Disassembler_dispatch(o);                
                 debug_print(">");                        
@@ -288,7 +288,7 @@ void Disassembler_dump_bytecode(pVMFrame frame, pVMMethod method, size_t bc_idx)
             pVMSymbol cname = SEND(c, get_name);
 
             debug_print("(index: %d) field: %s <(%s) ", BC_1,
-                        SEND(name, get_chars), SEND(cname, get_chars));
+                        SEND(name, get_rawChars), SEND(cname, get_rawChars));
             //dispatch
             _Disassembler_dispatch(o);                
             debug_print(">\n");                        
@@ -305,7 +305,7 @@ void Disassembler_dump_bytecode(pVMFrame frame, pVMMethod method, size_t bc_idx)
             pVMClass c = SEND(constant, get_class);
             pVMSymbol cname = SEND(c, get_name);
             debug_print("(index: %d) value: (%s) ", BC_1, 
-                        SEND(cname, get_chars));
+                        SEND(cname, get_rawChars));
             _Disassembler_dispatch(constant);
             debug_print("\n");
             break;
@@ -318,12 +318,12 @@ void Disassembler_dump_bytecode(pVMFrame frame, pVMMethod method, size_t bc_idx)
             if(o) {
                 pVMClass c = SEND(o, get_class);
                 cname = SEND(c, get_name);
-                c_cname = SEND(cname, get_chars);
+                c_cname = SEND(cname, get_rawChars);
             } else
                 c_cname = "NULL";
             
             debug_print("(index: %d)value: %s <(%s) ", BC_1,
-                        SEND(name, get_chars), c_cname);
+                        SEND(name, get_rawChars), c_cname);
             _Disassembler_dispatch(o);
             debug_print(">\n");
             break;
@@ -333,7 +333,7 @@ void Disassembler_dump_bytecode(pVMFrame frame, pVMMethod method, size_t bc_idx)
             pVMObject o = SEND((pVMArray)frame, get_indexable_field, sp);
             pVMClass c = SEND(o, get_class);
             pVMSymbol cname = SEND(c, get_name);
-            debug_print("popped <(%s) ", SEND(cname, get_chars));
+            debug_print("popped <(%s) ", SEND(cname, get_rawChars));
             //dispatch
             _Disassembler_dispatch(o);
             debug_print(">\n");                        
@@ -345,7 +345,7 @@ void Disassembler_dump_bytecode(pVMFrame frame, pVMMethod method, size_t bc_idx)
             pVMClass c = SEND(o, get_class);
             pVMSymbol cname = SEND(c, get_name);
             debug_print("popped local: %d, context: %d <(%s) ", BC_1, BC_2,
-                        SEND(cname, get_chars));
+                        SEND(cname, get_rawChars));
             //dispatch
             _Disassembler_dispatch(o);            
             debug_print(">\n");                        
@@ -357,7 +357,7 @@ void Disassembler_dump_bytecode(pVMFrame frame, pVMMethod method, size_t bc_idx)
             pVMClass c = SEND(o, get_class);
             pVMSymbol cname = SEND(c, get_name);
             debug_print("argument: %d, context: %d <(%s) ", BC_1, BC_2,
-                        SEND(cname, get_chars));
+                        SEND(cname, get_rawChars));
             //dispatch
             _Disassembler_dispatch(o);
             debug_print(">\n");                        
@@ -370,8 +370,8 @@ void Disassembler_dump_bytecode(pVMFrame frame, pVMMethod method, size_t bc_idx)
             pVMClass c = SEND(o, get_class);
             pVMSymbol cname = SEND(c, get_name);
             debug_print("(index: %d) field: %s <(%s) ",  BC_1,
-                        SEND(name, get_chars),
-                        SEND(cname, get_chars));
+                        SEND(name, get_rawChars),
+                        SEND(cname, get_rawChars));
             _Disassembler_dispatch(o);
             debug_print(">\n");                        
             break;
@@ -381,7 +381,7 @@ void Disassembler_dump_bytecode(pVMFrame frame, pVMMethod method, size_t bc_idx)
             pVMSymbol sel = (pVMSymbol)SEND(method, get_constant, bc_idx);
 
             debug_print("(index: %d) signature: %s (", BC_1,
-                        SEND(sel, get_chars));
+                        SEND(sel, get_rawChars));
             //handle primitives, they don't increase call-depth
             pVMObject elem = SEND(Interpreter_get_frame(), get_stack_element,
                                   Signature_get_number_of_arguments(sel));

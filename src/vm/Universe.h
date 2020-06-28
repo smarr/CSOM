@@ -79,7 +79,9 @@ void          Universe_error_exit(const char* restrict) __attribute__((noreturn)
 
 void          Universe_assert(bool);
 
-pVMSymbol     Universe_symbol_for(const char* restrict);
+pVMSymbol     Universe_symbol_for_str(pString restrict);
+pVMSymbol     Universe_symbol_for_chars(const char* restrict, size_t);
+pVMSymbol     Universe_symbol_for_cstr(const char* restrict);
 
 pVMArray      Universe_new_array(int64_t);
 pVMArray      Universe_new_array_list(pList list);
@@ -92,8 +94,13 @@ pVMObject     Universe_new_instance(pVMClass);
 pVMInteger    Universe_new_integer(int64_t);
 pVMDouble     Universe_new_double(double);
 pVMClass      Universe_new_metaclass_class(void);
-pVMString     Universe_new_string(const char*);
-pVMSymbol     Universe_new_symbol(const char*);
+
+pVMString     Universe_new_string_cstr(const char*);
+pVMString     Universe_new_string_str(pString);
+pVMString     Universe_new_string_string(const char* restrict, size_t);
+pVMString     Universe_new_string_concat(pVMString, pVMString);
+
+pVMSymbol     Universe_new_symbol(pString);
 pVMClass      Universe_new_system_class(void);
 
 void          Universe_initialize_system_class(pVMClass, pVMClass, const char*);

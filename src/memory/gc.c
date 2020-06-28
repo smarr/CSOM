@@ -232,7 +232,7 @@ void gc_show_memory() {
                 fprintf(stderr,"-xx-");
             } else {
                 pVMSymbol class_name = SEND(SEND(object, get_class), get_name);
-                fprintf(stderr,"-%ld %s %p-", object_size, SEND(class_name, get_plain_string), object);
+                fprintf(stderr,"|%ld %s %p", object_size, SEND(class_name, get_plain_string), object);
             }
         }
         // aligns the output by inserting a line break after 36 objects
@@ -484,11 +484,6 @@ void* internal_allocate(size_t size) {
 
 void internal_free(void* ptr) {
     free(ptr);
-}
-
-
-char* internal_allocate_string(const char* restrict str) {
-    return strdup(str);
 }
 
 

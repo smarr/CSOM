@@ -27,6 +27,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#include <misc/String.h>
+
 
 typedef enum {
   NONE, Integer, Double, Not, And, Or, Star, Div, Mod, Plus,
@@ -46,12 +48,14 @@ typedef struct {
   int line_num;
   Symbol sym;
   char symc;
-  char text[BUFSIZ];
+  char _text[BUFSIZ];
+  size_t _textLength;
 
   bool peekDone;
   Symbol nextSym;
   char nextSymc;
-  char nextText[BUFSIZ];
+  char _nextText[BUFSIZ];
+  size_t _nextTextLength;
 
   char buf[BUFSIZ];
   int bufp;
@@ -61,6 +65,9 @@ Lexer* Lexer_create(const FILE* fp, const char* fname);
 Lexer* Lexer_from_string(const char* stream);
 
 Symbol Lexer_get_sym(Lexer* l);
+pString Lexer_get_text(Lexer* l);
+void Lexer_consumed_text(Lexer* l);
+
 void Lexer_peek(Lexer* l);
 void Lexer_peek_if_necessary(Lexer* l);
 

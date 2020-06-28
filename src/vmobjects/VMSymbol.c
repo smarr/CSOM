@@ -38,13 +38,13 @@ THE SOFTWARE.
 /**
  * Create a new VMSymbol with an initial C-string
  */
-pVMSymbol VMSymbol_new(const char* restrict string) {
+pVMSymbol VMSymbol_new(pString restrict string) {
     pVMSymbol result = (pVMSymbol)gc_allocate_object(
-        sizeof(VMSymbol) + sizeof(char) * (strlen(string) + 1));
-    if(result) {
+        sizeof(VMSymbol) + sizeof(char) * (string->length + 1));
+    if (result) {
         result->_vtable = VMSymbol_vtable();
         gc_start_uninterruptable_allocation();
-        INIT(result, string);
+        INIT(result, (char*) string->chars, string->length);
         gc_end_uninterruptable_allocation();
     }
     return result;
@@ -57,8 +57,10 @@ pVMSymbol VMSymbol_new(const char* restrict string) {
 void _VMSymbol_init(void* _self, ...) {
     va_list args;
     va_start(args, _self);
+    char* chars = va_arg(args, char*);
+    size_t len  = va_arg(args, size_t);
 
-    SUPER(VMString, _self, init, va_arg(args, char*));
+    SUPER(VMString, _self, init, chars, len);
 
     va_end(args);
 }
@@ -74,8 +76,8 @@ const char* _VMSymbol_get_plain_string(void* _self) {
     char plain_string[1024];
     plain_string[0] = '\0';
     
-    size_t l = strlen(self->chars);
-    for(size_t i = 0; i <= l; i++) {
+    size_t l = self->length;
+    for (size_t i = 0; i <= l; i++) {
         switch(self->chars[i]) {
             case '~':
                 strcat(plain_string, "tilde");

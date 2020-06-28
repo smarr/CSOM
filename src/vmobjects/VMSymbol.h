@@ -54,7 +54,7 @@ struct _VMSymbol {
 
 #pragma mark class methods
 
-pVMSymbol VMSymbol_new(const char* restrict);
+pVMSymbol VMSymbol_new(pString restrict);
 
 #pragma mark vtable initialization
 

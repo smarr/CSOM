@@ -92,29 +92,31 @@ pVMClass SourcecodeCompiler_compile_class_string(const char* stream,
 
 
 pVMClass SourcecodeCompiler_compile_class(const char* path,
+                                          size_t pathLength,
                                           // ^^^ without file_separator!
-                                          const char* filename, 
+                                          const char* filename,
+                                          size_t filenameLength,
                                           pVMClass system_class) {
     pVMClass result = system_class;
 
     // filename to be created
     //const char* path_c = SEND(path, chars);
     char* fname = (char*)internal_allocate(
-            strlen(path) +
+            pathLength +
             strlen(file_separator) +
-            strlen(filename) +
+            filenameLength +
             4 + // ".som"
             1
         );
-    strcpy(fname, path);
+    strncpy(fname, path, pathLength);
     strcat(fname, file_separator);
-    strcat(fname, filename);
+    strncat(fname, filename, filenameLength);
     strcat(fname, ".som");
 
-    if(access(fname, F_OK & R_OK) == -1) {
+    if (access(fname, F_OK & R_OK) == -1) {
         //file not found or not readable       
-        debug_info("Unable to open specified classpath, trying next one. ");
-        debug_info("File: %s\n", fname);
+        debug_info("Unable to open specified classpath, trying next one.\n");
+        debug_info("\t\tFile: %s\n", fname);
         
         // name no longer needed.
         internal_free(fname);
@@ -134,10 +136,13 @@ pVMClass SourcecodeCompiler_compile_class(const char* path,
     Lexer* l = Parser_init(stream, filename);
     result = compile(l, system_class);
     internal_free(l);
+    fclose(stream);
     
     // Make sure the filename matches the class name
     pVMSymbol cname = SEND(result, get_name);
-    if(strcmp(filename, SEND(cname, get_chars)) != 0)  {
+
+    if (CString_compare(filename, filenameLength,
+                        SEND(cname, get_rawChars), SEND(cname, get_length)) != 0)  {
         // Show the compilation error and return null
         show_compilation_error(filename, 
                                "File name does not match class name");

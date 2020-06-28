@@ -137,13 +137,15 @@ void  _Double_lessthan(pVMObject object, pVMFrame frame) {
 
 void  _Double_asString(pVMObject object, pVMFrame frame) {
     pVMDouble self = (pVMDouble)SEND(frame, pop);
+
     // temporary storage for the number string
     // use c99 snprintf-goodie
     double dbl = SEND(self, get_embedded_double);
     char* strbuf = (char *)internal_allocate(snprintf(0, 0, "%.18g", dbl) +1);
     sprintf(strbuf, "%.18g", dbl);
-    SEND(frame, push, (pVMObject)Universe_new_string(strbuf));
-    internal_free(strbuf);    
+    SEND(frame, push, (pVMObject) Universe_new_string_cstr(strbuf));
+
+    internal_free(strbuf);
 }
 
 

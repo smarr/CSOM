@@ -36,30 +36,30 @@ extern void*  primitiveGet(pHashmap self, void* key, size_t start);
 extern bool   primitivePut(pHashmap self, pHashmapElem elem, size_t start);
 extern size_t hashf(pHashmap self, size_t hashv);
 
-void* _StringHashmap_get(void* _self, void* key);
-void  _StringHashmap_put(void* _self, void* key, void* value);
+void* _StringHashmap_get(void* _self, pString key);
+void  _StringHashmap_put(void* _self, pString key, void* value);
 
 
 /**
  * Compare two Keys using string comparison.
  * parameters key1 and key2 must be C-Strings
  */
-bool _StringHashmapElem_key_equal_to(void* _self, void* other) {
+bool _StringHashmapElem_key_equal_to(void* _self, pString other) {
     pStringHashmapElem self = (pStringHashmapElem)_self;
-    return 0 == strcmp((const char*)self->key, (const char*)other);
+    return 0 == SEND(other, compareTo, self->key);
 }
 
 
 int64_t _StringHashmapElem_key_hash(void* _self) {
     pStringHashmapElem self = (pStringHashmapElem)_self;
-    return string_hash((char*)self->key);
+    return self->key->hash;
 }
 
 
-pHashmapElem StringHashmapElem_new(void* k, void* v) {
+pHashmapElem StringHashmapElem_new(pString k, void* v) {
     pStringHashmapElem result =
         (pStringHashmapElem)internal_allocate(sizeof(StringHashmapElem));
-    if(result) {
+    if (result) {
         result->_vtable = StringHashmapElem_vtable();
         INIT(result, k, v);
     }
@@ -71,7 +71,7 @@ void _StringHashmapElem_init(void* _self, ...) {
     pStringHashmapElem self = (pStringHashmapElem)_self;
     va_list argp;
     va_start(argp, _self);
-    void* k = internal_allocate_string(va_arg(argp, char*));
+    pString k = va_arg(argp, pString);
     void* v = va_arg(argp, void*);
     SUPER(HashmapElem, self, init, k, v);
     va_end(argp);
@@ -132,9 +132,9 @@ void _StringHashmap_free(void* self) {
  *  Get Element from Map
  *  parameter key must be a C-String
  */
-void* _StringHashmap_get(void* _self, void* key) {
+void* _StringHashmap_get(void* _self, pString key) {
     pStringHashmap self = (pStringHashmap)_self;
-    size_t hash = string_hash((const char*)key);
+    size_t hash = key->hash;
     return primitiveGet((pHashmap)self, key, hashf((pHashmap)self, hash));
 }
 
@@ -143,7 +143,7 @@ void* _StringHashmap_get(void* _self, void* key) {
  *  Put element into Map
  *  parameter key must be a C-String
  */
-void _StringHashmap_put(void* _self, void* key, void* value) {
+void _StringHashmap_put(void* _self, pString key, void* value) {
     pStringHashmap self = (pStringHashmap)_self;
     pHashmapElem elem = (pHashmapElem) StringHashmapElem_new(key, value);
     if(!primitivePut((pHashmap)self, elem, SEND(elem, key_hash)))

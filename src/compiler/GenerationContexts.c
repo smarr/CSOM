@@ -111,7 +111,7 @@ int8_t method_genc_find_literal_index(
 
 bool method_genc_find_var(
     method_generation_context* mgenc,
-    const char* var,
+    pString var,
     size_t* index,
     size_t* context,
     bool* is_argument
@@ -122,8 +122,8 @@ bool method_genc_find_var(
     // 3. try 1+2 in surrounding context, if any
     // Return true on success, false otherwise.
     
-    if((*index = SEND(mgenc->locals, indexOfCString, var)) == -1) {
-        if((*index = SEND(mgenc->arguments, indexOfCString, var)) == -1) {
+    if((*index = SEND(mgenc->locals, indexOfString, var)) == -1) {
+        if((*index = SEND(mgenc->arguments, indexOfString, var)) == -1) {
             if(!mgenc->outer_genc)
                 return false;
             else {
@@ -140,12 +140,12 @@ bool method_genc_find_var(
 
 
 bool method_genc_find_field(method_generation_context* mgenc,
-    const char* field
+    pString field
 ) {
     pList fields = mgenc->holder_genc->class_side ?
         mgenc->holder_genc->class_fields :
         mgenc->holder_genc->instance_fields;
-    return SEND(fields, indexOf, Universe_symbol_for(field)) != -1;
+    return SEND(fields, indexOf, Universe_symbol_for_str(field)) != -1;
 }
 
 

@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-
+#include <compiler/Parser.h>
 #include <memory/gc.h>
 
 #include <vm/Universe.h>
@@ -140,7 +140,7 @@ static void assert_equals(pVMObject result, Test test) {
     if (test.expected_type == CLASS) {
         const char* expected = (const char*) test.expected_result;
         pVMClass actual = (pVMClass) result;
-        const char* actual_class_name = SEND(SEND(actual, get_name), get_chars);
+        const char* actual_class_name = SEND(SEND(actual, get_name), get_rawChars);
 
         assert_desc(strcmp(expected, actual_class_name) == 0,
                     "Assertion failed. Expected class %s, but got %s",
@@ -151,7 +151,7 @@ static void assert_equals(pVMObject result, Test test) {
     if (test.expected_type == SYMBOL) {
         const char* expected = (const char*) test.expected_result;
         pVMSymbol actual = (pVMSymbol) result;
-        const char* actual_str = SEND(actual, get_chars);
+        const char* actual_str = SEND(actual, get_rawChars);
 
         assert_desc(strcmp(expected, actual_str) == 0,
                     "Assertion failed. Expected symbol %s, but got %s",
@@ -171,6 +171,8 @@ void run_test(Test test) {
 
 
 bool run_all_tests() {
+    Parser_init_constants();
+    
     bool has_failures = false;
     for (int i = 0; tests[i].class_name != NULL; i += 1) {
         printf("Test: %s>>#%s\n", tests[i].class_name, tests[i].method_name);

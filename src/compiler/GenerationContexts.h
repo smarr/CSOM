@@ -80,13 +80,12 @@ int8_t  method_genc_find_literal_index(
 );
 bool    method_genc_find_var(
     method_generation_context* mgenc,
-    const char* var,
+    pString var,
     size_t* index,
     size_t* context,
     bool* is_argument
 );
-bool    method_genc_find_field(method_generation_context* mgenc,
-                               const char* field);
+bool    method_genc_find_field(method_generation_context* mgenc, pString field);
 uint8_t method_genc_compute_stack_depth(method_generation_context* mgenc);
 
 

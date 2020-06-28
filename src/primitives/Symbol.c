@@ -37,8 +37,10 @@ THE SOFTWARE.
 
 void  _Symbol_asString(pVMObject object, pVMFrame frame) {
     pVMSymbol sym = (pVMSymbol)SEND(frame, pop);
-    const char* chars = SEND(sym, get_chars);
-    SEND(frame, push, (pVMObject)Universe_new_string(chars));    
+    const char* chars = SEND(sym, get_rawChars);
+    const size_t length = SEND(sym, get_length);
+  
+    SEND(frame, push, (pVMObject) Universe_new_string_string(chars, length));
 }
 
 

@@ -99,12 +99,13 @@ pVMClass VMClass_new_num_fields(intptr_t number_of_fields) {
 
 pVMClass VMClass_assemble(class_generation_context* cgc) {
     // build class class name
-    const char* cgc_name = SEND(cgc->name, get_chars);
+    const char* cgc_name = SEND(cgc->name, get_rawChars);
+    size_t cgc_name_len = SEND(cgc->name, get_length);
     char* ccname =
-        (char*)internal_allocate(strlen(cgc_name) + 6 + 1); // 6: " class"
+        (char*)internal_allocate(cgc_name_len + 6 + 1); // 6: " class"
     strcpy(ccname, cgc_name);
     strcat(ccname, " class");
-    pVMSymbol ccname_sym = Universe_symbol_for(ccname);
+    pVMSymbol ccname_sym = Universe_symbol_for_cstr(ccname);
     internal_free(ccname);
     
     // Load the super class
@@ -398,14 +399,19 @@ int64_t number_of_super_instance_fields(void* _self) {
  * generate the string containing the path to a primitive library which may be 
  * located at the classpath given.
  */
-pString gen_loadstring(const pString restrict cp, 
-                       const char* cname
-                       ) {
-   
+pString gen_loadstring(const pString restrict cp, const char* cname, size_t cnameLen) {
     pString loadstring = String_new_from(cp);
-    SEND(loadstring, concatChars, file_separator);
-    SEND(loadstring, concatChars, cname);
-    SEND(loadstring, concatChars, shared_extension);
+    pString old = loadstring;
+    loadstring = SEND(old, concatChars, file_separator, strlen(file_separator));
+    internal_free(old);
+
+    old = loadstring;
+    loadstring = SEND(old, concatChars, cname, cnameLen);
+    internal_free(old);
+
+    old = loadstring;
+    loadstring = SEND(loadstring, concatChars, shared_extension, strlen(shared_extension));
+    internal_free(old);
     
     return loadstring;
 }
@@ -418,7 +424,7 @@ pString gen_loadstring(const pString restrict cp,
  */
 pString gen_core_loadstring(const pString restrict cp) {
     #define S_CORE "SOMCore"
-    pString result = gen_loadstring(cp, S_CORE);    
+    pString result = gen_loadstring(cp, S_CORE, strlen(S_CORE));
     return result;
 }
 
@@ -441,11 +447,13 @@ void* load_lib(const pString restrict path) {
     static void* handle = NULL;
     
     // try load lib
-    if((handle=dlopen(SEND(path, chars), DL_LOADMODE)))
-        //found.
+    if ((handle = dlopen(SEND(path, rawChars), DL_LOADMODE))) {
+        // found
         return handle;
-    else
+    } else {
+        printf("dlopen failed with: %s\n", dlerror());
         return NULL;
+    }
 }
 
 
@@ -504,9 +512,11 @@ void set_primitives(pVMClass class, void* handle, const char* cname,
             { //string block
                 char symbol[strlen(cname) + strlen(selector) + 2 + 1];
                                                                 //2 for 2x '_'
-                sprintf(symbol, format, cname, selector);
+                size_t length = sprintf(symbol, format, cname, selector);
+                pString symbolString = String_new(symbol, length);
 
-                bool loaded = (bool) SEND(primitive_map, get, (void*)symbol);
+                bool loaded = (bool) SEND(primitive_map, get, symbolString);
+
 
                 if (loaded) {
                     // we already loaded this symbol
@@ -515,7 +525,7 @@ void set_primitives(pVMClass class, void* handle, const char* cname,
 
                 // try loading the primitive
                 routine = (routine_fn)dlsym(handle, symbol);
-                SEND(primitive_map, put, (void*)symbol, (void*)true);
+                SEND(primitive_map, put, symbolString, (void*)true);
             }
             
             if(!routine && class == target) {
@@ -561,18 +571,19 @@ static void init_lib(void* dlhandle) {
 void _VMClass_load_primitives(void* _self, const pString* cp, size_t cp_count) {
     pVMClass self = (pVMClass)_self;
     // the library handle
-    void* dlhandle=NULL;
+    void* dlhandle = NULL;
     // cached object properties
-    const char* cname = SEND(self->name, get_chars);
+    const char* cname = SEND(self->name, get_rawChars);
+    size_t cnameLen = SEND(self->name, get_length);
 
     // iterate the classpathes
-    for(size_t i = 0; (i < cp_count) && !dlhandle; i++) {
+    for (size_t i = 0; (i < cp_count) && !dlhandle; i++) {
 
         // check the core library
         pString loadstring = gen_core_loadstring(cp[i]);
         dlhandle = load_lib(loadstring);
         SEND(loadstring, free);
-        if(dlhandle && is_responsible(dlhandle, cname)) {
+        if (dlhandle && is_responsible(dlhandle, cname)) {
             // the core library is found and responsible
             init_lib(dlhandle);
             break;
@@ -580,12 +591,12 @@ void _VMClass_load_primitives(void* _self, const pString* cp, size_t cp_count) {
         
         // the core library is not found or respondible, 
         // continue w/ class file
-        loadstring = gen_loadstring(cp[i], cname);
+        loadstring = gen_loadstring(cp[i], cname, cnameLen);
         dlhandle = load_lib(loadstring);
         SEND(loadstring, free);
-        if(dlhandle) {
+        if (dlhandle) {
             // the class library was found...
-            if(is_responsible(dlhandle, cname)) {
+            if (is_responsible(dlhandle, cname)) {
                 init_lib(dlhandle);
                 break;
             } else {

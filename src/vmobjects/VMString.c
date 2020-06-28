@@ -36,18 +36,47 @@ THE SOFTWARE.
 //
 
 
-pVMString VMString_new(const char* restrict chars) {
+pVMString VMString_new(const char* restrict chars, size_t length) {
     pVMString result = (pVMString)gc_allocate_object(
-        sizeof(VMString) + sizeof(char) * (strlen(chars) + 1));
-    if(result) {
+        sizeof(VMString) + sizeof(char) * (length + 1));
+    if (result) {
         result->_vtable = VMString_vtable();
         gc_start_uninterruptable_allocation();
-        INIT(result, chars);
+        INIT(result, chars, length);
         gc_end_uninterruptable_allocation();
     }
     return result;
 }
 
+pVMString VMString_new_concat(pVMString a, pVMString b) {
+    size_t aLen = SEND(a, get_length);
+    size_t bLen = SEND(b, get_length);
+
+    pVMString result = (pVMString)gc_allocate_object(
+        sizeof(VMString) + sizeof(char) * (aLen + bLen + 1));
+
+    if (result) {
+        result->_vtable = VMString_vtable();
+        gc_start_uninterruptable_allocation();
+        INIT(result, "", 0);
+        gc_end_uninterruptable_allocation();
+
+        // now, do the actual concatination work
+        size_t i = 0;
+        for (; i < aLen; i++) {
+            result->chars[i] = a->chars[i];
+        }
+
+        size_t j = 0;
+        for (; j < bLen; i++, j++) {
+            result->chars[i] = b->chars[j];
+        }
+
+        result->length = aLen + bLen;
+        result->chars[result->length] = '\0';
+    }
+    return result;
+}
 
 /**
  * Initialize a VMString
@@ -59,9 +88,12 @@ void _VMString_init(void* _self, ...) {
     va_list args; 
     va_start(args, _self);
     const char* embed = va_arg(args, char*);
+    size_t length = va_arg(args, size_t);
     va_end(args);
     
-    strcpy(self->chars, embed);
+    memcpy(self->chars, embed, length);
+    self->chars[length] = '\0';
+    self->length = length;
     self->hash = 0;
 }
 
@@ -71,8 +103,13 @@ void _VMString_init(void* _self, ...) {
 //
 
 
-const char* _VMString_get_chars(void* _self) {
+const char* _VMString_get_rawChars(void* _self) {
     return (const char*)(((pVMString)_self)->chars);
+}
+
+
+const size_t _VMString_get_length(void* _self) {
+    return (const size_t)(((pVMString)_self)->length);
 }
 
 
@@ -88,8 +125,10 @@ bool VMString_vtable_inited = false;
 VTABLE(VMString)* VMString_vtable(void) {
     if(! VMString_vtable_inited) {
         *((VTABLE(VMObject)*)&_VMString_vtable) = *VMObject_vtable();
-        _VMString_vtable.init = METHOD(VMString, init);        
-        _VMString_vtable.get_chars = METHOD(VMString, get_chars);
+        _VMString_vtable.init = METHOD(VMString, init);
+
+        _VMString_vtable.get_length = METHOD(VMString, get_length);
+        _VMString_vtable.get_rawChars = METHOD(VMString, get_rawChars);
         
         VMString_vtable_inited = true;
     }

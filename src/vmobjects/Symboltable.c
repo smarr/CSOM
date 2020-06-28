@@ -32,26 +32,27 @@ THE SOFTWARE.
 #include <misc/StringHashmap.h>
 
 // class variable
-static pHashmap symtab;
+static pStringHashmap symtab;
 
-pVMSymbol Symbol_table_lookup(const char* restrict string) {
-    return (pVMSymbol)SEND(symtab, get, (char*)string);
+pVMSymbol Symbol_table_lookup(pString restrict string) {
+    return (pVMSymbol)SEND(symtab, get, string);
 }
 
 
 void Symbol_table_insert(pVMSymbol symbol) {
-    const char* chars = SEND(symbol, get_chars);
-    SEND(symtab, put, (char*)chars, symbol);
+    pString key = String_new(SEND(symbol, get_rawChars), SEND(symbol, get_length));
+    SEND(symtab, put, key, symbol);
 }
 
 
 void Symbol_table_init(void) {
-    symtab = (pHashmap)StringHashmap_new();
+    symtab = StringHashmap_new();
 }
 
 
 void Symbol_table_destruct(void) {
-    if(symtab)
+    if (symtab) {
         SEND(symtab, free);
+    }
 }
 

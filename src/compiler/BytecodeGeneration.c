@@ -101,8 +101,9 @@ void emit_PUSH_CONSTANT_String(
     method_generation_context* mgenc,
     pVMString str
 ) {
-    const char* string = SEND(str, get_chars);
-    EMIT2(BC_PUSH_CONSTANT, SEND(mgenc->literals, indexOfCString, string));
+    const char* string = SEND(str, get_rawChars);
+    size_t length = SEND(str, get_length);
+    EMIT2(BC_PUSH_CONSTANT, SEND(mgenc->literals, indexOfStringLen, string, length));
 }
 
 

@@ -34,17 +34,22 @@ THE SOFTWARE.
 
 int Signature_get_number_of_arguments(pVMSymbol sig) {
     // check default binaries
-    if(Signature_is_binary(sig)) return 2;
-    else {
-        const char* str = SEND(sig, get_chars);
+    if (Signature_is_binary(sig)) {
+        return 2;
+    } else {
+        const char* str = SEND(sig, get_rawChars);
+        size_t length = SEND(sig, get_length);
+
         // colons in str
         int num_colons = 0;
         
         // search the str
-        for(int i = 0 ; i < strlen(str); i++) 
-            if(str[i] == ':')
+        for (int i = 0 ; i < length; i++) {
+            if (str[i] == ':') {
                 // additional colon found
                 num_colons++;
+            }
+        }
         
         // The number of arguments is equal to the number of colons plus one
         // (->> SELF)
@@ -54,8 +59,14 @@ int Signature_get_number_of_arguments(pVMSymbol sig) {
 
 
 bool Signature_is_binary(pVMSymbol sig) {
-    const char* sigstr = SEND(sig, get_chars);
-    switch(sigstr[0]) {
+    const char* sigstr = SEND(sig, get_rawChars);
+    size_t length = SEND(sig, get_length);
+
+    if (length < 1) {
+        return false;
+    }
+
+    switch (sigstr[0]) {
             case '~' :
             case '&' :
             case '|' :

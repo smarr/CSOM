@@ -136,6 +136,7 @@ pVMClass SourcecodeCompiler_compile_class(const char* path,
     Lexer* l = Parser_init(stream, filename);
     result = compile(l, system_class);
     internal_free(l);
+    fclose(stream);
     
     // Make sure the filename matches the class name
     pVMSymbol cname = SEND(result, get_name);

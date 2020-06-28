@@ -48,6 +48,35 @@ pVMString VMString_new(const char* restrict chars, size_t length) {
     return result;
 }
 
+pVMString VMString_new_concat(pVMString a, pVMString b) {
+    size_t aLen = SEND(a, get_length);
+    size_t bLen = SEND(b, get_length);
+
+    pVMString result = (pVMString)gc_allocate_object(
+        sizeof(VMString) + sizeof(char) * (aLen + bLen + 1));
+
+    if (result) {
+        result->_vtable = VMString_vtable();
+        gc_start_uninterruptable_allocation();
+        INIT(result, "", 0);
+        gc_end_uninterruptable_allocation();
+
+        // now, do the actual concatination work
+        size_t i = 0;
+        for (; i < aLen; i++) {
+            result->chars[i] = a->chars[i];
+        }
+
+        size_t j = 0;
+        for (; j < bLen; i++, j++) {
+            result->chars[i] = b->chars[j];
+        }
+
+        result->length = aLen + bLen;
+        result->chars[result->length] = '\0';
+    }
+    return result;
+}
 
 /**
  * Initialize a VMString

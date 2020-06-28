@@ -36,6 +36,18 @@ THE SOFTWARE.
 
 #include <vm/Universe.h>
 
+
+int CString_compare(const char* restrict a, size_t lenA, const char* restrict b, size_t lenB) {
+    size_t min_length = lenA < lenB ? lenA : lenB;
+    int result = memcmp(a, b, min_length);
+    if (result == 0) {
+        return (int) lenA - (int) lenB;
+    } else {
+        return result;
+    }
+}
+
+
 //
 //  Class Methods (Starting with String_) 
 //
@@ -147,13 +159,7 @@ const char* _String_rawChars(void* _self) {
 
 int _String_compareTo(void* _self, pString other) {
     pString self = (pString)_self;
-    size_t min_length = self->length < other->length ? self->length : other->length;
-    int result = memcmp(self->chars, other->chars, min_length);
-    if (result == 0) {
-        return (int) self->length - (int) other->length;
-    } else {
-        return result;
-    }
+    return CString_compare(self->chars, self->length, other->chars, other->length);
 }
 
 

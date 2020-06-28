@@ -86,6 +86,8 @@ pString String_new_from(pString restrict string);
 pString String_new_concat(pString, pString);
 pString String_new_concat_str(pString restrict, const char* restrict, size_t);
 
+int CString_compare(const char* restrict a, size_t lenA, const char* restrict b, size_t lenB);
+
 #pragma mark vtable initialization
 
 

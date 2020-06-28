@@ -140,7 +140,9 @@ pVMClass SourcecodeCompiler_compile_class(const char* path,
     
     // Make sure the filename matches the class name
     pVMSymbol cname = SEND(result, get_name);
-    if(strcmp(filename, SEND(cname, get_chars)) != 0)  {
+
+    if (CString_compare(filename, filenameLength,
+                        SEND(cname, get_rawChars), SEND(cname, get_length)) != 0)  {
         // Show the compilation error and return null
         show_compilation_error(filename, 
                                "File name does not match class name");

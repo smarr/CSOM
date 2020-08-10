@@ -234,12 +234,12 @@ static void assignation(Lexer* lexer, method_generation_context* mgenc);
 static void assignments(Lexer* lexer, method_generation_context* mgenc, pList l);
 static pString assignment(Lexer* l, method_generation_context* mgenc);
 static void evaluation(Lexer* l, method_generation_context* mgenc);
-static void primary(Lexer* l, method_generation_context* mgenc, bool* super);
+static bool primary(Lexer* l, method_generation_context* mgenc);
 static pString variable(Lexer* l);
 static void messages(Lexer* l, method_generation_context* mgenc, bool super);
 static void unaryMessage(Lexer* l, method_generation_context* mgenc, bool super);
 static void binaryMessage(Lexer* l, method_generation_context* mgenc, bool super);
-static void binaryOperand(Lexer* l, method_generation_context* mgenc, bool* super);
+static bool binaryOperand(Lexer* l, method_generation_context* mgenc);
 static void keywordMessage(Lexer* l, method_generation_context* mgenc, bool super);
 static void formula(Lexer* l, method_generation_context* mgenc);
 static void nestedTerm(Lexer* l, method_generation_context* mgenc);
@@ -782,8 +782,7 @@ pString assignment(Lexer* l, method_generation_context* mgenc) {
 
 
 void evaluation(Lexer* l, method_generation_context* mgenc) {
-    bool super;
-    primary(l, mgenc, &super);
+    bool super = primary(l, mgenc);
     if(l->sym == Identifier || l->sym == Keyword || l->sym == OperatorSequence ||
         symIn(l, binaryOpSyms)
     ) {       
@@ -792,13 +791,13 @@ void evaluation(Lexer* l, method_generation_context* mgenc) {
 }
 
 
-void primary(Lexer* l, method_generation_context* mgenc, bool* super) {
-    *super = false;
+bool primary(Lexer* l, method_generation_context* mgenc) {
+    bool super = false;
     switch(l->sym) {
         case Identifier: {
             pString var = variable(l);
             if (SEND(var, compareTo, superStr) == 0) {
-                *super = true;
+                super = true;
                 // sends to super push self as the receiver
                 gen_push_variable(mgenc, selfStr);
             } else {
@@ -827,10 +826,13 @@ void primary(Lexer* l, method_generation_context* mgenc, bool* super) {
             method_genc_release(&bgenc);
             break;
         }
-        default:
+        default: {
             literal(l, mgenc);
             break;
+        }
     }
+
+    return super;
 }
 
 
@@ -845,37 +847,39 @@ void messages(Lexer* l, method_generation_context* mgenc, bool super) {
             // only the first message in a sequence can be a super send
             unaryMessage(l, mgenc, super);
             super = false;
-        } while(l->sym == Identifier);
+        } while (l->sym == Identifier);
         
-        while(l->sym == OperatorSequence || symIn(l, binaryOpSyms)) {
+        while (l->sym == OperatorSequence || symIn(l, binaryOpSyms)) {
             binaryMessage(l, mgenc, false);
         }
         
-        if(l->sym == Keyword) {
+        if (l->sym == Keyword) {
             keywordMessage(l, mgenc, false);
         }
-    } else if(l->sym == OperatorSequence || symIn(l, binaryOpSyms)) {
+    } else if (l->sym == OperatorSequence || symIn(l, binaryOpSyms)) {
         do {
             // only the first message in a sequence can be a super send
             binaryMessage(l, mgenc, super);
             super = false;
         } while(l->sym == OperatorSequence || symIn(l, binaryOpSyms));
         
-        if(l->sym == Keyword) {
+        if (l->sym == Keyword) {
             keywordMessage(l, mgenc, false);
         }
-    } else
+    } else {
         keywordMessage(l, mgenc, super);
+    }
 }
 
 
 void unaryMessage(Lexer* l, method_generation_context* mgenc, bool super) {
     pVMSymbol msg = unarySelector(l);
     SEND(mgenc->literals, addIfAbsent, msg);
-    if(super)
+    if (super) {
         emit_SUPER_SEND(mgenc, msg);
-    else
+    } else {
         emit_SEND(mgenc, msg);
+    }
 }
 
 
@@ -883,21 +887,25 @@ void binaryMessage(Lexer* l, method_generation_context* mgenc, bool super) {
     pVMSymbol msg = binarySelector(l);
     SEND(mgenc->literals, addIfAbsent, msg);
     
-    bool tmp_bool = false;
-    binaryOperand(l, mgenc, &tmp_bool);
+    binaryOperand(l, mgenc);
     
-    if(super)
+    if (super) {
         emit_SUPER_SEND(mgenc, msg);
-    else
+    } else {
         emit_SEND(mgenc, msg);
+    }
 }
 
 
-void binaryOperand(Lexer* l, method_generation_context* mgenc, bool* super) {
-    primary(l, mgenc, super);
+bool binaryOperand(Lexer* l, method_generation_context* mgenc) {
+    bool super = primary(l, mgenc);
     
-    while(l->sym == Identifier)
-        unaryMessage(l, mgenc, *super);
+    while (l->sym == Identifier) {
+        unaryMessage(l, mgenc, super);
+        super = false;
+    }
+
+    return super;
 }
 
 
@@ -922,14 +930,16 @@ void keywordMessage(Lexer* l, method_generation_context* mgenc, bool super) {
 
 
 void formula(Lexer* l, method_generation_context* mgenc) {
-    bool super;
-    binaryOperand(l, mgenc, &super);
+    bool super = binaryOperand(l, mgenc);
     
     // only the first message in a sequence can be a super send
-    if(l->sym == OperatorSequence || symIn(l, binaryOpSyms))
+    if (l->sym == OperatorSequence || symIn(l, binaryOpSyms)) {
         binaryMessage(l, mgenc, super);
-    while(l->sym == OperatorSequence || symIn(l, binaryOpSyms))
+    }
+
+    while(l->sym == OperatorSequence || symIn(l, binaryOpSyms)) {
         binaryMessage(l, mgenc, false);
+    }
 }
 
 

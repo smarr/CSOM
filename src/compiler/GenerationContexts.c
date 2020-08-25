@@ -191,3 +191,7 @@ uint8_t method_genc_compute_stack_depth(method_generation_context* mgenc) {
     
     return max_depth;
 }
+
+bool method_genc_has_bytecodes(method_generation_context* mgenc) {
+    return mgenc->bp != 0;
+}

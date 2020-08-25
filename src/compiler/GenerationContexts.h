@@ -88,5 +88,6 @@ bool    method_genc_find_var(
 bool    method_genc_find_field(method_generation_context* mgenc, pString field);
 uint8_t method_genc_compute_stack_depth(method_generation_context* mgenc);
 
+bool    method_genc_has_bytecodes(method_generation_context* mgenc);
 
 #endif // GENERATIONCONTEXTS_H_

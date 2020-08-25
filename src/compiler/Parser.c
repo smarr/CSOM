@@ -698,11 +698,17 @@ void blockBody(Lexer* l, method_generation_context* mgenc, bool seen_period) {
     if(accept(l, Exit))
         result(l, mgenc);
     else if(l->sym == EndBlock) {
-        if(seen_period)
+        if (seen_period) {
             // a POP has been generated which must be elided (blocks always
             // return the value of the last expression, regardless of whether it
             // was terminated with a . or not)
             mgenc->bp--;
+        }
+        if (mgenc->block_method && !method_genc_has_bytecodes(mgenc)) {
+            pVMSymbol nilSym = Universe_symbol_for_cstr("nil");
+            SEND(mgenc->literals, addIfAbsent, nilSym);
+            emit_PUSH_GLOBAL(mgenc, nilSym);
+        }
         emit_RETURN_LOCAL(mgenc);
         mgenc->finished = true;
     } else if(l->sym == EndTerm) {
@@ -1118,7 +1124,12 @@ void nestedBlock(Lexer* l, method_generation_context* mgenc) {
     
     // if no return has been generated, we can be sure that the last expression
     // in the block was not terminated by ., and can generate a return
-    if(!mgenc->finished) {
+    if (!mgenc->finished) {
+        if (!method_genc_has_bytecodes(mgenc)) {
+            pVMSymbol nilSym = Universe_symbol_for_cstr("nil");
+            SEND(mgenc->literals, addIfAbsent, nilSym);
+            emit_PUSH_GLOBAL(mgenc, nilSym);
+        }
         emit_RETURN_LOCAL(mgenc);
         mgenc->finished = true;
     }

@@ -31,7 +31,7 @@
 export ROOT_DIR	:=$(PWD)
 export BUILD_DIR:=$(ROOT_DIR)/build
 
-export ARCH?=32bit
+export ARCH?=64bit
 
 ifeq ($(ARCH),32bit)
   COMPILER_ARCH=-m32

@@ -13,4 +13,4 @@ build_test_benchmark_job:
   script:
     - ARCH=64bit make
     - ARCH=64bit make test
-    - rebench --without-nice --experiment="CI Benchmark Run Pipeline ID $CI_PIPELINE_ID" --branch="$CI_COMMIT_REF_NAME" -c rebench.conf CSOM
+    - rebench --experiment="CI ID $CI_PIPELINE_ID" --branch="$CI_COMMIT_REF_NAME" -c rebench.conf CSOM

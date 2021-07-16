@@ -45,9 +45,13 @@ static const Test tests[] = {
     {"Blocks", "testArg2", (void*) 77, INTEGER},
     {"Blocks", "testArgAndLocal",   (void*) 8, INTEGER},
     {"Blocks", "testArgAndContext", (void*) 8, INTEGER},
-    {"Blocks", "testEmptyZeroArg", 1, INTEGER},
-    {"Blocks", "testEmptyOneArg", 1, INTEGER},
-    {"Blocks", "testEmptyTwoArg", 1, INTEGER},
+    {"Blocks", "testEmptyZeroArg", (void*) 1, INTEGER},
+    {"Blocks", "testEmptyOneArg", (void*) 1, INTEGER},
+    {"Blocks", "testEmptyTwoArg", (void*) 1, INTEGER},
+    {"Return", "testReturnSelf", "Return", CLASS},
+    {"Return", "testReturnSelfImplicitly", "Return", CLASS},
+    {"Return", "testNoReturnReturnsSelf", "Return", CLASS},
+    {"Return", "testBlockReturnsImplicitlyLastValue", (void*) 4, INTEGER},
 
     {"Return", "testReturnSelf", "Return", CLASS},
     {"Return", "testReturnSelfImplicitly", "Return", CLASS},
@@ -57,6 +61,10 @@ static const Test tests[] = {
     {"IfTrueIfFalse", "test",  (void*) 42, INTEGER},
     {"IfTrueIfFalse", "test2", (void*) 33, INTEGER},
     {"IfTrueIfFalse", "test3", (void*)  4, INTEGER},
+    {"IfTrueIfFalse", "testIfTrueTrueResult", "Integer", CLASS},
+    {"IfTrueIfFalse", "testIfTrueFalseResult", "Nil", CLASS},
+    {"IfTrueIfFalse", "testIfFalseTrueResult", "Nil", CLASS},
+    {"IfTrueIfFalse", "testIfFalseFalseResult", "Integer", CLASS},
 
     {"CompilerSimplification", "testReturnConstantSymbol", "constant", SYMBOL},
     {"CompilerSimplification", "testReturnConstantInt", (void*) 42, INTEGER},
@@ -101,12 +109,12 @@ static const Test tests[] = {
 
     {"Regressions", "testSymbolEquality", (void*) 1, INTEGER},
     {"Regressions", "testSymbolReferenceEquality", (void*) 1, INTEGER},
-    {"Regressions", "testUninitializedLocal", 1, INTEGER},
-    {"Regressions", "testUninitializedLocalInBlock", 1, INTEGER},
+    {"Regressions", "testUninitializedLocal", (void*) 1, INTEGER},
+    {"Regressions", "testUninitializedLocalInBlock", (void*) 1, INTEGER},
 
     {"BinaryOperation", "test", (void*) 11, INTEGER},
 
-    {"NumberOfTests", "numberOfTests", (void*) 57, INTEGER},
+    {"NumberOfTests", "numberOfTests", (void*) 65, INTEGER},
 
     {NULL}
 };
@@ -177,7 +185,7 @@ void run_test(Test test) {
 
 bool run_all_tests() {
     Parser_init_constants();
-    
+
     bool has_failures = false;
     for (int i = 0; tests[i].class_name != NULL; i += 1) {
         printf("Test: %s>>#%s\n", tests[i].class_name, tests[i].method_name);

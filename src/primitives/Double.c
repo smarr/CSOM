@@ -92,7 +92,7 @@ void  _Double_slashslash(pVMObject object, pVMFrame frame) {
 void  _Double_percent(pVMObject object, pVMFrame frame) {
     PREPARE_OPERANDS;
     SEND(frame, push, (pVMObject)Universe_new_double((double)
-                                                     ((int64_t)left % 
+                                                     ((int64_t)left %
                                                       (int64_t)right)));
 }
 
@@ -100,7 +100,7 @@ void  _Double_percent(pVMObject object, pVMFrame frame) {
 void  _Double_and(pVMObject object, pVMFrame frame) {
     PREPARE_OPERANDS;
     SEND(frame, push, (pVMObject)Universe_new_double((double)
-                                                     ((int64_t)left & 
+                                                     ((int64_t)left &
                                                       (int64_t)right)));
 }
 
@@ -151,7 +151,7 @@ void  _Double_asString(pVMObject object, pVMFrame frame) {
 
 void _Double_sqrt(pVMObject object, pVMFrame frame) {
     pVMDouble self = (pVMDouble)SEND(frame, pop);
-    pVMDouble result = Universe_new_double(sqrt(SEND(self, 
+    pVMDouble result = Universe_new_double(sqrt(SEND(self,
                                                      get_embedded_double)));
     SEND(frame, push, (pVMObject) result);
 }

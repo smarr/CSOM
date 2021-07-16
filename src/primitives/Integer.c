@@ -56,7 +56,7 @@ THE SOFTWARE.
         return; \
     } \
 })
-    
+
 
 //
 // private functions for Integer
@@ -88,13 +88,13 @@ void __Integer_init(void) {
 void  _Integer_plus(pVMObject object, pVMFrame frame) {
     pVMObject rightObj = SEND(frame, pop);
     pVMInteger left = (pVMInteger)SEND(frame, pop);
-    
+
     CHECK_COERCION(rightObj, left, "+");
 
     // Do operation:
     pVMInteger right = (pVMInteger)rightObj;
-    
-    int64_t result = (int64_t)SEND(left, get_embedded_integer) + 
+
+    int64_t result = (int64_t)SEND(left, get_embedded_integer) +
         (int64_t)SEND(right, get_embedded_integer);
     SEND(frame, push, (pVMObject)Universe_new_integer(result));
 }
@@ -103,13 +103,13 @@ void  _Integer_plus(pVMObject object, pVMFrame frame) {
 void  _Integer_minus(pVMObject object, pVMFrame frame) {
     pVMObject rightObj = SEND(frame, pop);
     pVMInteger left = (pVMInteger)SEND(frame, pop);
-    
+
     CHECK_COERCION(rightObj, left, "-");
 
     // Do operation:
     pVMInteger right = (pVMInteger)rightObj;
-    
-    int64_t result = (int64_t)SEND(left, get_embedded_integer) - 
+
+    int64_t result = (int64_t)SEND(left, get_embedded_integer) -
                      (int64_t)SEND(right, get_embedded_integer);
     SEND(frame, push, (pVMObject)Universe_new_integer(result));
 }
@@ -118,13 +118,13 @@ void  _Integer_minus(pVMObject object, pVMFrame frame) {
 void  _Integer_star(pVMObject object, pVMFrame frame) {
     pVMObject rightObj = SEND(frame, pop);
     pVMInteger left = (pVMInteger)SEND(frame, pop);
-    
+
     CHECK_COERCION(rightObj, left, "*");
 
     // Do operation:
     pVMInteger right = (pVMInteger)rightObj;
-    
-    int64_t result = (int64_t)SEND(left, get_embedded_integer) * 
+
+    int64_t result = (int64_t)SEND(left, get_embedded_integer) *
                      (int64_t)SEND(right, get_embedded_integer);
     SEND(frame, push, (pVMObject)Universe_new_integer(result));
 }
@@ -133,12 +133,12 @@ void  _Integer_star(pVMObject object, pVMFrame frame) {
 void  _Integer_slashslash(pVMObject object, pVMFrame frame) {
     pVMObject rightObj = SEND(frame, pop);
     pVMInteger left = (pVMInteger)SEND(frame, pop);
-    
+
     CHECK_COERCION(rightObj, left, "/");
 
     // Do operation:
     pVMInteger right = (pVMInteger)rightObj;
-    
+
     double result = (double)SEND(left, get_embedded_integer) /
                     (double)SEND(right, get_embedded_integer);
     SEND(frame, push, (pVMObject)Universe_new_double(result));
@@ -148,13 +148,13 @@ void  _Integer_slashslash(pVMObject object, pVMFrame frame) {
 void  _Integer_slash(pVMObject object, pVMFrame frame) {
     pVMObject rightObj = SEND(frame, pop);
     pVMInteger left = (pVMInteger)SEND(frame, pop);
-    
+
     CHECK_COERCION(rightObj, left, "/");
 
     // Do operation:
     pVMInteger right = (pVMInteger)rightObj;
-    
-    int64_t result = (int64_t)SEND(left, get_embedded_integer) / 
+
+    int64_t result = (int64_t)SEND(left, get_embedded_integer) /
                      (int64_t)SEND(right, get_embedded_integer);
     SEND(frame, push, (pVMObject)Universe_new_integer(result));
 }
@@ -163,21 +163,21 @@ void  _Integer_slash(pVMObject object, pVMFrame frame) {
 void  _Integer_percent(pVMObject object, pVMFrame frame) {
     pVMObject rightObj = SEND(frame, pop);
     pVMInteger left = (pVMInteger)SEND(frame, pop);
-    
+
     CHECK_COERCION(rightObj, left, "%");
 
     // Do operation:
     pVMInteger right = (pVMInteger)rightObj;
-    
+
     int64_t l = (int64_t)SEND(left, get_embedded_integer);
     int64_t r = (int64_t)SEND(right, get_embedded_integer);
 
     int64_t result = l % r;
-    
+
     if ((result != 0) && ((result < 0) != (r < 0))) {
         result += r;
     }
-    
+
     SEND(frame, push, (pVMObject)Universe_new_integer(result));
 }
 
@@ -185,29 +185,29 @@ void  _Integer_percent(pVMObject object, pVMFrame frame) {
 void  _Integer_and(pVMObject object, pVMFrame frame) {
     pVMObject rightObj = SEND(frame, pop);
     pVMInteger left = (pVMInteger)SEND(frame, pop);
-    
+
     CHECK_COERCION(rightObj, left, "&");
 
     // Do operation:
     pVMInteger right = (pVMInteger)rightObj;
-    
-    int64_t result = (int64_t)SEND(left, get_embedded_integer) & 
+
+    int64_t result = (int64_t)SEND(left, get_embedded_integer) &
                     (int64_t)SEND(right, get_embedded_integer);
     SEND(frame, push, (pVMObject)Universe_new_integer(result));
-}   
+}
 
 
 void  _Integer_equal(pVMObject object, pVMFrame frame) {
     pVMObject rightObj = SEND(frame, pop);
     pVMInteger left = (pVMInteger)SEND(frame, pop);
-    
+
     CHECK_COERCION(rightObj, left, "=");
 
     if(IS_A(rightObj, VMInteger)) {
         // Second operand was Integer:
         pVMInteger right = (pVMInteger)rightObj;
-        
-        if(SEND(left, get_embedded_integer) 
+
+        if(SEND(left, get_embedded_integer)
             == SEND(right, get_embedded_integer))
             SEND(frame, push, true_object);
         else
@@ -215,8 +215,8 @@ void  _Integer_equal(pVMObject object, pVMFrame frame) {
     } else if(IS_A(rightObj, VMDouble)) {
         // Second operand was Double:
         pVMDouble right = (pVMDouble)rightObj;
-        
-        if((double)SEND(left, get_embedded_integer) 
+
+        if((double)SEND(left, get_embedded_integer)
             == SEND(right, get_embedded_double))
             SEND(frame, push, true_object);
         else
@@ -230,11 +230,11 @@ void  _Integer_equal(pVMObject object, pVMFrame frame) {
 void  _Integer_lessthan(pVMObject object, pVMFrame frame) {
     pVMObject rightObj = SEND(frame, pop);
     pVMInteger left = (pVMInteger)SEND(frame, pop);
-    
+
     CHECK_COERCION(rightObj, left, "<");
 
     pVMInteger right = (pVMInteger)rightObj;
-    
+
     if(SEND(left, get_embedded_integer) < SEND(right, get_embedded_integer))
         SEND(frame, push, true_object);
     else
@@ -252,16 +252,16 @@ void  _Integer_asString(pVMObject object, pVMFrame frame) {
     sprintf(strbuf, "%lld", integer);
 
     SEND(frame, push, (pVMObject) Universe_new_string_cstr(strbuf));
-    internal_free(strbuf);    
+    internal_free(strbuf);
 }
 
 
 void Integer_fromString_(pVMObject object, pVMFrame frame) {
     pVMString self = (pVMString)SEND(frame, pop);
     SEND(frame, pop);
-    
+
     int64_t integer = atol(SEND(self, get_rawChars));
-    
+
     SEND(frame, push, (pVMObject)Universe_new_integer(integer));
 }
 
@@ -269,7 +269,7 @@ void Integer_fromString_(pVMObject object, pVMFrame frame) {
 void  _Integer_sqrt(pVMObject object, pVMFrame frame) {
     pVMInteger self = (pVMInteger)SEND(frame, pop);
     double result = sqrt((double)SEND(self, get_embedded_integer));
-    
+
     if (result == rint(result))
         SEND(frame, push, (pVMObject)Universe_new_integer(result));
     else

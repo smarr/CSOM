@@ -46,9 +46,9 @@ void  _System_global_(pVMObject object, pVMFrame frame) {
     pVMSymbol arg = (pVMSymbol)SEND(frame, pop);
     pVMObject self __attribute__((unused))= SEND(frame, pop);
     pVMObject result = Universe_get_global(arg);
-    
+
     SEND(frame, push, result?
-                      result:nil_object);    
+                      result:nil_object);
 }
 
 
@@ -77,7 +77,7 @@ void  _System_load_(pVMObject object, pVMFrame frame) {
     pVMClass result = Universe_load_class(arg);
     SEND(frame, push, result? (pVMObject)result:
                               nil_object);
-   
+
 }
 
 
@@ -108,7 +108,7 @@ void  _System_time(pVMObject object, pVMFrame frame) {
     pVMObject self __attribute__((unused)) = SEND(frame, pop);
     struct timeval now;
     gettimeofday(&now, NULL);
-    long long diff = 
+    long long diff =
         ((now.tv_sec - _System_start_time.tv_sec) * 1000) + //seconds
         ((now.tv_usec - _System_start_time.tv_usec) / 1000); // µseconds
     SEND(frame, push, (pVMObject)Universe_new_integer((int32_t)diff));
@@ -118,7 +118,7 @@ void  _System_ticks(pVMObject object, pVMFrame frame) {
     SEND(frame, pop);
     struct timeval now;
     gettimeofday(&now, NULL);
-    
+
     int64_t ticks = ((now.tv_sec - _System_start_time.tv_sec) * 1000 * 1000) + //seconds
                     ((now.tv_usec - _System_start_time.tv_usec)); //µseconds
     SEND(frame, push, (pVMObject)Universe_new_integer(ticks));

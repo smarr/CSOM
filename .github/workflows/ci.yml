@@ -54,10 +54,10 @@ jobs:
           ./som-em.sh -cp Smalltalk TestSuite/TestHarness.som
         if: matrix.compiler == 'emcc'
       
-      - name: SomSom Tests
-        run: |
-          ./CSOM -cp core-lib/Smalltalk:core-lib/TestSuite:core-lib/SomSom/src/compiler:core-lib/SomSom/src/vm:core-lib/SomSom/src/vmobjects:core-lib/SomSom/src/interpreter:core-lib/SomSom/src/primitives \
-            core-lib/SomSom/tests/SomSomTests.som
+      # - name: SomSom Tests
+      #   run: |
+      #     ./CSOM -cp core-lib/Smalltalk:core-lib/TestSuite:core-lib/SomSom/src/compiler:core-lib/SomSom/src/vm:core-lib/SomSom/src/vmobjects:core-lib/SomSom/src/interpreter:core-lib/SomSom/src/primitives \
+      #       core-lib/SomSom/tests/SomSomTests.som
 
       - name: Checkout AWFY
         uses: actions/checkout@v2

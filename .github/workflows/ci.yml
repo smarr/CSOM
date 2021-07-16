@@ -1,0 +1,76 @@
+name: Tests
+
+on: [push, pull_request]
+
+jobs:
+  test_som:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: GCC 32bit
+            bit: 32
+            compiler: gcc
+          - name: GCC 64bit
+            bit: 64
+            compiler: gcc
+          - name: Clang 32bit
+            bit: 32
+            compiler: Clang
+          - name: Clang 64bit
+            bit: 64
+            compiler: clang
+          - name: Emscripten
+            compiler: emcc
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+      
+      - name: Install Multilib
+        if: matrix.bit == 32
+        run: |
+          sudo apt-get install libc6-dev-i386 gcc-multilib
+      
+      - name: Tests
+        run: |
+          export COMPILER=${{ matrix.compiler }}
+          export ARCH=${{ matrix.bit }}bit
+          make test
+        if: matrix.compiler != 'emcc'
+      
+      - name: Load Emscripten
+        uses: mymindstorm/setup-emsdk@v10
+        with:
+           version: 1.38.40
+        if: matrix.compiler == 'emcc'
+
+      - name: Tests Emscripten
+        run: |
+          make emscripten
+          ./som-em.sh -cp Smalltalk TestSuite/TestHarness.som
+        if: matrix.compiler == 'emcc'
+      
+      # - name: SomSom Tests
+      #   run: |
+      #     ./CSOM -cp core-lib/Smalltalk:core-lib/TestSuite:core-lib/SomSom/src/compiler:core-lib/SomSom/src/vm:core-lib/SomSom/src/vmobjects:core-lib/SomSom/src/interpreter:core-lib/SomSom/src/primitives \
+      #       core-lib/SomSom/tests/SomSomTests.som
+
+      # - name: Checkout AWFY
+      #   uses: actions/checkout@v2
+      #   with:
+      #     repository: smarr/are-we-fast-yet
+      #     path: are-we-fast-yet
+      
+      # - name: AWFY Test Run
+      #   run: |
+      #     pwd
+      #     export COMPILER=${{ matrix.compiler }}
+      #     export ARCH=${{ matrix.bit }}bit
+      #     make
+      #     pip install ReBench
+      #     rebench awfy-test.conf
+      #   if: matrix.compiler != 'emcc'

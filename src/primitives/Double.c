@@ -197,3 +197,13 @@ void Double_PositiveInfinity(pVMObject object, pVMFrame frame) {
   SEND(frame, pop);
   SEND(frame, push, (pVMObject)Universe_new_double(INFINITY));
 }
+
+void Double_fromString_(pVMObject object, pVMFrame frame) {
+  pVMString string = (pVMString)SEND(frame, pop);
+  SEND(frame, pop);
+
+  // TODO: make save using strncpy, see also Integer prims
+  double d = strtod(SEND(string, get_rawChars), NULL);
+
+  SEND(frame, push, (pVMObject)Universe_new_double(d));
+}

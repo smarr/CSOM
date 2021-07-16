@@ -38,6 +38,7 @@ void  _Integer_percent(pVMObject object, pVMFrame frame);
 void  _Integer_and(pVMObject object, pVMFrame frame);
 void  _Integer_equal(pVMObject object, pVMFrame frame);
 void  _Integer_lessthan(pVMObject object, pVMFrame frame);
+void  _Integer_asDouble(pVMObject object, pVMFrame frame);
 void  _Integer_asString(pVMObject object, pVMFrame frame);
 void  _Integer_sqrt(pVMObject object, pVMFrame frame);
 void  _Integer_atRandom(pVMObject object, pVMFrame frame);

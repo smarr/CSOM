@@ -242,6 +242,16 @@ void  _Integer_lessthan(pVMObject object, pVMFrame frame) {
 }
 
 
+void  _Integer_asDouble(pVMObject object, pVMFrame frame) {
+    pVMInteger self = (pVMInteger)SEND(frame, pop);
+
+    int64_t integer = SEND(self,  get_embedded_integer);
+    double result = (double) integer;
+
+    SEND(frame, push, (pVMObject) Universe_new_double(result));
+}
+
+
 void  _Integer_asString(pVMObject object, pVMFrame frame) {
     pVMInteger self = (pVMInteger)SEND(frame, pop);
 
@@ -260,6 +270,7 @@ void Integer_fromString_(pVMObject object, pVMFrame frame) {
     pVMString self = (pVMString)SEND(frame, pop);
     SEND(frame, pop);
 
+    // TODO: make save using strncpy
     int64_t integer = atol(SEND(self, get_rawChars));
 
     SEND(frame, push, (pVMObject)Universe_new_integer(integer));

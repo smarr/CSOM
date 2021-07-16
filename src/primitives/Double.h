@@ -46,5 +46,6 @@ void  _Double_cos(pVMObject object, pVMFrame frame);
 void  _Double_sin(pVMObject object, pVMFrame frame);
 
 void  Double_PositiveInfinity(pVMObject object, pVMFrame frame);
+void  Double_fromString_(pVMObject object, pVMFrame frame);
 
 #endif // CORE_DOUBLE_H_

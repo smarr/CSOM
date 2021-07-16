@@ -96,6 +96,20 @@ void  _System_printString_(pVMObject object, pVMFrame frame) {
 }
 
 
+void  _System_errorPrint_(pVMObject object, pVMFrame frame) {
+    pVMString arg = (pVMString)SEND(frame, pop);
+    fprintf(stderr, "%s", SEND(arg, get_rawChars));
+    fflush(stderr);
+}
+
+
+void  _System_errorPrintln_(pVMObject object, pVMFrame frame) {
+    pVMString arg = (pVMString)SEND(frame, pop);
+    fprintf(stderr, "%s\n", SEND(arg, get_rawChars));
+    fflush(stderr);
+}
+
+
 void  _System_printNewline(pVMObject object, pVMFrame frame) {
     printf("\n");
     fflush(stdout);
@@ -127,6 +141,40 @@ void _System_fullGC(pVMObject object, pVMFrame frame) {
     SEND(frame, pop);
     gc_collect();
     SEND(frame, push, true_object);
+}
+
+void _System_loadFile_(pVMObject object, pVMFrame frame) {
+    pVMString fileName = (pVMString)SEND(frame, pop);
+
+    size_t fileNameLength = SEND(fileName, get_length);
+
+    char* c_fileName = internal_allocate(fileNameLength + 1);
+    strncpy(c_fileName, SEND(fileName, get_rawChars), fileNameLength);
+
+    FILE* fp = fopen(c_fileName, "r");
+    internal_free(c_fileName);
+
+    if (fp == NULL) {
+        SEND(frame, push, nil_object);
+        return;
+    }
+
+    char* buffer = NULL;
+    size_t fileLength;
+    ssize_t bytesRead = getdelim(&buffer, &fileLength, '\0', fp);
+    if (bytesRead == -1) {
+        SEND(frame, push, nil_object);
+        return;
+    }
+
+    SEND(frame, push, (pVMObject)VMString_new(buffer, fileLength));
+
+    free(buffer);
+}
+
+
+void  _System_printStackTrace(pVMObject object, pVMFrame frame) {
+    SEND(frame, print_stack_trace);
 }
 
 void __System_init(void) {

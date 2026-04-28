@@ -26,22 +26,22 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
         with:
           submodules: true
-      
+
       - name: Install Multilib
         if: matrix.bit == 32
         run: |
           sudo apt-get install libc6-dev-i386 gcc-multilib
-      
+
       - name: Tests
         run: |
           export COMPILER=${{ matrix.compiler }}
           export ARCH=${{ matrix.bit }}bit
           make test
         if: matrix.compiler != 'emcc'
-      
+
       - name: Load Emscripten
         uses: mymindstorm/setup-emsdk@v10
         with:
@@ -53,7 +53,7 @@ jobs:
           make emscripten
           ./som-em.sh -cp Smalltalk TestSuite/TestHarness.som
         if: matrix.compiler == 'emcc'
-      
+
       # - name: SomSom Tests
       #   run: |
       #     ./CSOM -cp core-lib/Smalltalk:core-lib/TestSuite:core-lib/SomSom/src/compiler:core-lib/SomSom/src/vm:core-lib/SomSom/src/vmobjects:core-lib/SomSom/src/interpreter:core-lib/SomSom/src/primitives \
@@ -64,7 +64,7 @@ jobs:
       #   with:
       #     repository: smarr/are-we-fast-yet
       #     path: are-we-fast-yet
-      
+
       # - name: AWFY Test Run
       #   run: |
       #     pwd

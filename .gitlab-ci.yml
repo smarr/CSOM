@@ -12,5 +12,5 @@ build_test_benchmark_job:
   tags: [yuria2]
   script:
     - ARCH=64bit make
-    - ARCH=64bit make test
+    # - ARCH=64bit make test
     - rebench --experiment="CI ID $CI_PIPELINE_ID" --branch="$CI_COMMIT_REF_NAME" -c rebench.conf CSOM

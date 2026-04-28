@@ -9,7 +9,7 @@ before_script:
 
 build_test_benchmark_job:
   stage: build-test-benchmark
-  tags: [benchmarks, infinity]
+  tags: [yuria2]
   script:
     - ARCH=64bit make
     - ARCH=64bit make test

@@ -61,8 +61,9 @@ With emscripten, it can run on Node.js as follows:
 Build Status
 ------------
 
-Thanks to Travis CI, all commits of this repository are tested.
-The current build status is: [![Build Status](https://travis-ci.org/SOM-st/CSOM.png?branch=master)](https://travis-ci.org/SOM-st/CSOM/)
+This repo has CI setups for GitLab CI and GitHub Actions.
+
+[![Build Status](https://github.com/SOM-st/CSOM/actions/workflows/ci.yml/badge.svg)](https://github.com/SOM-st/CSOM/actions)
 
  [SOM]: http://www.hpi.uni-potsdam.de/hirschfeld/projects/som/
  [SOMst]: https://travis-ci.org/SOM-st/
